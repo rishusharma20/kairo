@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/lib/generated/prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String
+  
+  isSuspended    Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  // Relations
+  subscription   Subscription?
+  sessions       Session[]
+  devices        Device[]
+  requestLogs    RequestLog[]
+}
+
+model Session {
+  token        String   @id
+  userId       String
+  deviceId     String?
+  expiresAt    DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Device {
+  id           String   @id @default(uuid())
+  userId       String
+  osInfo       String   
+  lastSync     DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id                  String  @id // 'FREE', 'PRO', 'ELITE'
+  name                String
+  priceMonthly        Float
+  dailyQueryLimit     Int     
+  priorityRouting     Boolean @default(false)
+  
+  subscriptions       Subscription[]
+}
+
+model Subscription {
+  userId           String   @id
+  planId           String
+  queriesUsedToday Int      @default(0)
+  expiresAt        DateTime?
+  
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan             Plan     @relation(fields: [planId], references: [id])
+}
+
+model RequestLog {
+  id           String   @id @default(uuid())
+  userId       String
+  queryType    String   // 'ask', 'page', 'text'
+  latencyMs    Int
+  statusCode   Int
+  timestamp    DateTime @default(now())
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdminConfig {
+  key          String   @id 
+  value        String
+  updatedAt    DateTime @updatedAt
+}
