@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -24,6 +24,10 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+    
+    // Lazily enforce plan expiration upon login
+    const { enforcePlanExpiration } = await import("@/lib/services/plan");
+    user = await enforcePlanExpiration(user.id) as typeof user;
 
     if (user.status === "BLOCKED") {
       return NextResponse.json(
@@ -50,8 +54,8 @@ export async function POST(request: Request) {
     await createSession({
       userId: user.id,
       email: user.email,
-      plan: user.plan as "FREE" | "PREMIUM",
-      status: user.status as "ACTIVE" | "BLOCKED" | "DELETED",
+      plan: user.plan,
+      status: user.status,
       createdAt: user.created_at.toISOString(),
     });
 

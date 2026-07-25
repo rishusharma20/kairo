@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { prisma } from '@/lib/db';
-import { blockUser, unblockUser, deleteUser, upgradeToPremiumAdmin, downgradeToFreeAdmin } from '@/lib/services/admin';
-import { releaseKeys, assignKeys } from '@/lib/services/keys';
+import { blockUser, unblockUser, deleteUser, changeUserTierAdmin } from '@/lib/services/admin';
+import { changeUserTier } from '@/lib/services/plan';
 import { upgradeToPremium, downgradeToFree } from '@/lib/services/plan';
 import { logSystemEventInBackground } from '@/lib/services/audit';
 import { withAdminValidation } from '@/lib/middlewares/withAdmin';

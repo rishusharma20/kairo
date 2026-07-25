@@ -2,7 +2,7 @@
 
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { searchUsers, blockUser, unblockUser, deleteUser, upgradeToPremiumAdmin, downgradeToFreeAdmin } from "@/lib/services/admin";
+import { searchUsers, blockUser, unblockUser, deleteUser, changeUserTierAdmin } from "@/lib/services/admin";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gmail.com";
 
@@ -35,7 +35,11 @@ export async function fetchUsersAction(query: { email?: string; id?: string; sta
 /**
  * Admin Actions (direct service calls)
  */
-export async function performAdminAction(userId: string, action: "block" | "unblock" | "upgrade" | "downgrade" | "delete") {
+export async function performAdminAction(
+  userId: string, 
+  action: "block" | "unblock" | "change_tier" | "delete",
+  options?: { targetPlan?: string, durationDays?: number | null }
+) {
   await requireAdmin();
   
   let result;
@@ -46,11 +50,9 @@ export async function performAdminAction(userId: string, action: "block" | "unbl
     case "unblock": 
       result = await unblockUser(userId); 
       break;
-    case "upgrade": 
-      result = await upgradeToPremiumAdmin(userId); 
-      break;
-    case "downgrade": 
-      result = await downgradeToFreeAdmin(userId); 
+    case "change_tier": 
+      if (!options?.targetPlan) throw new Error("targetPlan is required for change_tier");
+      result = await changeUserTierAdmin(userId, options.targetPlan, options.durationDays || null); 
       break;
     case "delete": 
       result = await deleteUser(userId); 

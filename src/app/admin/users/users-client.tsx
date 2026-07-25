@@ -5,15 +5,18 @@ import { fetchUsersAction, performAdminAction } from "./actions";
 import { Search, Filter, Shield, MoreVertical, X, AlertTriangle, Loader2, User as UserIcon, Mail, Crown, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const PLANS = ["FREE", "BASIC", "PRO", "PREMIUM", "ENTERPRISE"];
+
 type UserType = {
   id: string;
   full_name: string;
   email: string;
-  plan: "FREE" | "PREMIUM";
-  status: "ACTIVE" | "BLOCKED" | "DELETED";
+  plan: string;
+  status: string;
   daily_limit: number;
   requests_used: number;
   created_at: string;
+  plan_expires_at?: string | null;
 };
 
 export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
@@ -27,9 +30,13 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
 
   // Modal State
   const [viewUser, setViewUser] = useState<UserType | null>(null);
-  const [actionModal, setActionModal] = useState<{ type: string; user: UserType } | null>(null);
+  const [actionModal, setActionModal] = useState<{ type: string; user: UserType; targetPlan?: string; durationDays?: number | null } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  
+  // Change Tier Form State
+  const [selectedPlan, setSelectedPlan] = useState<string>("FREE");
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(30);
 
   // Handlers
   const handleSearch = async (e: React.FormEvent) => {
@@ -55,10 +62,16 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
     setErrorMsg("");
     
     try {
-      const result = await performAdminAction(actionModal.user.id, actionModal.type as any);
+      const targetPlan = actionModal.type === 'change_tier' ? selectedPlan : actionModal.targetPlan;
+      const durationDays = actionModal.type === 'change_tier' ? selectedDuration : actionModal.durationDays;
+      
+      const result = await performAdminAction(
+        actionModal.user.id, 
+        actionModal.type as any,
+        { targetPlan, durationDays }
+      );
       // Update local state smoothly
       setUsers(prev => prev.map(u => (u.id === actionModal.user.id ? { ...u, ...result } : u)));
-      // Also update viewUser if it's currently open
       if (viewUser && viewUser.id === actionModal.user.id) {
         setViewUser(prev => prev ? { ...prev, ...result } : null);
       }
@@ -68,6 +81,14 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const openChangeTierModal = (user: UserType) => {
+    const currentIdx = PLANS.indexOf(user.plan);
+    const defaultTarget = currentIdx < PLANS.length - 1 ? PLANS[currentIdx + 1] : PLANS[currentIdx - 1];
+    setSelectedPlan(defaultTarget);
+    setSelectedDuration(30);
+    setActionModal({ type: 'change_tier', user });
   };
 
   return (
@@ -109,8 +130,7 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
           className="w-full sm:w-auto bg-[var(--surface)]/50 border border-[var(--border)] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-accent text-text-primary"
         >
           <option value="">All Plans</option>
-          <option value="FREE">Free</option>
-          <option value="PREMIUM">Premium</option>
+          {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
 
         <button 
@@ -124,8 +144,6 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
 
       {/* Users List (Responsive) */}
       <div className="glass border border-[var(--border)] rounded-2xl overflow-hidden">
-        
-        {/* Desktop Table */}
         <div className="hidden lg:block w-full overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
@@ -155,7 +173,7 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider ${
-                        user.plan === 'PREMIUM' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-[var(--surface)] text-text-muted border border-[var(--border)]'
+                        user.plan !== 'FREE' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-[var(--surface)] text-text-muted border border-[var(--border)]'
                       }`}>
                         {user.plan}
                       </span>
@@ -207,7 +225,7 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                 
                 <div className="flex flex-wrap items-center gap-3">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider ${
-                    user.plan === 'PREMIUM' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-[var(--surface)] text-text-muted border border-[var(--border)]'
+                    user.plan !== 'FREE' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-[var(--surface)] text-text-muted border border-[var(--border)]'
                   }`}>
                     {user.plan}
                   </span>
@@ -229,7 +247,7 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
         </div>
       </div>
 
-      {/* View User Details Drawer/Modal */}
+      {/* View User Details Modal */}
       <AnimatePresence>
         {viewUser && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -242,7 +260,6 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="relative w-full max-w-lg glass border border-[var(--border)] rounded-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              {/* Header */}
               <div className="p-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--surface)]/50">
                 <h3 className="font-semibold text-text-primary flex items-center gap-2">
                   <UserIcon className="w-4 h-4 text-text-muted" /> User Details
@@ -252,7 +269,6 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                 </button>
               </div>
 
-              {/* Body */}
               <div className="p-6 overflow-y-auto space-y-6">
                 
                 {/* Info Grid */}
@@ -268,12 +284,14 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                   <div className="space-y-1">
                     <span className="text-[10px] uppercase tracking-wider text-text-muted">Plan</span>
                     <p className="text-sm font-bold mt-1">
-                      <span className={viewUser.plan === 'PREMIUM' ? 'text-accent' : 'text-text-muted'}>{viewUser.plan}</span>
+                      <span className={viewUser.plan !== 'FREE' ? 'text-accent' : 'text-text-muted'}>{viewUser.plan}</span>
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] uppercase tracking-wider text-text-muted">Status</span>
-                    <p className="text-sm font-medium mt-1 text-text-primary">{viewUser.status}</p>
+                    <span className="text-[10px] uppercase tracking-wider text-text-muted">Expires At</span>
+                    <p className="text-sm font-medium mt-1 text-text-primary">
+                      {viewUser.plan_expires_at ? new Date(viewUser.plan_expires_at).toLocaleDateString() : 'Never'}
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-[10px] uppercase tracking-wider text-text-muted">Usage Today</span>
@@ -290,8 +308,19 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                 {/* Actions Grid */}
                 <div className="space-y-3">
                   <h4 className="text-[10px] uppercase tracking-wider text-text-muted font-medium mb-4">Administrative Actions</h4>
+                  
+                  {/* Change Tier Button */}
+                  {viewUser.status !== "DELETED" && (
+                    <button 
+                      onClick={() => openChangeTierModal(viewUser)}
+                      className="w-full px-4 py-3 bg-accent/10 text-accent border border-accent/20 rounded-xl text-sm font-medium hover:bg-accent/20 transition-colors flex items-center justify-center gap-2 mb-4"
+                    >
+                      <Crown className="w-4 h-4" />
+                      Manage Subscription Tier
+                    </button>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    
                     {/* Status Actions */}
                     {viewUser.status === "ACTIVE" && (
                       <button 
@@ -321,24 +350,6 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                       <p className="text-xs text-destructive col-span-full border border-destructive/20 bg-destructive/10 p-2 rounded text-center">
                         User is DELETED. Restoration is not supported.
                       </p>
-                    )}
-
-                    {/* Plan Actions */}
-                    {viewUser.status !== "DELETED" && viewUser.plan === "FREE" && (
-                      <button 
-                        onClick={() => setActionModal({ type: 'upgrade', user: viewUser })}
-                        className="px-4 py-2 bg-accent/10 text-accent border border-accent/20 rounded-lg text-xs font-medium hover:bg-accent/20 transition-colors col-span-1"
-                      >
-                        Upgrade to Premium
-                      </button>
-                    )}
-                    {viewUser.status !== "DELETED" && viewUser.plan === "PREMIUM" && (
-                      <button 
-                        onClick={() => setActionModal({ type: 'downgrade', user: viewUser })}
-                        className="px-4 py-2 bg-[var(--surface)] text-text-muted border border-[var(--border)] rounded-lg text-xs font-medium hover:bg-[var(--surface)]/80 transition-colors col-span-1"
-                      >
-                        Downgrade to Free
-                      </button>
                     )}
                   </div>
                 </div>
@@ -370,23 +381,69 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                   <AlertTriangle className="w-8 h-8" />
                 </div>
                 
-                <div>
+                <div className="w-full">
                   <h3 className="text-lg font-semibold text-text-primary capitalize">
-                    {actionModal.type} User
+                    {actionModal.type.replace('_', ' ')}
                   </h3>
-                  <p className="text-sm text-text-muted mt-2">
-                    Are you sure you want to {actionModal.type} <span className="font-bold text-text-primary">{actionModal.user.email}</span>?
-                  </p>
-                  
-                  {actionModal.type === 'block' && (
-                    <p className="text-xs text-warning mt-2 bg-warning/5 p-2 rounded border border-warning/10">
-                      Active sessions will be terminated and all keys will be released.
-                    </p>
-                  )}
-                  {actionModal.type === 'delete' && (
-                    <p className="text-xs text-destructive mt-2 bg-destructive/5 p-2 rounded border border-destructive/10">
-                      This action is permanent and cannot be reversed.
-                    </p>
+
+                  {actionModal.type === 'change_tier' ? (
+                    <div className="mt-4 space-y-4 text-left">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-text-muted">Target Tier</label>
+                        <select 
+                          value={selectedPlan}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setSelectedPlan(val);
+                            setActionModal({ ...actionModal, targetPlan: val });
+                          }}
+                          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-accent text-text-primary"
+                        >
+                          {PLANS.map((plan, idx) => {
+                            const currentIdx = PLANS.indexOf(actionModal.user.plan);
+                            // Ensure it's within 2 tiers up or down
+                            if (Math.abs(idx - currentIdx) <= 2) {
+                              return <option key={plan} value={plan}>{plan}</option>;
+                            }
+                            return null;
+                          })}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-text-muted">Duration</label>
+                        <select 
+                          value={selectedDuration || ""}
+                          onChange={(e) => {
+                            const val = e.target.value ? parseInt(e.target.value) : null;
+                            setSelectedDuration(val);
+                            setActionModal({ ...actionModal, durationDays: val });
+                          }}
+                          disabled={selectedPlan === "FREE"}
+                          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-accent text-text-primary disabled:opacity-50"
+                        >
+                          <option value="7">7 Days</option>
+                          <option value="30">30 Days</option>
+                          <option value="">Indefinitely (No Expiry)</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-text-muted mt-2">
+                        Are you sure you want to {actionModal.type} <span className="font-bold text-text-primary">{actionModal.user.email}</span>?
+                      </p>
+                      {actionModal.type === 'block' && (
+                        <p className="text-xs text-warning mt-2 bg-warning/5 p-2 rounded border border-warning/10">
+                          Active sessions will be terminated and all keys will be released.
+                        </p>
+                      )}
+                      {actionModal.type === 'delete' && (
+                        <p className="text-xs text-destructive mt-2 bg-destructive/5 p-2 rounded border border-destructive/10">
+                          This action is permanent and cannot be reversed.
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>

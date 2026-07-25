@@ -2,15 +2,14 @@ import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { getTodayUTC } from "@/lib/services/usage";
 
+import { enforcePlanExpiration } from "@/lib/services/plan";
+
 /**
  * Deduplicates database queries across Next.js Server Components.
- * If layout.tsx and page.tsx both call this function in the same render pass,
- * the database is only hit once.
+ * Also lazily enforces plan expiration.
  */
 export const getCachedUser = cache(async (userId: string) => {
-  return await prisma.user.findUnique({
-    where: { id: userId },
-  });
+  return await enforcePlanExpiration(userId);
 });
 
 /**

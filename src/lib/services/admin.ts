@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client/client";
 import { assignKeys, releaseKeys } from "@/lib/services/keys";
 import { logSystemEventInBackground } from "@/lib/services/audit";
-import { upgradeToPremium, downgradeToFree } from "@/lib/services/plan";
+import { changeUserTier } from "@/lib/services/plan";
 import { getTodayUTC } from "@/lib/services/usage";
 
 // --------------------------------------------------------
@@ -63,25 +63,20 @@ export async function deleteUser(userId: string) {
   return updated;
 }
 
-export async function upgradeToPremiumAdmin(userId: string) {
+export async function changeUserTierAdmin(userId: string, targetPlan: string, durationDays: number | null) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
   if (user.status === "DELETED") throw new Error("Invalid user state");
-  if (user.plan === "PREMIUM") throw new Error("User is already premium");
 
-  const updated = await upgradeToPremium(userId);
-  logSystemEventInBackground("PLAN_UPGRADED", userId, { plan: "PREMIUM", adminAction: true });
-  return updated;
-}
-
-export async function downgradeToFreeAdmin(userId: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new Error("User not found");
-  if (user.status === "DELETED") throw new Error("Invalid user state");
-  if (user.plan === "FREE") throw new Error("User is already free");
-
-  const updated = await downgradeToFree(userId);
-  logSystemEventInBackground("PLAN_DOWNGRADED", userId, { plan: "FREE", adminAction: true });
+  // Typecast to PlanTier (validation happens inside changeUserTier)
+  const updated = await changeUserTier(userId, targetPlan as any, durationDays);
+  
+  logSystemEventInBackground("PLAN_CHANGED", userId, { 
+    plan: targetPlan, 
+    durationDays, 
+    adminAction: true 
+  });
+  
   return updated;
 }
 

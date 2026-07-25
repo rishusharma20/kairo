@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { upgradeToPremium } from "@/lib/services/plan";
+import { changeUserTier } from "@/lib/services/plan";
 import { logSystemEvent } from "@/lib/services/audit";
 
 export async function getPaymentRequests(statusFilter?: "PENDING" | "APPROVED" | "REJECTED") {
@@ -50,7 +50,7 @@ export async function approvePayment(paymentRequestId: string, adminId: string) 
   if (metadata.status !== "PENDING") throw new Error("Payment request is already processed");
 
   // 2. Perform existing Upgrade Logic
-  await upgradeToPremium(log.user_id);
+  await changeUserTier(log.user_id, "PREMIUM", 30);
 
   // 3. Mark as Approved
   metadata.status = "APPROVED";

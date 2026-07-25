@@ -34,6 +34,7 @@ model User {
   
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
+  plan_expires_at DateTime?
 
   // Relationships
   assigned_keys  GeminiKey[]         @relation("AssignedKeys")
