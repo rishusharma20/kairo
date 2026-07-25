@@ -96,7 +96,7 @@ export function HeroSection() {
         >
           <div className="flex items-center gap-3">
             <kbd className="px-5 py-3 rounded-2xl glass-strong text-text-primary font-mono text-xl tracking-widest border border-[var(--border)] hover:border-accent/40 transition-colors cursor-default shadow-lg">
-              {isMac ? "⌥" : "Alt"} + X
+              {isMac ? "⌥" : "Alt"} + D
             </kbd>
           </div>
           <span className="text-text-muted text-sm tracking-widest uppercase font-light mt-2">to invoke intelligence</span>

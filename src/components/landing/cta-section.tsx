@@ -46,7 +46,7 @@ export function CTASection() {
           >
             <span>Start Thinking</span>
             <kbd className="text-xs px-2 py-1 rounded-lg bg-accent/10 border border-accent/20 font-mono">
-              ⌥X
+              ⌥D
             </kbd>
           </Link>
         </motion.div>
