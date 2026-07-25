@@ -83,7 +83,7 @@ export function Navbar() {
             >
               <span>Get Started</span>
               <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-accent/10 border border-accent/20 font-mono">
-                ⌥X
+                ⌥D
               </kbd>
             </Link>
 
