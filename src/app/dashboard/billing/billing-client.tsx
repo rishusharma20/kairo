@@ -160,7 +160,7 @@ export default function BillingClient({ user }: BillingClientProps) {
                         }`}
                       >
                         <span className="font-bold">7 Days</span>
-                        <span className="text-xs opacity-80 mt-1">$9.99</span>
+                        <span className="text-xs opacity-80 mt-1">₹500</span>
                       </button>
                       <button 
                         type="button"
@@ -170,7 +170,7 @@ export default function BillingClient({ user }: BillingClientProps) {
                         }`}
                       >
                         <span className="font-bold">30 Days</span>
-                        <span className="text-xs opacity-80 mt-1">$29.99</span>
+                        <span className="text-xs opacity-80 mt-1">₹1500</span>
                       </button>
                     </div>
                   </div>
