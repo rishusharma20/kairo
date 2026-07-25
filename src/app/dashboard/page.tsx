@@ -45,13 +45,13 @@ export default async function DashboardHome() {
         
         {/* Plan Card */}
         <div className="p-6 rounded-2xl glass border-[var(--border)] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <h2 className="text-text-muted text-sm font-medium tracking-wide uppercase mb-6">Current Plan</h2>
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          <h2 className="relative z-10 text-text-muted text-sm font-medium tracking-wide uppercase mb-6">Current Plan</h2>
           
-          <div className="space-y-1">
+          <div className="relative z-10 space-y-1">
             <h3 className="text-3xl font-bold tracking-tight">
-              <span className={user.plan === "PREMIUM" ? "gradient-text-gold" : "text-text-primary"}>
-                {user.plan}
+              <span className={user.plan.includes("PREMIUM") ? "gradient-text-gold" : "text-text-primary"}>
+                {user.plan.replace(/_/g, " ")}
               </span>
             </h3>
             <p className="text-sm text-text-muted">
@@ -60,7 +60,7 @@ export default async function DashboardHome() {
           </div>
 
           {user.plan === "FREE" && (
-            <div className="mt-8">
+            <div className="relative z-10 mt-8">
               <Link 
                 href="/dashboard/billing"
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-accent/10 text-accent text-sm font-medium border border-accent/20 hover:bg-accent/20 transition-colors w-full sm:w-auto"

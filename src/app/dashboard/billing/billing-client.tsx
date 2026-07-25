@@ -55,9 +55,9 @@ export default function BillingClient({ user }: BillingClientProps) {
 
       {/* Plan Card */}
       <div className="p-8 rounded-2xl glass border-[var(--border)] relative overflow-hidden group max-w-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-4">
             <h2 className="text-text-muted text-sm font-medium tracking-wide uppercase flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
