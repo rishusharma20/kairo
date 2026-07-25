@@ -60,19 +60,19 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      const res = await fetch("/api/auth/otp", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+      if (!res.ok) throw new Error(data.error || "Login failed");
       
       setLoading(false);
-      setState("otp");
+      startLoaderSequence(); // Skip OTP, login is successful
     } catch (err: any) {
       setLoading(false);
-      setError(err.message || "Something went wrong.");
+      setError(err.message || "Invalid credentials.");
     }
   };
 
