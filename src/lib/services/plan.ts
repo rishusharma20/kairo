@@ -3,40 +3,39 @@ import { assignKeys, releaseKeys } from "@/lib/services/keys";
 
 export const PLANS = [
   "FREE",
-  "BASIC",
-  "PRO",
-  "PREMIUM",
-  "ENTERPRISE"
+  "PREMIUM_7_DAYS",
+  "PREMIUM_30_DAYS"
 ] as const;
 
 export type PlanTier = typeof PLANS[number];
 
 export const PLAN_CONFIGS: Record<PlanTier, { dailyLimit: number; keysRequired: number }> = {
   FREE: { dailyLimit: 1, keysRequired: 1 },
-  BASIC: { dailyLimit: 500, keysRequired: 1 },
-  PRO: { dailyLimit: 1500, keysRequired: 2 },
-  PREMIUM: { dailyLimit: 3000, keysRequired: 3 },
-  ENTERPRISE: { dailyLimit: 10000, keysRequired: 5 },
+  PREMIUM_7_DAYS: { dailyLimit: 3000, keysRequired: 3 },
+  PREMIUM_30_DAYS: { dailyLimit: 3000, keysRequired: 3 },
 };
 
 /**
  * Change a user's subscription tier, adjusting limits and API keys automatically.
  */
-export async function changeUserTier(userId: string, targetPlan: PlanTier, durationDays: number | null = null) {
+export async function changeUserTier(userId: string, targetPlan: PlanTier, _ignoredDuration: number | null = null) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
 
-  const currentPlan = user.plan as PlanTier;
+  const currentPlan = (user.plan as PlanTier) || "FREE";
   const currentConfig = PLAN_CONFIGS[currentPlan] || PLAN_CONFIGS.FREE;
   const targetConfig = PLAN_CONFIGS[targetPlan];
 
   if (!targetConfig) throw new Error(`Invalid plan: ${targetPlan}`);
 
-  // Calculate Expiration
+  // Calculate Expiration based entirely on the Tier name
   let planExpiresAt: Date | null = null;
-  if (targetPlan !== "FREE" && durationDays) {
+  if (targetPlan === "PREMIUM_7_DAYS") {
     planExpiresAt = new Date();
-    planExpiresAt.setDate(planExpiresAt.getDate() + durationDays);
+    planExpiresAt.setDate(planExpiresAt.getDate() + 7);
+  } else if (targetPlan === "PREMIUM_30_DAYS") {
+    planExpiresAt = new Date();
+    planExpiresAt.setDate(planExpiresAt.getDate() + 30);
   }
 
   // Determine Key Delta

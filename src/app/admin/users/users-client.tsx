@@ -5,7 +5,7 @@ import { fetchUsersAction, performAdminAction } from "./actions";
 import { Search, Filter, Shield, MoreVertical, X, AlertTriangle, Loader2, User as UserIcon, Mail, Crown, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const PLANS = ["FREE", "BASIC", "PRO", "PREMIUM", "ENTERPRISE"];
+const PLANS = ["FREE", "PREMIUM_7_DAYS", "PREMIUM_30_DAYS"];
 
 type UserType = {
   id: string;
@@ -30,13 +30,12 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
 
   // Modal State
   const [viewUser, setViewUser] = useState<UserType | null>(null);
-  const [actionModal, setActionModal] = useState<{ type: string; user: UserType; targetPlan?: string; durationDays?: number | null } | null>(null);
+  const [actionModal, setActionModal] = useState<{ type: string; user: UserType; targetPlan?: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   
   // Change Tier Form State
   const [selectedPlan, setSelectedPlan] = useState<string>("FREE");
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(30);
 
   // Handlers
   const handleSearch = async (e: React.FormEvent) => {
@@ -63,12 +62,11 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
     
     try {
       const targetPlan = actionModal.type === 'change_tier' ? selectedPlan : actionModal.targetPlan;
-      const durationDays = actionModal.type === 'change_tier' ? selectedDuration : actionModal.durationDays;
       
       const result = await performAdminAction(
         actionModal.user.id, 
         actionModal.type as any,
-        { targetPlan, durationDays }
+        { targetPlan }
       );
       // Update local state smoothly
       setUsers(prev => prev.map(u => (u.id === actionModal.user.id ? { ...u, ...result } : u)));
@@ -87,7 +85,6 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
     const currentIdx = PLANS.indexOf(user.plan);
     const defaultTarget = currentIdx < PLANS.length - 1 ? PLANS[currentIdx + 1] : PLANS[currentIdx - 1];
     setSelectedPlan(defaultTarget);
-    setSelectedDuration(30);
     setActionModal({ type: 'change_tier', user });
   };
 
@@ -399,32 +396,9 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
                           }}
                           className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-accent text-text-primary"
                         >
-                          {PLANS.map((plan, idx) => {
-                            const currentIdx = PLANS.indexOf(actionModal.user.plan);
-                            // Ensure it's within 2 tiers up or down
-                            if (Math.abs(idx - currentIdx) <= 2) {
-                              return <option key={plan} value={plan}>{plan}</option>;
-                            }
-                            return null;
-                          })}
-                        </select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-text-muted">Duration</label>
-                        <select 
-                          value={selectedDuration || ""}
-                          onChange={(e) => {
-                            const val = e.target.value ? parseInt(e.target.value) : null;
-                            setSelectedDuration(val);
-                            setActionModal({ ...actionModal, durationDays: val });
-                          }}
-                          disabled={selectedPlan === "FREE"}
-                          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-accent text-text-primary disabled:opacity-50"
-                        >
-                          <option value="7">7 Days</option>
-                          <option value="30">30 Days</option>
-                          <option value="">Indefinitely (No Expiry)</option>
+                          {PLANS.map((plan) => (
+                            <option key={plan} value={plan}>{plan.replace(/_/g, ' ')}</option>
+                          ))}
                         </select>
                       </div>
                     </div>

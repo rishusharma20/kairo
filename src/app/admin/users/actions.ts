@@ -38,7 +38,7 @@ export async function fetchUsersAction(query: { email?: string; id?: string; sta
 export async function performAdminAction(
   userId: string, 
   action: "block" | "unblock" | "change_tier" | "delete",
-  options?: { targetPlan?: string, durationDays?: number | null }
+  options?: { targetPlan?: string }
 ) {
   await requireAdmin();
   
@@ -52,7 +52,7 @@ export async function performAdminAction(
       break;
     case "change_tier": 
       if (!options?.targetPlan) throw new Error("targetPlan is required for change_tier");
-      result = await changeUserTierAdmin(userId, options.targetPlan, options.durationDays || null); 
+      result = await changeUserTierAdmin(userId, options.targetPlan, null); 
       break;
     case "delete": 
       result = await deleteUser(userId); 
