@@ -1,11 +1,10 @@
 "use server";
 
 import { getSession } from "@/lib/auth";
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { searchUsers, blockUser, unblockUser, deleteUser, upgradeToPremiumAdmin, downgradeToFreeAdmin } from "@/lib/services/admin";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gmail.com";
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "kairo-local-admin-key";
 
 /**
  * Validates that the current caller is an authenticated admin.
@@ -18,70 +17,53 @@ async function requireAdmin() {
 }
 
 /**
- * Constructs the base URL dynamically so fetch calls work in any environment
- * without hardcoding localhost.
- */
-async function getBaseUrl() {
-  const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3000";
-  const protocol = host.includes("localhost") ? "http" : "https";
-  return `${protocol}://${host}`;
-}
-
-/**
- * Proxy: Fetch Users
+ * Fetch Users (direct service call)
  */
 export async function fetchUsersAction(query: { email?: string; id?: string; status?: string; plan?: string } = {}) {
   await requireAdmin();
-  const baseUrl = await getBaseUrl();
   
-  const params = new URLSearchParams();
-  if (query.email) params.append("email", query.email);
-  if (query.id) params.append("id", query.id);
-  if (query.status) params.append("status", query.status);
-  if (query.plan) params.append("plan", query.plan);
+  // Call the database service directly instead of fetching from our own API
+  const users = await searchUsers(query);
   
-  const url = `${baseUrl}/api/admin/users${params.toString() ? `?${params.toString()}` : ""}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "x-admin-key": ADMIN_API_KEY
-    },
-    cache: "no-store"
-  });
-
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || "Failed to fetch users");
-  return json.data;
+  // Serialize dates to prevent Next.js Server Actions serialization errors
+  return users.map(user => ({
+    ...user,
+    created_at: user.created_at.toISOString(),
+  }));
 }
 
 /**
- * Proxy: Admin Actions (Block, Unblock, Upgrade, Downgrade, Delete)
+ * Admin Actions (direct service calls)
  */
 export async function performAdminAction(userId: string, action: "block" | "unblock" | "upgrade" | "downgrade" | "delete") {
   await requireAdmin();
-  const baseUrl = await getBaseUrl();
   
-  // Maps the action to the exact frozen endpoints
-  const isDelete = action === "delete";
-  const endpoint = isDelete 
-    ? `${baseUrl}/api/admin/users/${userId}` 
-    : `${baseUrl}/api/admin/users/${userId}/${action}`;
-
-  const res = await fetch(endpoint, {
-    method: isDelete ? "DELETE" : "POST",
-    headers: {
-      "x-admin-key": ADMIN_API_KEY
-    },
-    cache: "no-store"
-  });
-
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `Failed to ${action} user`);
+  let result;
+  switch (action) {
+    case "block": 
+      result = await blockUser(userId); 
+      break;
+    case "unblock": 
+      result = await unblockUser(userId); 
+      break;
+    case "upgrade": 
+      result = await upgradeToPremiumAdmin(userId); 
+      break;
+    case "downgrade": 
+      result = await downgradeToFreeAdmin(userId); 
+      break;
+    case "delete": 
+      result = await deleteUser(userId); 
+      break;
+    default: 
+      throw new Error("Invalid action");
+  }
   
-  // Phase 5: Revalidate entire admin layout to ensure Overview and Audit Logs reflect mutations
   revalidatePath('/admin', 'layout');
   
-  return json.data;
+  return {
+    ...result,
+    created_at: result.created_at.toISOString(),
+    updated_at: result.updated_at.toISOString()
+  };
 }
