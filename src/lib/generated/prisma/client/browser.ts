@@ -23,32 +23,22 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
- * Model Session
+ * Model GeminiKey
  * 
  */
-export type Session = Prisma.SessionModel
+export type GeminiKey = Prisma.GeminiKeyModel
 /**
- * Model Device
+ * Model UserKeyAssignment
  * 
  */
-export type Device = Prisma.DeviceModel
+export type UserKeyAssignment = Prisma.UserKeyAssignmentModel
 /**
- * Model Plan
+ * Model DailyUsage
  * 
  */
-export type Plan = Prisma.PlanModel
+export type DailyUsage = Prisma.DailyUsageModel
 /**
- * Model Subscription
+ * Model AuditLog
  * 
  */
-export type Subscription = Prisma.SubscriptionModel
-/**
- * Model RequestLog
- * 
- */
-export type RequestLog = Prisma.RequestLogModel
-/**
- * Model AdminConfig
- * 
- */
-export type AdminConfig = Prisma.AdminConfigModel
+export type AuditLog = Prisma.AuditLogModel

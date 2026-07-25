@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { verifySession } from '@/lib/auth'
 
 const protectedRoutes = ['/dashboard', '/admin']
-const authRoutes = ['/auth/login', '/auth/verify']
+const authRoutes = ['/auth/login', '/auth/register']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -25,6 +25,13 @@ export async function middleware(request: NextRequest) {
   // Redirect to login if trying to access protected route without valid session
   if (isProtectedRoute && !session) {
     const url = new URL('/auth/login', request.url)
+    return NextResponse.redirect(url)
+  }
+
+  // Enforce V2 status requirements for protected routes
+  if (isProtectedRoute && session && (session.status === 'BLOCKED' || session.status === 'DELETED')) {
+    const url = new URL('/auth/login', request.url)
+    // Optionally we can append a query param like ?error=blocked to inform the user
     return NextResponse.redirect(url)
   }
 

@@ -12,7 +12,8 @@ const SESSION_COOKIE_NAME = "kairo_session";
 export interface SessionPayload {
   userId: string;
   email: string;
-  tier: "FREE" | "PRO" | "ELITE";
+  plan: "FREE" | "PREMIUM";
+  status: "ACTIVE" | "BLOCKED" | "DELETED";
   createdAt: string;
 }
 

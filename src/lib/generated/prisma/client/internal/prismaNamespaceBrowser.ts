@@ -52,12 +52,10 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Session: 'Session',
-  Device: 'Device',
-  Plan: 'Plan',
-  Subscription: 'Subscription',
-  RequestLog: 'RequestLog',
-  AdminConfig: 'AdminConfig'
+  GeminiKey: 'GeminiKey',
+  UserKeyAssignment: 'UserKeyAssignment',
+  DailyUsage: 'DailyUsage',
+  AuditLog: 'AuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,75 +73,69 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  full_name: 'full_name',
   email: 'email',
-  name: 'name',
-  isSuspended: 'isSuspended',
-  createdAt: 'createdAt'
+  password_hash: 'password_hash',
+  plan: 'plan',
+  status: 'status',
+  daily_limit: 'daily_limit',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const SessionScalarFieldEnum = {
-  token: 'token',
-  userId: 'userId',
-  deviceId: 'deviceId',
-  expiresAt: 'expiresAt'
-} as const
-
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-export const DeviceScalarFieldEnum = {
+export const GeminiKeyScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  osInfo: 'osInfo',
-  lastSync: 'lastSync'
+  encrypted_api_key: 'encrypted_api_key',
+  status: 'status',
+  assigned_user_id: 'assigned_user_id',
+  priority: 'priority',
+  last_used_at: 'last_used_at',
+  failure_count: 'failure_count',
+  cooldown_until: 'cooldown_until',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
-export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof DeviceScalarFieldEnum]
+export type GeminiKeyScalarFieldEnum = (typeof GeminiKeyScalarFieldEnum)[keyof typeof GeminiKeyScalarFieldEnum]
 
 
-export const PlanScalarFieldEnum = {
+export const UserKeyAssignmentScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  priceMonthly: 'priceMonthly',
-  dailyQueryLimit: 'dailyQueryLimit',
-  priorityRouting: 'priorityRouting'
+  user_id: 'user_id',
+  gemini_key_id: 'gemini_key_id',
+  assigned_at: 'assigned_at',
+  released_at: 'released_at',
+  release_reason: 'release_reason'
 } as const
 
-export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
+export type UserKeyAssignmentScalarFieldEnum = (typeof UserKeyAssignmentScalarFieldEnum)[keyof typeof UserKeyAssignmentScalarFieldEnum]
 
 
-export const SubscriptionScalarFieldEnum = {
-  userId: 'userId',
-  planId: 'planId',
-  queriesUsedToday: 'queriesUsedToday',
-  expiresAt: 'expiresAt'
-} as const
-
-export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
-
-
-export const RequestLogScalarFieldEnum = {
+export const DailyUsageScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  queryType: 'queryType',
-  latencyMs: 'latencyMs',
-  statusCode: 'statusCode',
-  timestamp: 'timestamp'
+  user_id: 'user_id',
+  usage_date: 'usage_date',
+  requests_used: 'requests_used',
+  daily_limit: 'daily_limit',
+  updated_at: 'updated_at'
 } as const
 
-export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
+export type DailyUsageScalarFieldEnum = (typeof DailyUsageScalarFieldEnum)[keyof typeof DailyUsageScalarFieldEnum]
 
 
-export const AdminConfigScalarFieldEnum = {
-  key: 'key',
-  value: 'value',
-  updatedAt: 'updatedAt'
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  user_id: 'user_id',
+  admin_id: 'admin_id',
+  metadata: 'metadata',
+  created_at: 'created_at'
 } as const
 
-export type AdminConfigScalarFieldEnum = (typeof AdminConfigScalarFieldEnum)[keyof typeof AdminConfigScalarFieldEnum]
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -26,9 +26,14 @@ interface SidebarProps {
   items: readonly NavItem[];
   title?: string;
   badge?: string;
+  user?: {
+    name: string;
+    email: string;
+    plan: string;
+  };
 }
 
-export function Sidebar({ items, title = "KAIRO", badge }: SidebarProps) {
+export function Sidebar({ items, title = "KAIRO", badge, user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -139,8 +144,8 @@ export function Sidebar({ items, title = "KAIRO", badge }: SidebarProps) {
                   exit={{ opacity: 0 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-text-primary text-sm truncate">Alex Chen</p>
-                  <p className="text-text-muted text-xs truncate">Pro Plan</p>
+                  <p className="text-text-primary text-sm truncate">{user?.name || "User"}</p>
+                  <p className="text-text-muted text-xs truncate capitalize">{user?.plan?.toLowerCase() || "Free"} Plan</p>
                 </motion.div>
               )}
             </AnimatePresence>

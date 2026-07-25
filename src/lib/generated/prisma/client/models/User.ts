@@ -20,58 +20,100 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
 
+export type UserAvgAggregateOutputType = {
+  daily_limit: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  daily_limit: number | null
+}
+
 export type UserMinAggregateOutputType = {
   id: string | null
+  full_name: string | null
   email: string | null
-  name: string | null
-  isSuspended: boolean | null
-  createdAt: Date | null
+  password_hash: string | null
+  plan: string | null
+  status: string | null
+  daily_limit: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: string | null
+  full_name: string | null
   email: string | null
-  name: string | null
-  isSuspended: boolean | null
-  createdAt: Date | null
+  password_hash: string | null
+  plan: string | null
+  status: string | null
+  daily_limit: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
+  full_name: number
   email: number
-  name: number
-  isSuspended: number
-  createdAt: number
+  password_hash: number
+  plan: number
+  status: number
+  daily_limit: number
+  created_at: number
+  updated_at: number
   _all: number
 }
 
 
+export type UserAvgAggregateInputType = {
+  daily_limit?: true
+}
+
+export type UserSumAggregateInputType = {
+  daily_limit?: true
+}
+
 export type UserMinAggregateInputType = {
   id?: true
+  full_name?: true
   email?: true
-  name?: true
-  isSuspended?: true
-  createdAt?: true
+  password_hash?: true
+  plan?: true
+  status?: true
+  daily_limit?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
+  full_name?: true
   email?: true
-  name?: true
-  isSuspended?: true
-  createdAt?: true
+  password_hash?: true
+  plan?: true
+  status?: true
+  daily_limit?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
+  full_name?: true
   email?: true
-  name?: true
-  isSuspended?: true
-  createdAt?: true
+  password_hash?: true
+  plan?: true
+  status?: true
+  daily_limit?: true
+  created_at?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -113,6 +155,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -143,17 +197,25 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
 
 export type UserGroupByOutputType = {
   id: string
+  full_name: string
   email: string
-  name: string
-  isSuspended: boolean
-  createdAt: Date
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at: Date
+  updated_at: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -178,26 +240,34 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
+  full_name?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  name?: Prisma.StringFilter<"User"> | string
-  isSuspended?: Prisma.BoolFilter<"User"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
-  sessions?: Prisma.SessionListRelationFilter
-  devices?: Prisma.DeviceListRelationFilter
-  requestLogs?: Prisma.RequestLogListRelationFilter
+  password_hash?: Prisma.StringFilter<"User"> | string
+  plan?: Prisma.StringFilter<"User"> | string
+  status?: Prisma.StringFilter<"User"> | string
+  daily_limit?: Prisma.IntFilter<"User"> | number
+  created_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  assigned_keys?: Prisma.GeminiKeyListRelationFilter
+  assignments?: Prisma.UserKeyAssignmentListRelationFilter
+  daily_usages?: Prisma.DailyUsageListRelationFilter
+  audit_logs?: Prisma.AuditLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  full_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  isSuspended?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  subscription?: Prisma.SubscriptionOrderByWithRelationInput
-  sessions?: Prisma.SessionOrderByRelationAggregateInput
-  devices?: Prisma.DeviceOrderByRelationAggregateInput
-  requestLogs?: Prisma.RequestLogOrderByRelationAggregateInput
+  password_hash?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  daily_limit?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  assigned_keys?: Prisma.GeminiKeyOrderByRelationAggregateInput
+  assignments?: Prisma.UserKeyAssignmentOrderByRelationAggregateInput
+  daily_usages?: Prisma.DailyUsageOrderByRelationAggregateInput
+  audit_logs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -206,24 +276,34 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  name?: Prisma.StringFilter<"User"> | string
-  isSuspended?: Prisma.BoolFilter<"User"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
-  sessions?: Prisma.SessionListRelationFilter
-  devices?: Prisma.DeviceListRelationFilter
-  requestLogs?: Prisma.RequestLogListRelationFilter
+  full_name?: Prisma.StringFilter<"User"> | string
+  password_hash?: Prisma.StringFilter<"User"> | string
+  plan?: Prisma.StringFilter<"User"> | string
+  status?: Prisma.StringFilter<"User"> | string
+  daily_limit?: Prisma.IntFilter<"User"> | number
+  created_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  assigned_keys?: Prisma.GeminiKeyListRelationFilter
+  assignments?: Prisma.UserKeyAssignmentListRelationFilter
+  daily_usages?: Prisma.DailyUsageListRelationFilter
+  audit_logs?: Prisma.AuditLogListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  full_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  isSuspended?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  daily_limit?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -231,106 +311,163 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
+  full_name?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
-  name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  isSuspended?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  password_hash?: Prisma.StringWithAggregatesFilter<"User"> | string
+  plan?: Prisma.StringWithAggregatesFilter<"User"> | string
+  status?: Prisma.StringWithAggregatesFilter<"User"> | string
+  daily_limit?: Prisma.IntWithAggregatesFilter<"User"> | number
+  created_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  updated_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
 export type UserCreateInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogUncheckedCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUncheckedUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  full_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  isSuspended?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  daily_limit?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  daily_limit?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  full_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  isSuspended?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  daily_limit?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  full_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  isSuspended?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  daily_limit?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  daily_limit?: Prisma.SortOrder
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type UserScalarRelationFilter = {
@@ -342,308 +479,380 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type UserCreateNestedOneWithoutSessionsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
+export type UserCreateNestedOneWithoutAssigned_keysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssigned_keysInput, Prisma.UserUncheckedCreateWithoutAssigned_keysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssigned_keysInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
-  upsert?: Prisma.UserUpsertWithoutSessionsInput
+export type UserUpdateOneWithoutAssigned_keysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssigned_keysInput, Prisma.UserUncheckedCreateWithoutAssigned_keysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssigned_keysInput
+  upsert?: Prisma.UserUpsertWithoutAssigned_keysInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssigned_keysInput, Prisma.UserUpdateWithoutAssigned_keysInput>, Prisma.UserUncheckedUpdateWithoutAssigned_keysInput>
 }
 
-export type UserCreateNestedOneWithoutDevicesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDevicesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutDevicesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDevicesInput
-  upsert?: Prisma.UserUpsertWithoutDevicesInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDevicesInput, Prisma.UserUpdateWithoutDevicesInput>, Prisma.UserUncheckedUpdateWithoutDevicesInput>
-}
-
-export type UserCreateNestedOneWithoutSubscriptionInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionInput
+export type UserCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutSubscriptionNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionInput
-  upsert?: Prisma.UserUpsertWithoutSubscriptionInput
+export type UserUpdateOneRequiredWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutAssignmentsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubscriptionInput, Prisma.UserUpdateWithoutSubscriptionInput>, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.UserUpdateWithoutAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
 }
 
-export type UserCreateNestedOneWithoutRequestLogsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutRequestLogsInput, Prisma.UserUncheckedCreateWithoutRequestLogsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRequestLogsInput
+export type UserCreateNestedOneWithoutDaily_usagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDaily_usagesInput, Prisma.UserUncheckedCreateWithoutDaily_usagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDaily_usagesInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutRequestLogsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutRequestLogsInput, Prisma.UserUncheckedCreateWithoutRequestLogsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRequestLogsInput
-  upsert?: Prisma.UserUpsertWithoutRequestLogsInput
+export type UserUpdateOneRequiredWithoutDaily_usagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDaily_usagesInput, Prisma.UserUncheckedCreateWithoutDaily_usagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDaily_usagesInput
+  upsert?: Prisma.UserUpsertWithoutDaily_usagesInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRequestLogsInput, Prisma.UserUpdateWithoutRequestLogsInput>, Prisma.UserUncheckedUpdateWithoutRequestLogsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDaily_usagesInput, Prisma.UserUpdateWithoutDaily_usagesInput>, Prisma.UserUncheckedUpdateWithoutDaily_usagesInput>
 }
 
-export type UserCreateWithoutSessionsInput = {
+export type UserCreateNestedOneWithoutAudit_logsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAudit_logsInput, Prisma.UserUncheckedCreateWithoutAudit_logsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAudit_logsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAudit_logsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAudit_logsInput, Prisma.UserUncheckedCreateWithoutAudit_logsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAudit_logsInput
+  upsert?: Prisma.UserUpsertWithoutAudit_logsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAudit_logsInput, Prisma.UserUpdateWithoutAudit_logsInput>, Prisma.UserUncheckedUpdateWithoutAudit_logsInput>
+}
+
+export type UserCreateWithoutAssigned_keysInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
-  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutSessionsInput = {
+export type UserUncheckedCreateWithoutAssigned_keysInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
-  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogUncheckedCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutSessionsInput = {
+export type UserCreateOrConnectWithoutAssigned_keysInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssigned_keysInput, Prisma.UserUncheckedCreateWithoutAssigned_keysInput>
 }
 
-export type UserUpsertWithoutSessionsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+export type UserUpsertWithoutAssigned_keysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssigned_keysInput, Prisma.UserUncheckedUpdateWithoutAssigned_keysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssigned_keysInput, Prisma.UserUncheckedCreateWithoutAssigned_keysInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutSessionsInput = {
+export type UserUpdateToOneWithWhereWithoutAssigned_keysInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssigned_keysInput, Prisma.UserUncheckedUpdateWithoutAssigned_keysInput>
 }
 
-export type UserUpdateWithoutSessionsInput = {
+export type UserUpdateWithoutAssigned_keysInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
-  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutSessionsInput = {
+export type UserUncheckedUpdateWithoutAssigned_keysInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
-  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUncheckedUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutDevicesInput = {
+export type UserCreateWithoutAssignmentsInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
+  daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutDevicesInput = {
+export type UserUncheckedCreateWithoutAssignmentsInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogUncheckedCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
+  daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutDevicesInput = {
+export type UserCreateOrConnectWithoutAssignmentsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
 }
 
-export type UserUpsertWithoutDevicesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDevicesInput, Prisma.UserUncheckedUpdateWithoutDevicesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+export type UserUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutDevicesInput = {
+export type UserUpdateToOneWithWhereWithoutAssignmentsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDevicesInput, Prisma.UserUncheckedUpdateWithoutDevicesInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
 }
 
-export type UserUpdateWithoutDevicesInput = {
+export type UserUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
+  daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutDevicesInput = {
+export type UserUncheckedUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUncheckedUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
+  daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutSubscriptionInput = {
+export type UserCreateWithoutDaily_usagesInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutSubscriptionInput = {
+export type UserUncheckedCreateWithoutDaily_usagesInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
-  requestLogs?: Prisma.RequestLogUncheckedCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutSubscriptionInput = {
+export type UserCreateOrConnectWithoutDaily_usagesInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDaily_usagesInput, Prisma.UserUncheckedCreateWithoutDaily_usagesInput>
 }
 
-export type UserUpsertWithoutSubscriptionInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionInput, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+export type UserUpsertWithoutDaily_usagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDaily_usagesInput, Prisma.UserUncheckedUpdateWithoutDaily_usagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDaily_usagesInput, Prisma.UserUncheckedCreateWithoutDaily_usagesInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutSubscriptionInput = {
+export type UserUpdateToOneWithWhereWithoutDaily_usagesInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionInput, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDaily_usagesInput, Prisma.UserUncheckedUpdateWithoutDaily_usagesInput>
 }
 
-export type UserUpdateWithoutSubscriptionInput = {
+export type UserUpdateWithoutDaily_usagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutSubscriptionInput = {
+export type UserUncheckedUpdateWithoutDaily_usagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
-  requestLogs?: Prisma.RequestLogUncheckedUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutRequestLogsInput = {
+export type UserCreateWithoutAudit_logsInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutRequestLogsInput = {
+export type UserUncheckedCreateWithoutAudit_logsInput = {
   id?: string
+  full_name: string
   email: string
-  name: string
-  isSuspended?: boolean
-  createdAt?: Date | string
-  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  password_hash: string
+  plan: string
+  status: string
+  daily_limit: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
+  daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutRequestLogsInput = {
+export type UserCreateOrConnectWithoutAudit_logsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutRequestLogsInput, Prisma.UserUncheckedCreateWithoutRequestLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAudit_logsInput, Prisma.UserUncheckedCreateWithoutAudit_logsInput>
 }
 
-export type UserUpsertWithoutRequestLogsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutRequestLogsInput, Prisma.UserUncheckedUpdateWithoutRequestLogsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutRequestLogsInput, Prisma.UserUncheckedCreateWithoutRequestLogsInput>
+export type UserUpsertWithoutAudit_logsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAudit_logsInput, Prisma.UserUncheckedUpdateWithoutAudit_logsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAudit_logsInput, Prisma.UserUncheckedCreateWithoutAudit_logsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutRequestLogsInput = {
+export type UserUpdateToOneWithWhereWithoutAudit_logsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutRequestLogsInput, Prisma.UserUncheckedUpdateWithoutRequestLogsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAudit_logsInput, Prisma.UserUncheckedUpdateWithoutAudit_logsInput>
 }
 
-export type UserUpdateWithoutRequestLogsInput = {
+export type UserUpdateWithoutAudit_logsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutRequestLogsInput = {
+export type UserUncheckedUpdateWithoutAudit_logsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
+  assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -652,15 +861,17 @@ export type UserUncheckedUpdateWithoutRequestLogsInput = {
  */
 
 export type UserCountOutputType = {
-  sessions: number
-  devices: number
-  requestLogs: number
+  assigned_keys: number
+  assignments: number
+  daily_usages: number
+  audit_logs: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  sessions?: boolean | UserCountOutputTypeCountSessionsArgs
-  devices?: boolean | UserCountOutputTypeCountDevicesArgs
-  requestLogs?: boolean | UserCountOutputTypeCountRequestLogsArgs
+  assigned_keys?: boolean | UserCountOutputTypeCountAssigned_keysArgs
+  assignments?: boolean | UserCountOutputTypeCountAssignmentsArgs
+  daily_usages?: boolean | UserCountOutputTypeCountDaily_usagesArgs
+  audit_logs?: boolean | UserCountOutputTypeCountAudit_logsArgs
 }
 
 /**
@@ -676,68 +887,91 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SessionWhereInput
+export type UserCountOutputTypeCountAssigned_keysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GeminiKeyWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DeviceWhereInput
+export type UserCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserKeyAssignmentWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountRequestLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.RequestLogWhereInput
+export type UserCountOutputTypeCountDaily_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DailyUsageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAudit_logsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
 }
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  full_name?: boolean
   email?: boolean
-  name?: boolean
-  isSuspended?: boolean
-  createdAt?: boolean
-  subscription?: boolean | Prisma.User$subscriptionArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
-  requestLogs?: boolean | Prisma.User$requestLogsArgs<ExtArgs>
+  password_hash?: boolean
+  plan?: boolean
+  status?: boolean
+  daily_limit?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  assigned_keys?: boolean | Prisma.User$assigned_keysArgs<ExtArgs>
+  assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
+  daily_usages?: boolean | Prisma.User$daily_usagesArgs<ExtArgs>
+  audit_logs?: boolean | Prisma.User$audit_logsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  full_name?: boolean
   email?: boolean
-  name?: boolean
-  isSuspended?: boolean
-  createdAt?: boolean
+  password_hash?: boolean
+  plan?: boolean
+  status?: boolean
+  daily_limit?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  full_name?: boolean
   email?: boolean
-  name?: boolean
-  isSuspended?: boolean
-  createdAt?: boolean
+  password_hash?: boolean
+  plan?: boolean
+  status?: boolean
+  daily_limit?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   id?: boolean
+  full_name?: boolean
   email?: boolean
-  name?: boolean
-  isSuspended?: boolean
-  createdAt?: boolean
+  password_hash?: boolean
+  plan?: boolean
+  status?: boolean
+  daily_limit?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "isSuspended" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "full_name" | "email" | "password_hash" | "plan" | "status" | "daily_limit" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subscription?: boolean | Prisma.User$subscriptionArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
-  requestLogs?: boolean | Prisma.User$requestLogsArgs<ExtArgs>
+  assigned_keys?: boolean | Prisma.User$assigned_keysArgs<ExtArgs>
+  assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
+  daily_usages?: boolean | Prisma.User$daily_usagesArgs<ExtArgs>
+  audit_logs?: boolean | Prisma.User$audit_logsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -746,17 +980,21 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
-    sessions: Prisma.$SessionPayload<ExtArgs>[]
-    devices: Prisma.$DevicePayload<ExtArgs>[]
-    requestLogs: Prisma.$RequestLogPayload<ExtArgs>[]
+    assigned_keys: Prisma.$GeminiKeyPayload<ExtArgs>[]
+    assignments: Prisma.$UserKeyAssignmentPayload<ExtArgs>[]
+    daily_usages: Prisma.$DailyUsagePayload<ExtArgs>[]
+    audit_logs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    full_name: string
     email: string
-    name: string
-    isSuspended: boolean
-    createdAt: Date
+    password_hash: string
+    plan: string
+    status: string
+    daily_limit: number
+    created_at: Date
+    updated_at: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1151,10 +1389,10 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  subscription<T extends Prisma.User$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  devices<T extends Prisma.User$devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  requestLogs<T extends Prisma.User$requestLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$requestLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequestLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assigned_keys<T extends Prisma.User$assigned_keysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assigned_keysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeminiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.User$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserKeyAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  daily_usages<T extends Prisma.User$daily_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$daily_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  audit_logs<T extends Prisma.User$audit_logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$audit_logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1185,10 +1423,14 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
+  readonly full_name: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
-  readonly name: Prisma.FieldRef<"User", 'String'>
-  readonly isSuspended: Prisma.FieldRef<"User", 'Boolean'>
-  readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly password_hash: Prisma.FieldRef<"User", 'String'>
+  readonly plan: Prisma.FieldRef<"User", 'String'>
+  readonly status: Prisma.FieldRef<"User", 'String'>
+  readonly daily_limit: Prisma.FieldRef<"User", 'Int'>
+  readonly created_at: Prisma.FieldRef<"User", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
@@ -1580,94 +1822,99 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.subscription
+ * User.assigned_keys
  */
-export type User$subscriptionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$assigned_keysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Subscription
+   * Select specific fields to fetch from the GeminiKey
    */
-  select?: Prisma.SubscriptionSelect<ExtArgs> | null
+  select?: Prisma.GeminiKeySelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Subscription
+   * Omit specific fields from the GeminiKey
    */
-  omit?: Prisma.SubscriptionOmit<ExtArgs> | null
+  omit?: Prisma.GeminiKeyOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.SubscriptionInclude<ExtArgs> | null
-  where?: Prisma.SubscriptionWhereInput
+  include?: Prisma.GeminiKeyInclude<ExtArgs> | null
+  where?: Prisma.GeminiKeyWhereInput
+  orderBy?: Prisma.GeminiKeyOrderByWithRelationInput | Prisma.GeminiKeyOrderByWithRelationInput[]
+  cursor?: Prisma.GeminiKeyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GeminiKeyScalarFieldEnum | Prisma.GeminiKeyScalarFieldEnum[]
 }
 
 /**
- * User.sessions
+ * User.assignments
  */
-export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Session
+   * Select specific fields to fetch from the UserKeyAssignment
    */
-  select?: Prisma.SessionSelect<ExtArgs> | null
+  select?: Prisma.UserKeyAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Session
+   * Omit specific fields from the UserKeyAssignment
    */
-  omit?: Prisma.SessionOmit<ExtArgs> | null
+  omit?: Prisma.UserKeyAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.SessionInclude<ExtArgs> | null
-  where?: Prisma.SessionWhereInput
-  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
-  cursor?: Prisma.SessionWhereUniqueInput
+  include?: Prisma.UserKeyAssignmentInclude<ExtArgs> | null
+  where?: Prisma.UserKeyAssignmentWhereInput
+  orderBy?: Prisma.UserKeyAssignmentOrderByWithRelationInput | Prisma.UserKeyAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.UserKeyAssignmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+  distinct?: Prisma.UserKeyAssignmentScalarFieldEnum | Prisma.UserKeyAssignmentScalarFieldEnum[]
 }
 
 /**
- * User.devices
+ * User.daily_usages
  */
-export type User$devicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$daily_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Device
+   * Select specific fields to fetch from the DailyUsage
    */
-  select?: Prisma.DeviceSelect<ExtArgs> | null
+  select?: Prisma.DailyUsageSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Device
+   * Omit specific fields from the DailyUsage
    */
-  omit?: Prisma.DeviceOmit<ExtArgs> | null
+  omit?: Prisma.DailyUsageOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.DeviceInclude<ExtArgs> | null
-  where?: Prisma.DeviceWhereInput
-  orderBy?: Prisma.DeviceOrderByWithRelationInput | Prisma.DeviceOrderByWithRelationInput[]
-  cursor?: Prisma.DeviceWhereUniqueInput
+  include?: Prisma.DailyUsageInclude<ExtArgs> | null
+  where?: Prisma.DailyUsageWhereInput
+  orderBy?: Prisma.DailyUsageOrderByWithRelationInput | Prisma.DailyUsageOrderByWithRelationInput[]
+  cursor?: Prisma.DailyUsageWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.DeviceScalarFieldEnum | Prisma.DeviceScalarFieldEnum[]
+  distinct?: Prisma.DailyUsageScalarFieldEnum | Prisma.DailyUsageScalarFieldEnum[]
 }
 
 /**
- * User.requestLogs
+ * User.audit_logs
  */
-export type User$requestLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$audit_logsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the RequestLog
+   * Select specific fields to fetch from the AuditLog
    */
-  select?: Prisma.RequestLogSelect<ExtArgs> | null
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the RequestLog
+   * Omit specific fields from the AuditLog
    */
-  omit?: Prisma.RequestLogOmit<ExtArgs> | null
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.RequestLogInclude<ExtArgs> | null
-  where?: Prisma.RequestLogWhereInput
-  orderBy?: Prisma.RequestLogOrderByWithRelationInput | Prisma.RequestLogOrderByWithRelationInput[]
-  cursor?: Prisma.RequestLogWhereUniqueInput
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.RequestLogScalarFieldEnum | Prisma.RequestLogScalarFieldEnum[]
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

@@ -7,72 +7,109 @@ datasource db {
   provider = "sqlite"
 }
 
+// ========================================================
+// ENUMS
+// Since SQLite doesn't natively support enums, we will 
+// simulate them using String fields, but define them here 
+// for documentation and ORM typing purposes.
+// ========================================================
+
+// Plan: FREE, PREMIUM
+// Status (User): ACTIVE, BLOCKED, DELETED
+// Status (Key): AVAILABLE, ASSIGNED, COOLDOWN, DISABLED
+// ReleaseReason: REGISTER, PREMIUM_UPGRADE, PREMIUM_DOWNGRADE, USER_BLOCKED, USER_DELETED, ADMIN_RELEASE
+
+// ========================================================
+// ENTITIES
+// ========================================================
+
 model User {
   id             String    @id @default(uuid())
+  full_name      String
   email          String    @unique
-  name           String
+  password_hash  String
+  plan           String    // "FREE" | "PREMIUM"
+  status         String    // "ACTIVE" | "BLOCKED" | "DELETED"
+  daily_limit    Int
   
-  isSuspended    Boolean   @default(false)
-  createdAt      DateTime  @default(now())
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
 
-  // Relations
-  subscription   Subscription?
-  sessions       Session[]
-  devices        Device[]
-  requestLogs    RequestLog[]
-}
-
-model Session {
-  token        String   @id
-  userId       String
-  deviceId     String?
-  expiresAt    DateTime
-
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Device {
-  id           String   @id @default(uuid())
-  userId       String
-  osInfo       String   
-  lastSync     DateTime @default(now())
-
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Plan {
-  id                  String  @id // 'FREE', 'PRO', 'ELITE'
-  name                String
-  priceMonthly        Float
-  dailyQueryLimit     Int     
-  priorityRouting     Boolean @default(false)
+  // Relationships
+  assigned_keys  GeminiKey[]         @relation("AssignedKeys")
+  assignments    UserKeyAssignment[]
+  daily_usages   DailyUsage[]
+  audit_logs     AuditLog[]          @relation("UserAuditLogs")
   
-  subscriptions       Subscription[]
+  @@map("users")
 }
 
-model Subscription {
-  userId           String   @id
-  planId           String
-  queriesUsedToday Int      @default(0)
-  expiresAt        DateTime?
+model GeminiKey {
+  id                String    @id @default(uuid())
+  encrypted_api_key String    @unique
+  status            String    // "AVAILABLE" | "ASSIGNED" | "COOLDOWN" | "DISABLED"
   
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan             Plan     @relation(fields: [planId], references: [id])
-}
+  assigned_user_id  String?
+  assigned_user     User?     @relation("AssignedKeys", fields: [assigned_user_id], references: [id], onDelete: SetNull)
 
-model RequestLog {
-  id           String   @id @default(uuid())
-  userId       String
-  queryType    String   // 'ask', 'page', 'text'
-  latencyMs    Int
-  statusCode   Int
-  timestamp    DateTime @default(now())
+  priority          Int       @default(0)
+  last_used_at      DateTime?
+  failure_count     Int       @default(0)
+  cooldown_until    DateTime?
   
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relationships
+  assignments       UserKeyAssignment[]
+  
+  @@map("gemini_keys")
 }
 
-model AdminConfig {
-  key          String   @id 
-  value        String
-  updatedAt    DateTime @updatedAt
+model UserKeyAssignment {
+  id              String    @id @default(uuid())
+  
+  user_id         String
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  gemini_key_id   String
+  gemini_key      GeminiKey @relation(fields: [gemini_key_id], references: [id], onDelete: Cascade)
+  
+  assigned_at     DateTime  @default(now())
+  released_at     DateTime?
+  release_reason  String?   // "REGISTER" | "PREMIUM_UPGRADE" | "PREMIUM_DOWNGRADE" | "USER_BLOCKED" | "USER_DELETED" | "ADMIN_RELEASE"
+
+  @@map("user_key_assignments")
+}
+
+model DailyUsage {
+  id            String   @id @default(uuid())
+  
+  user_id       String
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  usage_date    DateTime // Store as purely Date object or DateTime string truncated to the day
+  requests_used Int      @default(0)
+  daily_limit   Int
+  
+  updated_at    DateTime @updatedAt
+
+  // Composite unique key to ensure one record per user per day
+  @@unique([user_id, usage_date])
+  @@map("daily_usage")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  
+  user_id     String?
+  user        User?    @relation("UserAuditLogs", fields: [user_id], references: [id], onDelete: SetNull)
+  
+  admin_id    String?
+  metadata    String?  // JSON string
+  
+  created_at  DateTime @default(now())
+
+  @@map("audit_logs")
 }

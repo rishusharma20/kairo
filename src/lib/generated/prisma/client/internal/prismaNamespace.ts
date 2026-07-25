@@ -398,12 +398,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Session: 'Session',
-  Device: 'Device',
-  Plan: 'Plan',
-  Subscription: 'Subscription',
-  RequestLog: 'RequestLog',
-  AdminConfig: 'AdminConfig'
+  GeminiKey: 'GeminiKey',
+  UserKeyAssignment: 'UserKeyAssignment',
+  DailyUsage: 'DailyUsage',
+  AuditLog: 'AuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "device" | "plan" | "subscription" | "requestLog" | "adminConfig"
+    modelProps: "user" | "geminiKey" | "userKeyAssignment" | "dailyUsage" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -497,447 +495,299 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Session: {
-      payload: Prisma.$SessionPayload<ExtArgs>
-      fields: Prisma.SessionFieldRefs
+    GeminiKey: {
+      payload: Prisma.$GeminiKeyPayload<ExtArgs>
+      fields: Prisma.GeminiKeyFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.SessionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+          args: Prisma.GeminiKeyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.SessionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         findFirst: {
-          args: Prisma.SessionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+          args: Prisma.GeminiKeyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.SessionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         findMany: {
-          args: Prisma.SessionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          args: Prisma.GeminiKeyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>[]
         }
         create: {
-          args: Prisma.SessionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         createMany: {
-          args: Prisma.SessionCreateManyArgs<ExtArgs>
+          args: Prisma.GeminiKeyCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.SessionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          args: Prisma.GeminiKeyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>[]
         }
         delete: {
-          args: Prisma.SessionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         update: {
-          args: Prisma.SessionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         deleteMany: {
-          args: Prisma.SessionDeleteManyArgs<ExtArgs>
+          args: Prisma.GeminiKeyDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.SessionUpdateManyArgs<ExtArgs>
+          args: Prisma.GeminiKeyUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.SessionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          args: Prisma.GeminiKeyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>[]
         }
         upsert: {
-          args: Prisma.SessionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+          args: Prisma.GeminiKeyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeminiKeyPayload>
         }
         aggregate: {
-          args: Prisma.SessionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSession>
+          args: Prisma.GeminiKeyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGeminiKey>
         }
         groupBy: {
-          args: Prisma.SessionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SessionGroupByOutputType>[]
+          args: Prisma.GeminiKeyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GeminiKeyGroupByOutputType>[]
         }
         count: {
-          args: Prisma.SessionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
+          args: Prisma.GeminiKeyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GeminiKeyCountAggregateOutputType> | number
         }
       }
     }
-    Device: {
-      payload: Prisma.$DevicePayload<ExtArgs>
-      fields: Prisma.DeviceFieldRefs
+    UserKeyAssignment: {
+      payload: Prisma.$UserKeyAssignmentPayload<ExtArgs>
+      fields: Prisma.UserKeyAssignmentFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.DeviceFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload> | null
+          args: Prisma.UserKeyAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.DeviceFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         findFirst: {
-          args: Prisma.DeviceFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload> | null
+          args: Prisma.UserKeyAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.DeviceFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         findMany: {
-          args: Prisma.DeviceFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>[]
+          args: Prisma.UserKeyAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>[]
         }
         create: {
-          args: Prisma.DeviceCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         createMany: {
-          args: Prisma.DeviceCreateManyArgs<ExtArgs>
+          args: Prisma.UserKeyAssignmentCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.DeviceCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>[]
+          args: Prisma.UserKeyAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>[]
         }
         delete: {
-          args: Prisma.DeviceDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         update: {
-          args: Prisma.DeviceUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         deleteMany: {
-          args: Prisma.DeviceDeleteManyArgs<ExtArgs>
+          args: Prisma.UserKeyAssignmentDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.DeviceUpdateManyArgs<ExtArgs>
+          args: Prisma.UserKeyAssignmentUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.DeviceUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>[]
+          args: Prisma.UserKeyAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>[]
         }
         upsert: {
-          args: Prisma.DeviceUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DevicePayload>
+          args: Prisma.UserKeyAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserKeyAssignmentPayload>
         }
         aggregate: {
-          args: Prisma.DeviceAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDevice>
+          args: Prisma.UserKeyAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserKeyAssignment>
         }
         groupBy: {
-          args: Prisma.DeviceGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeviceGroupByOutputType>[]
+          args: Prisma.UserKeyAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserKeyAssignmentGroupByOutputType>[]
         }
         count: {
-          args: Prisma.DeviceCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeviceCountAggregateOutputType> | number
+          args: Prisma.UserKeyAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserKeyAssignmentCountAggregateOutputType> | number
         }
       }
     }
-    Plan: {
-      payload: Prisma.$PlanPayload<ExtArgs>
-      fields: Prisma.PlanFieldRefs
+    DailyUsage: {
+      payload: Prisma.$DailyUsagePayload<ExtArgs>
+      fields: Prisma.DailyUsageFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.PlanFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload> | null
+          args: Prisma.DailyUsageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.PlanFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         findFirst: {
-          args: Prisma.PlanFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload> | null
+          args: Prisma.DailyUsageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.PlanFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         findMany: {
-          args: Prisma.PlanFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>[]
+          args: Prisma.DailyUsageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>[]
         }
         create: {
-          args: Prisma.PlanCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         createMany: {
-          args: Prisma.PlanCreateManyArgs<ExtArgs>
+          args: Prisma.DailyUsageCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.PlanCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>[]
+          args: Prisma.DailyUsageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>[]
         }
         delete: {
-          args: Prisma.PlanDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         update: {
-          args: Prisma.PlanUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         deleteMany: {
-          args: Prisma.PlanDeleteManyArgs<ExtArgs>
+          args: Prisma.DailyUsageDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.PlanUpdateManyArgs<ExtArgs>
+          args: Prisma.DailyUsageUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.PlanUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>[]
+          args: Prisma.DailyUsageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>[]
         }
         upsert: {
-          args: Prisma.PlanUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanPayload>
+          args: Prisma.DailyUsageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUsagePayload>
         }
         aggregate: {
-          args: Prisma.PlanAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePlan>
+          args: Prisma.DailyUsageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyUsage>
         }
         groupBy: {
-          args: Prisma.PlanGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PlanGroupByOutputType>[]
+          args: Prisma.DailyUsageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyUsageGroupByOutputType>[]
         }
         count: {
-          args: Prisma.PlanCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PlanCountAggregateOutputType> | number
+          args: Prisma.DailyUsageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyUsageCountAggregateOutputType> | number
         }
       }
     }
-    Subscription: {
-      payload: Prisma.$SubscriptionPayload<ExtArgs>
-      fields: Prisma.SubscriptionFieldRefs
+    AuditLog: {
+      payload: Prisma.$AuditLogPayload<ExtArgs>
+      fields: Prisma.AuditLogFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.SubscriptionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null
+          args: Prisma.AuditLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.SubscriptionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         findFirst: {
-          args: Prisma.SubscriptionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null
+          args: Prisma.AuditLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.SubscriptionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         findMany: {
-          args: Prisma.SubscriptionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+          args: Prisma.AuditLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
         }
         create: {
-          args: Prisma.SubscriptionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         createMany: {
-          args: Prisma.SubscriptionCreateManyArgs<ExtArgs>
+          args: Prisma.AuditLogCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.SubscriptionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+          args: Prisma.AuditLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
         }
         delete: {
-          args: Prisma.SubscriptionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         update: {
-          args: Prisma.SubscriptionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         deleteMany: {
-          args: Prisma.SubscriptionDeleteManyArgs<ExtArgs>
+          args: Prisma.AuditLogDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.SubscriptionUpdateManyArgs<ExtArgs>
+          args: Prisma.AuditLogUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.SubscriptionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+          args: Prisma.AuditLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
         }
         upsert: {
-          args: Prisma.SubscriptionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+          args: Prisma.AuditLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
         }
         aggregate: {
-          args: Prisma.SubscriptionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSubscription>
+          args: Prisma.AuditLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuditLog>
         }
         groupBy: {
-          args: Prisma.SubscriptionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SubscriptionGroupByOutputType>[]
+          args: Prisma.AuditLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogGroupByOutputType>[]
         }
         count: {
-          args: Prisma.SubscriptionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SubscriptionCountAggregateOutputType> | number
-        }
-      }
-    }
-    RequestLog: {
-      payload: Prisma.$RequestLogPayload<ExtArgs>
-      fields: Prisma.RequestLogFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.RequestLogFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.RequestLogFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        findFirst: {
-          args: Prisma.RequestLogFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.RequestLogFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        findMany: {
-          args: Prisma.RequestLogFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>[]
-        }
-        create: {
-          args: Prisma.RequestLogCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        createMany: {
-          args: Prisma.RequestLogCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.RequestLogCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>[]
-        }
-        delete: {
-          args: Prisma.RequestLogDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        update: {
-          args: Prisma.RequestLogUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        deleteMany: {
-          args: Prisma.RequestLogDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.RequestLogUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.RequestLogUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>[]
-        }
-        upsert: {
-          args: Prisma.RequestLogUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestLogPayload>
-        }
-        aggregate: {
-          args: Prisma.RequestLogAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateRequestLog>
-        }
-        groupBy: {
-          args: Prisma.RequestLogGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RequestLogGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.RequestLogCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RequestLogCountAggregateOutputType> | number
-        }
-      }
-    }
-    AdminConfig: {
-      payload: Prisma.$AdminConfigPayload<ExtArgs>
-      fields: Prisma.AdminConfigFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AdminConfigFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AdminConfigFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        findFirst: {
-          args: Prisma.AdminConfigFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AdminConfigFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        findMany: {
-          args: Prisma.AdminConfigFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>[]
-        }
-        create: {
-          args: Prisma.AdminConfigCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        createMany: {
-          args: Prisma.AdminConfigCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AdminConfigCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>[]
-        }
-        delete: {
-          args: Prisma.AdminConfigDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        update: {
-          args: Prisma.AdminConfigUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        deleteMany: {
-          args: Prisma.AdminConfigDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AdminConfigUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AdminConfigUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>[]
-        }
-        upsert: {
-          args: Prisma.AdminConfigUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminConfigPayload>
-        }
-        aggregate: {
-          args: Prisma.AdminConfigAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminConfig>
-        }
-        groupBy: {
-          args: Prisma.AdminConfigGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdminConfigGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AdminConfigCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdminConfigCountAggregateOutputType> | number
+          args: Prisma.AuditLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogCountAggregateOutputType> | number
         }
       }
     }
@@ -979,75 +829,69 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  full_name: 'full_name',
   email: 'email',
-  name: 'name',
-  isSuspended: 'isSuspended',
-  createdAt: 'createdAt'
+  password_hash: 'password_hash',
+  plan: 'plan',
+  status: 'status',
+  daily_limit: 'daily_limit',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const SessionScalarFieldEnum = {
-  token: 'token',
-  userId: 'userId',
-  deviceId: 'deviceId',
-  expiresAt: 'expiresAt'
-} as const
-
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-export const DeviceScalarFieldEnum = {
+export const GeminiKeyScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  osInfo: 'osInfo',
-  lastSync: 'lastSync'
+  encrypted_api_key: 'encrypted_api_key',
+  status: 'status',
+  assigned_user_id: 'assigned_user_id',
+  priority: 'priority',
+  last_used_at: 'last_used_at',
+  failure_count: 'failure_count',
+  cooldown_until: 'cooldown_until',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
-export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof DeviceScalarFieldEnum]
+export type GeminiKeyScalarFieldEnum = (typeof GeminiKeyScalarFieldEnum)[keyof typeof GeminiKeyScalarFieldEnum]
 
 
-export const PlanScalarFieldEnum = {
+export const UserKeyAssignmentScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  priceMonthly: 'priceMonthly',
-  dailyQueryLimit: 'dailyQueryLimit',
-  priorityRouting: 'priorityRouting'
+  user_id: 'user_id',
+  gemini_key_id: 'gemini_key_id',
+  assigned_at: 'assigned_at',
+  released_at: 'released_at',
+  release_reason: 'release_reason'
 } as const
 
-export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
+export type UserKeyAssignmentScalarFieldEnum = (typeof UserKeyAssignmentScalarFieldEnum)[keyof typeof UserKeyAssignmentScalarFieldEnum]
 
 
-export const SubscriptionScalarFieldEnum = {
-  userId: 'userId',
-  planId: 'planId',
-  queriesUsedToday: 'queriesUsedToday',
-  expiresAt: 'expiresAt'
-} as const
-
-export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
-
-
-export const RequestLogScalarFieldEnum = {
+export const DailyUsageScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  queryType: 'queryType',
-  latencyMs: 'latencyMs',
-  statusCode: 'statusCode',
-  timestamp: 'timestamp'
+  user_id: 'user_id',
+  usage_date: 'usage_date',
+  requests_used: 'requests_used',
+  daily_limit: 'daily_limit',
+  updated_at: 'updated_at'
 } as const
 
-export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
+export type DailyUsageScalarFieldEnum = (typeof DailyUsageScalarFieldEnum)[keyof typeof DailyUsageScalarFieldEnum]
 
 
-export const AdminConfigScalarFieldEnum = {
-  key: 'key',
-  value: 'value',
-  updatedAt: 'updatedAt'
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  user_id: 'user_id',
+  admin_id: 'admin_id',
+  metadata: 'metadata',
+  created_at: 'created_at'
 } as const
 
-export type AdminConfigScalarFieldEnum = (typeof AdminConfigScalarFieldEnum)[keyof typeof AdminConfigScalarFieldEnum]
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1080,9 +924,9 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 
 
 /**
- * Reference to a field of type 'Boolean'
+ * Reference to a field of type 'Int'
  */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
@@ -1097,13 +941,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 /**
@@ -1258,12 +1095,10 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
-  session?: Prisma.SessionOmit
-  device?: Prisma.DeviceOmit
-  plan?: Prisma.PlanOmit
-  subscription?: Prisma.SubscriptionOmit
-  requestLog?: Prisma.RequestLogOmit
-  adminConfig?: Prisma.AdminConfigOmit
+  geminiKey?: Prisma.GeminiKeyOmit
+  userKeyAssignment?: Prisma.UserKeyAssignmentOmit
+  dailyUsage?: Prisma.DailyUsageOmit
+  auditLog?: Prisma.AuditLogOmit
 }
 
 /* Types for Logging */
