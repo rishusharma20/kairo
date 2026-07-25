@@ -130,7 +130,7 @@ function PricingCard({
           <div className="mt-6 mb-6">
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-light text-text-primary">
-                {plan.price === 0 ? "Free" : `$${plan.price}`}
+                {plan.price === 0 ? "Free" : `₹${plan.price}`}
               </span>
               {plan.price > 0 && (
                 <span className="text-text-muted text-sm">/{plan.period}</span>
