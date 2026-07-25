@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, CreditCard, Loader2, QrCode, CheckCircle2, ShieldAlert, X } from "lucide-react";
+import { Crown, CreditCard, Loader2, QrCode, ShieldAlert, X } from "lucide-react";
+import { submitPaymentAction, checkPendingPaymentAction } from "./actions";
 
 interface BillingClientProps {
   user: {
@@ -14,23 +15,35 @@ interface BillingClientProps {
 export default function BillingClient({ user }: BillingClientProps) {
   const [showModal, setShowModal] = useState(false);
   const [utr, setUtr] = useState("");
+  const [targetPlan, setTargetPlan] = useState<"PREMIUM_7_DAYS" | "PREMIUM_30_DAYS">("PREMIUM_30_DAYS");
   const [submitting, setSubmitting] = useState(false);
-  // Simulating payment state since backend table doesn't exist
   const [paymentStatus, setPaymentStatus] = useState<"NONE" | "PENDING">("NONE");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if there is already a pending payment request on load
+    checkPendingPaymentAction().then(isPending => {
+      if (isPending) setPaymentStatus("PENDING");
+    });
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!utr.trim()) return;
 
     setSubmitting(true);
+    setErrorMsg("");
     
-    // Simulate API delay
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await submitPaymentAction(utr, targetPlan);
       setPaymentStatus("PENDING");
       setShowModal(false);
       setUtr("");
-    }, 1500);
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred while submitting payment.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -65,8 +78,8 @@ export default function BillingClient({ user }: BillingClientProps) {
             </h2>
             <div className="space-y-1">
               <h3 className="text-4xl font-bold tracking-tight">
-                <span className={user.plan === "PREMIUM" ? "gradient-text-gold" : "text-text-primary"}>
-                  {user.plan}
+                <span className={user.plan.includes("PREMIUM") ? "gradient-text-gold" : "text-text-primary"}>
+                  {user.plan.replace(/_/g, " ")}
                 </span>
               </h3>
               <p className="text-sm text-text-muted">
@@ -104,7 +117,6 @@ export default function BillingClient({ user }: BillingClientProps) {
       <AnimatePresence>
         {showModal && (
           <>
-            {/* Backdrop */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -112,15 +124,14 @@ export default function BillingClient({ user }: BillingClientProps) {
               onClick={() => !submitting && setShowModal(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             >
-              {/* Modal Content */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-[var(--background)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden"
+                className="w-full max-w-md bg-[var(--background)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
               >
-                <div className="p-6 border-b border-[var(--border)] flex items-center justify-between">
+                <div className="p-6 border-b border-[var(--border)] flex items-center justify-between shrink-0">
                   <h3 className="text-lg font-medium text-text-primary flex items-center gap-2">
                     <Crown className="w-5 h-5 text-accent" />
                     Premium Upgrade
@@ -134,13 +145,44 @@ export default function BillingClient({ user }: BillingClientProps) {
                   </button>
                 </div>
 
-                <div className="p-6 space-y-6">
+                <div className="p-6 overflow-y-auto space-y-6">
+                  {/* Select Plan */}
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-text-muted uppercase tracking-wider">
+                      Select Duration
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button 
+                        type="button"
+                        onClick={() => setTargetPlan("PREMIUM_7_DAYS")}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                          targetPlan === "PREMIUM_7_DAYS" ? "bg-accent/10 border-accent/50 text-accent" : "bg-[var(--surface)] border-[var(--border)] text-text-primary hover:border-accent/30 hover:bg-[var(--surface)]/80"
+                        }`}
+                      >
+                        <span className="font-bold">7 Days</span>
+                        <span className="text-xs opacity-80 mt-1">$9.99</span>
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setTargetPlan("PREMIUM_30_DAYS")}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                          targetPlan === "PREMIUM_30_DAYS" ? "bg-accent/10 border-accent/50 text-accent" : "bg-[var(--surface)] border-[var(--border)] text-text-primary hover:border-accent/30 hover:bg-[var(--surface)]/80"
+                        }`}
+                      >
+                        <span className="font-bold">30 Days</span>
+                        <span className="text-xs opacity-80 mt-1">$29.99</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <hr className="border-[var(--border)]" />
+
                   {/* Instructions */}
                   <div className="space-y-4">
                     <p className="text-sm text-text-muted">Follow these instructions to complete your manual upgrade:</p>
                     <ol className="text-sm text-text-muted space-y-2 list-decimal list-inside pl-2">
                       <li>Scan the QR code below.</li>
-                      <li>Complete the exact payment amount.</li>
+                      <li>Complete the exact payment amount for your chosen duration.</li>
                       <li>Copy the transaction UTR / Reference number.</li>
                       <li>Enter the UTR below and submit.</li>
                     </ol>
@@ -151,6 +193,12 @@ export default function BillingClient({ user }: BillingClientProps) {
                     <QrCode className="w-12 h-12 text-text-muted opacity-50" />
                     <span className="text-xs text-text-muted uppercase tracking-widest">Kairo QR Asset</span>
                   </div>
+
+                  {errorMsg && (
+                    <div className="p-3 rounded bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+                      {errorMsg}
+                    </div>
+                  )}
 
                   {/* UTR Form */}
                   <form onSubmit={handleSubmit} className="space-y-4">

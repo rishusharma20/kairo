@@ -2,6 +2,46 @@ import { prisma } from "@/lib/db";
 import { changeUserTier } from "@/lib/services/plan";
 import { logSystemEvent } from "@/lib/services/audit";
 
+export async function submitPaymentRequest(userId: string, utr: string, targetPlan: string) {
+  // Check if already pending
+  const pending = await hasPendingPaymentRequest(userId);
+  if (pending) throw new Error("You already have a pending payment request.");
+
+  const metadata = {
+    utr,
+    targetPlan,
+    status: "PENDING",
+    submitted_at: new Date().toISOString()
+  };
+
+  await prisma.auditLog.create({
+    data: {
+      user_id: userId,
+      action: "PAYMENT_REQUEST",
+      metadata: JSON.stringify(metadata)
+    }
+  });
+
+  return { success: true };
+}
+
+export async function hasPendingPaymentRequest(userId: string) {
+  const logs = await prisma.auditLog.findMany({
+    where: { user_id: userId, action: "PAYMENT_REQUEST" },
+    orderBy: { created_at: "desc" },
+    take: 1
+  });
+
+  if (logs.length === 0) return false;
+
+  try {
+    const metadata = JSON.parse(logs[0].metadata || "{}");
+    return metadata.status === "PENDING";
+  } catch {
+    return false;
+  }
+}
+
 export async function getPaymentRequests(statusFilter?: "PENDING" | "APPROVED" | "REJECTED") {
   const logs = await prisma.auditLog.findMany({
     where: { action: "PAYMENT_REQUEST" },
@@ -19,6 +59,7 @@ export async function getPaymentRequests(statusFilter?: "PENDING" | "APPROVED" |
       id: log.id,
       user_id: log.user_id,
       utr: String(metadata.utr || "N/A"),
+      targetPlan: String(metadata.targetPlan || "PREMIUM_30_DAYS"),
       status: (metadata.status as "PENDING" | "APPROVED" | "REJECTED") || "PENDING",
       submitted_at: log.created_at.toISOString(),
       user: log.user ? {
@@ -49,8 +90,9 @@ export async function approvePayment(paymentRequestId: string, adminId: string) 
   }
   if (metadata.status !== "PENDING") throw new Error("Payment request is already processed");
 
-  // 2. Perform existing Upgrade Logic
-  await changeUserTier(log.user_id, "PREMIUM_30_DAYS");
+  // 2. Perform existing Upgrade Logic using requested plan
+  const targetPlan = metadata.targetPlan || "PREMIUM_30_DAYS";
+  await changeUserTier(log.user_id, targetPlan as any);
 
   // 3. Mark as Approved
   metadata.status = "APPROVED";
@@ -63,7 +105,7 @@ export async function approvePayment(paymentRequestId: string, adminId: string) 
   });
 
   // 4. Create Audit Log for the decision
-  await logSystemEvent("PAYMENT_APPROVED", log.user_id, { paymentRequestId, utr: metadata.utr }, adminId);
+  await logSystemEvent("PAYMENT_APPROVED", log.user_id, { paymentRequestId, utr: metadata.utr, targetPlan }, adminId);
 
   return { success: true };
 }

@@ -9,6 +9,7 @@ export type PaymentRequestType = {
   id: string;
   user_id: string | null;
   utr: string;
+  targetPlan: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   submitted_at: string;
   user: {
@@ -253,10 +254,16 @@ export function PaymentsClient({ initialPayments }: { initialPayments: PaymentRe
                     <span className="text-[10px] uppercase tracking-wider text-text-muted">Current Plan</span>
                     <p className="text-sm font-bold mt-1">
                       {viewPayment.user ? (
-                        <span className={viewPayment.user.plan === 'PREMIUM' ? 'text-accent' : 'text-text-muted'}>
-                          {viewPayment.user.plan}
+                        <span className={viewPayment.user.plan.includes('PREMIUM') ? 'text-accent' : 'text-text-muted'}>
+                          {viewPayment.user.plan.replace(/_/g, ' ')}
                         </span>
                       ) : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-text-muted">Requested Plan</span>
+                    <p className="text-sm font-bold mt-1 text-accent">
+                      {viewPayment.targetPlan.replace(/_/g, ' ')}
                     </p>
                   </div>
                   <div className="space-y-1">
@@ -358,7 +365,7 @@ export function PaymentsClient({ initialPayments }: { initialPayments: PaymentRe
 
                   {actionModal.type === 'approve' && (
                     <p className="text-xs text-success mt-3 bg-success/5 p-2 rounded border border-success/10">
-                      The user will be immediately upgraded to PREMIUM (3000 reqs/day, 3 keys).
+                      The user will be immediately upgraded to {actionModal.payment.targetPlan.replace(/_/g, ' ')}.
                     </p>
                   )}
                   {actionModal.type === 'reject' && (
