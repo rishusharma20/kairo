@@ -83,7 +83,8 @@ export const UserScalarFieldEnum = {
   status: 'status',
   daily_limit: 'daily_limit',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  plan_expires_at: 'plan_expires_at'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

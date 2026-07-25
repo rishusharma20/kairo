@@ -29,6 +29,7 @@ export async function fetchUsersAction(query: { email?: string; id?: string; sta
   return users.map(user => ({
     ...user,
     created_at: user.created_at.toISOString(),
+    plan_expires_at: user.plan_expires_at ? user.plan_expires_at.toISOString() : null,
   }));
 }
 
@@ -66,6 +67,7 @@ export async function performAdminAction(
   return {
     ...result,
     created_at: result.created_at.toISOString(),
-    updated_at: result.updated_at.toISOString()
+    updated_at: result.updated_at.toISOString(),
+    plan_expires_at: result.plan_expires_at ? result.plan_expires_at.toISOString() : null,
   };
 }

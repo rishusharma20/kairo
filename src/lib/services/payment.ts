@@ -10,7 +10,7 @@ export async function getPaymentRequests(statusFilter?: "PENDING" | "APPROVED" |
   });
 
   const parsed = logs.map(log => {
-    let metadata: Record<string, unknown> = {};
+    let metadata: any = {};
     try { metadata = log.metadata ? JSON.parse(log.metadata) : {}; } catch (e) {
       console.error(e);
     }
@@ -18,8 +18,8 @@ export async function getPaymentRequests(statusFilter?: "PENDING" | "APPROVED" |
     return {
       id: log.id,
       user_id: log.user_id,
-      utr: metadata.utr || "N/A",
-      status: metadata.status || "PENDING",
+      utr: String(metadata.utr || "N/A"),
+      status: (metadata.status as "PENDING" | "APPROVED" | "REJECTED") || "PENDING",
       submitted_at: log.created_at.toISOString(),
       user: log.user ? {
         full_name: log.user.full_name,
@@ -43,14 +43,14 @@ export async function approvePayment(paymentRequestId: string, adminId: string) 
   if (log.action !== "PAYMENT_REQUEST") throw new Error("Invalid request type");
   if (!log.user_id) throw new Error("User associated with this request was not found");
   
-  let metadata: Record<string, unknown> = {};
+  let metadata: any = {};
   try { metadata = log.metadata ? JSON.parse(log.metadata) : {}; } catch (e) {
     console.error(e);
   }
   if (metadata.status !== "PENDING") throw new Error("Payment request is already processed");
 
   // 2. Perform existing Upgrade Logic
-  await changeUserTier(log.user_id, "PREMIUM", 30);
+  await changeUserTier(log.user_id, "PREMIUM_30_DAYS");
 
   // 3. Mark as Approved
   metadata.status = "APPROVED";
@@ -73,7 +73,7 @@ export async function rejectPayment(paymentRequestId: string, adminId: string) {
   if (!log) throw new Error("Payment request not found");
   if (log.action !== "PAYMENT_REQUEST") throw new Error("Invalid request type");
   
-  let metadata: Record<string, unknown> = {};
+  let metadata: any = {};
   try { metadata = log.metadata ? JSON.parse(log.metadata) : {}; } catch (e) {
     console.error(e);
   }

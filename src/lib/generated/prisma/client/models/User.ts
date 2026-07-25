@@ -44,6 +44,7 @@ export type UserMinAggregateOutputType = {
   daily_limit: number | null
   created_at: Date | null
   updated_at: Date | null
+  plan_expires_at: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type UserMaxAggregateOutputType = {
   daily_limit: number | null
   created_at: Date | null
   updated_at: Date | null
+  plan_expires_at: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -68,6 +70,7 @@ export type UserCountAggregateOutputType = {
   daily_limit: number
   created_at: number
   updated_at: number
+  plan_expires_at: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type UserMinAggregateInputType = {
   daily_limit?: true
   created_at?: true
   updated_at?: true
+  plan_expires_at?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -102,6 +106,7 @@ export type UserMaxAggregateInputType = {
   daily_limit?: true
   created_at?: true
   updated_at?: true
+  plan_expires_at?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -114,6 +119,7 @@ export type UserCountAggregateInputType = {
   daily_limit?: true
   created_at?: true
   updated_at?: true
+  plan_expires_at?: true
   _all?: true
 }
 
@@ -213,6 +219,7 @@ export type UserGroupByOutputType = {
   daily_limit: number
   created_at: Date
   updated_at: Date
+  plan_expires_at: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -248,6 +255,7 @@ export type UserWhereInput = {
   daily_limit?: Prisma.IntFilter<"User"> | number
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  plan_expires_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   assigned_keys?: Prisma.GeminiKeyListRelationFilter
   assignments?: Prisma.UserKeyAssignmentListRelationFilter
   daily_usages?: Prisma.DailyUsageListRelationFilter
@@ -264,6 +272,7 @@ export type UserOrderByWithRelationInput = {
   daily_limit?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  plan_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   assigned_keys?: Prisma.GeminiKeyOrderByRelationAggregateInput
   assignments?: Prisma.UserKeyAssignmentOrderByRelationAggregateInput
   daily_usages?: Prisma.DailyUsageOrderByRelationAggregateInput
@@ -283,6 +292,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   daily_limit?: Prisma.IntFilter<"User"> | number
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  plan_expires_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   assigned_keys?: Prisma.GeminiKeyListRelationFilter
   assignments?: Prisma.UserKeyAssignmentListRelationFilter
   daily_usages?: Prisma.DailyUsageListRelationFilter
@@ -299,6 +309,7 @@ export type UserOrderByWithAggregationInput = {
   daily_limit?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  plan_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -319,6 +330,7 @@ export type UserScalarWhereWithAggregatesInput = {
   daily_limit?: Prisma.IntWithAggregatesFilter<"User"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  plan_expires_at?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -331,6 +343,7 @@ export type UserCreateInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
@@ -347,6 +360,7 @@ export type UserUncheckedCreateInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
@@ -363,6 +377,7 @@ export type UserUpdateInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
@@ -379,6 +394,7 @@ export type UserUncheckedUpdateInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
@@ -395,6 +411,7 @@ export type UserCreateManyInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -407,6 +424,7 @@ export type UserUpdateManyMutationInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -419,6 +437,7 @@ export type UserUncheckedUpdateManyInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -431,6 +450,7 @@ export type UserCountOrderByAggregateInput = {
   daily_limit?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  plan_expires_at?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -447,6 +467,7 @@ export type UserMaxOrderByAggregateInput = {
   daily_limit?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  plan_expires_at?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -459,6 +480,7 @@ export type UserMinOrderByAggregateInput = {
   daily_limit?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  plan_expires_at?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -489,6 +511,10 @@ export type IntFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutAssigned_keysInput = {
@@ -561,6 +587,7 @@ export type UserCreateWithoutAssigned_keysInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -576,6 +603,7 @@ export type UserUncheckedCreateWithoutAssigned_keysInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -607,6 +635,7 @@ export type UserUpdateWithoutAssigned_keysInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -622,6 +651,7 @@ export type UserUncheckedUpdateWithoutAssigned_keysInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -637,6 +667,7 @@ export type UserCreateWithoutAssignmentsInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
   daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -652,6 +683,7 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
   daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -683,6 +715,7 @@ export type UserUpdateWithoutAssignmentsInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
   daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -698,6 +731,7 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
   daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -713,6 +747,7 @@ export type UserCreateWithoutDaily_usagesInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -728,6 +763,7 @@ export type UserUncheckedCreateWithoutDaily_usagesInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -759,6 +795,7 @@ export type UserUpdateWithoutDaily_usagesInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -774,6 +811,7 @@ export type UserUncheckedUpdateWithoutDaily_usagesInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -789,6 +827,7 @@ export type UserCreateWithoutAudit_logsInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageCreateNestedManyWithoutUserInput
@@ -804,6 +843,7 @@ export type UserUncheckedCreateWithoutAudit_logsInput = {
   daily_limit: number
   created_at?: Date | string
   updated_at?: Date | string
+  plan_expires_at?: Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedCreateNestedManyWithoutAssigned_userInput
   assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutUserInput
   daily_usages?: Prisma.DailyUsageUncheckedCreateNestedManyWithoutUserInput
@@ -835,6 +875,7 @@ export type UserUpdateWithoutAudit_logsInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUpdateManyWithoutUserNestedInput
@@ -850,6 +891,7 @@ export type UserUncheckedUpdateWithoutAudit_logsInput = {
   daily_limit?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assigned_keys?: Prisma.GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput
   assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutUserNestedInput
   daily_usages?: Prisma.DailyUsageUncheckedUpdateManyWithoutUserNestedInput
@@ -923,6 +965,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   daily_limit?: boolean
   created_at?: boolean
   updated_at?: boolean
+  plan_expires_at?: boolean
   assigned_keys?: boolean | Prisma.User$assigned_keysArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   daily_usages?: boolean | Prisma.User$daily_usagesArgs<ExtArgs>
@@ -940,6 +983,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   daily_limit?: boolean
   created_at?: boolean
   updated_at?: boolean
+  plan_expires_at?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -952,6 +996,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   daily_limit?: boolean
   created_at?: boolean
   updated_at?: boolean
+  plan_expires_at?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -964,9 +1009,10 @@ export type UserSelectScalar = {
   daily_limit?: boolean
   created_at?: boolean
   updated_at?: boolean
+  plan_expires_at?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "full_name" | "email" | "password_hash" | "plan" | "status" | "daily_limit" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "full_name" | "email" | "password_hash" | "plan" | "status" | "daily_limit" | "created_at" | "updated_at" | "plan_expires_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_keys?: boolean | Prisma.User$assigned_keysArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
@@ -995,6 +1041,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     daily_limit: number
     created_at: Date
     updated_at: Date
+    plan_expires_at: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1431,6 +1478,7 @@ export interface UserFieldRefs {
   readonly daily_limit: Prisma.FieldRef<"User", 'Int'>
   readonly created_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"User", 'DateTime'>
+  readonly plan_expires_at: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

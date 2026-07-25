@@ -14,7 +14,7 @@ export type PaymentRequestType = {
   user: {
     full_name: string;
     email: string;
-    plan: "FREE" | "PREMIUM";
+    plan: string;
   } | null;
 };
 

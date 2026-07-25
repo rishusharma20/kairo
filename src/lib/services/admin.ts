@@ -106,7 +106,8 @@ export async function searchUsers(params: {
       plan: true,
       status: true,
       daily_limit: true,
-      created_at: true
+      created_at: true,
+      plan_expires_at: true
     },
     orderBy: { created_at: 'desc' },
     take: 100

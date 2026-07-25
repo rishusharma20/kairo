@@ -531,10 +531,6 @@ export type GeminiKeyUncheckedUpdateManyWithoutAssigned_userNestedInput = {
   deleteMany?: Prisma.GeminiKeyScalarWhereInput | Prisma.GeminiKeyScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
