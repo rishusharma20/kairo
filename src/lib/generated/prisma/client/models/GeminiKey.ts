@@ -586,6 +586,7 @@ export type GeminiKeyCreateOrConnectWithoutAssigned_userInput = {
 
 export type GeminiKeyCreateManyAssigned_userInputEnvelope = {
   data: Prisma.GeminiKeyCreateManyAssigned_userInput | Prisma.GeminiKeyCreateManyAssigned_userInput[]
+  skipDuplicates?: boolean
 }
 
 export type GeminiKeyUpsertWithWhereUniqueWithoutAssigned_userInput = {
@@ -1525,6 +1526,7 @@ export type GeminiKeyCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data used to create many GeminiKeys.
    */
   data: Prisma.GeminiKeyCreateManyInput | Prisma.GeminiKeyCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1543,6 +1545,7 @@ export type GeminiKeyCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * The data used to create many GeminiKeys.
    */
   data: Prisma.GeminiKeyCreateManyInput | Prisma.GeminiKeyCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

@@ -448,6 +448,7 @@ export type UserKeyAssignmentCreateOrConnectWithoutUserInput = {
 
 export type UserKeyAssignmentCreateManyUserInputEnvelope = {
   data: Prisma.UserKeyAssignmentCreateManyUserInput | Prisma.UserKeyAssignmentCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type UserKeyAssignmentUpsertWithWhereUniqueWithoutUserInput = {
@@ -501,6 +502,7 @@ export type UserKeyAssignmentCreateOrConnectWithoutGemini_keyInput = {
 
 export type UserKeyAssignmentCreateManyGemini_keyInputEnvelope = {
   data: Prisma.UserKeyAssignmentCreateManyGemini_keyInput | Prisma.UserKeyAssignmentCreateManyGemini_keyInput[]
+  skipDuplicates?: boolean
 }
 
 export type UserKeyAssignmentUpsertWithWhereUniqueWithoutGemini_keyInput = {
@@ -1319,6 +1321,7 @@ export type UserKeyAssignmentCreateManyArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many UserKeyAssignments.
    */
   data: Prisma.UserKeyAssignmentCreateManyInput | Prisma.UserKeyAssignmentCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1337,6 +1340,7 @@ export type UserKeyAssignmentCreateManyAndReturnArgs<ExtArgs extends runtime.Typ
    * The data used to create many UserKeyAssignments.
    */
   data: Prisma.UserKeyAssignmentCreateManyInput | Prisma.UserKeyAssignmentCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
