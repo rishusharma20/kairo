@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/generated/prisma/client/client";
 import { assignKeys, releaseKeys } from "@/lib/services/keys";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 import { upgradeToPremium, downgradeToFree } from "@/lib/services/plan";
