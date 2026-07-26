@@ -63,19 +63,15 @@ export async function deleteUser(userId: string) {
   return updated;
 }
 
-export async function changeUserTierAdmin(userId: string, targetPlan: string, durationDays: number | null) {
+export async function changeUserTierAdmin(userId: string, targetPlan: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
   if (user.status === "DELETED") throw new Error("Invalid user state");
 
   // Typecast to PlanTier (validation happens inside changeUserTier)
-  const updated = await changeUserTier(userId, targetPlan as any, durationDays);
+  const updated = await changeUserTier(userId, targetPlan as import("@/lib/services/plan").PlanTier);
   
-  logSystemEventInBackground("PLAN_CHANGED", userId, { 
-    plan: targetPlan, 
-    durationDays, 
-    adminAction: true 
-  });
+  logSystemEventInBackground("PLAN_CHANGED");
   
   return updated;
 }

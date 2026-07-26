@@ -64,11 +64,12 @@ export function KairoChat() {
       };
 
       setMessages((prev) => [...prev, kairoMessage]);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const e = error as Error;
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "error",
-        content: error.message || "Failed to communicate with Kairo.",
+        content: e.message || "Failed to communicate with Kairo.",
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -83,7 +84,7 @@ export function KairoChat() {
     return parts.map((part, i) => {
       if (part.startsWith("```") && part.endsWith("```")) {
         // It's a code block
-        const codeContent = part.substring(3, part.length - 3).replace(/^[a-z]+[ \t]*\n/, (match) => ""); // strip optional language tag like ```python
+        const codeContent = part.substring(3, part.length - 3).replace(/^[a-z]+[ \t]*\n/, () => ""); // strip optional language tag like ```python
         
         return (
           <pre key={i} className="my-3 p-4 rounded-xl bg-[var(--background)] border border-[var(--border)] overflow-x-auto text-sm font-mono text-text-primary">

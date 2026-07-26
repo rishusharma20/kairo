@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 type AuthState =
@@ -70,9 +70,9 @@ export default function LoginPage() {
       
       setLoading(false);
       startLoaderSequence(); // Skip OTP, login is successful
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoading(false);
-      setError(err.message || "Invalid credentials.");
+      setError((err as Error).message || "Invalid credentials.");
     }
   };
 
@@ -96,9 +96,9 @@ export default function LoginPage() {
       
       setLoading(false);
       startLoaderSequence();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoading(false);
-      setError(err.message || "Invalid code.");
+      setError((err as Error).message || "Invalid code.");
     }
   };
 

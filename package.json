@@ -7,7 +7,8 @@
     "build": "rm -rf .next && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "extension:build": "node extension/build.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
+    "@types/chrome": "^0.2.2",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",

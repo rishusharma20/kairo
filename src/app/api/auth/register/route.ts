@@ -14,6 +14,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (typeof fullName !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { error: "Invalid field types" },
+        { status: 400 }
+      );
+    }
+
     // Check duplicate email
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -94,8 +101,8 @@ export async function POST(request: Request) {
       },
     });
 
-  } catch (error: any) {
-    if (error.message === "NO_KEYS_AVAILABLE") {
+  } catch (error: unknown) {
+    if ((error as Error).message === "NO_KEYS_AVAILABLE") {
       return NextResponse.json(
         { error: "No available Gemini API keys. Please try again later." },
         { status: 503 }

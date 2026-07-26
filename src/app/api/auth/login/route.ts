@@ -14,6 +14,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { error: "Invalid field types" },
+        { status: 400 }
+      );
+    }
+
     let user = await prisma.user.findUnique({
       where: { email },
     });

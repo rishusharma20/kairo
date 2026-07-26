@@ -18,7 +18,7 @@ export const PLAN_CONFIGS: Record<PlanTier, { dailyLimit: number; keysRequired: 
 /**
  * Change a user's subscription tier, adjusting limits and API keys automatically.
  */
-export async function changeUserTier(userId: string, targetPlan: PlanTier, _ignoredDuration: number | null = null) {
+export async function changeUserTier(userId: string, targetPlan: PlanTier) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
 
@@ -44,11 +44,7 @@ export async function changeUserTier(userId: string, targetPlan: PlanTier, _igno
   // Perform Update
   const updatedUser = await prisma.user.update({
     where: { id: userId },
-    data: {
-      plan: targetPlan,
-      daily_limit: targetConfig.dailyLimit,
-      plan_expires_at: planExpiresAt,
-    },
+    data: { plan: targetPlan, daily_limit: targetConfig.dailyLimit, plan_expires_at: planExpiresAt }
   });
 
   // Adjust Keys
@@ -72,7 +68,7 @@ export async function enforcePlanExpiration(userId: string) {
   // Check if expiration exists and has passed
   if (user.plan_expires_at && user.plan_expires_at.getTime() < Date.now()) {
     console.log(`[Expiration Engine] User ${userId} plan ${user.plan} expired. Downgrading to FREE.`);
-    return await changeUserTier(userId, "FREE", null);
+    return await changeUserTier(userId, "FREE");
   }
 
   return user;

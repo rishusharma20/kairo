@@ -11,9 +11,9 @@ async function handler(request: Request) {
     const logs = await getAuditLogs(limit, offset);
 
     return NextResponse.json({ success: true, data: logs });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin Audit Error:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message || "Internal Server Error" }, { status: 500 });
   }
 }
 

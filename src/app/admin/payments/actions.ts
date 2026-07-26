@@ -5,13 +5,14 @@ import { revalidatePath } from "next/cache";
 import { getPaymentRequests, approvePayment, rejectPayment } from "@/lib/services/payment";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gmail.com";
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 
 async function requireAdmin() {
   const session = await getSession();
   if (!session || session.email !== ADMIN_EMAIL) {
     throw new Error("Unauthorized: Admin access required.");
   }
-  return session;
+  return { ...session, apiKey: ADMIN_API_KEY as string };
 }
 
 /**

@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 // ========================================================
@@ -24,76 +24,77 @@ datasource db {
 // ========================================================
 
 model User {
-  id             String    @id @default(uuid())
-  full_name      String
-  email          String    @unique
-  password_hash  String
-  plan           String    // "FREE" | "PREMIUM"
-  status         String    // "ACTIVE" | "BLOCKED" | "DELETED"
-  daily_limit    Int
-  
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  id            String @id @default(uuid())
+  full_name     String
+  email         String @unique
+  password_hash String
+  plan          String // "FREE" | "PREMIUM"
+  status        String // "ACTIVE" | "BLOCKED" | "DELETED"
+  daily_limit   Int
+
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
   plan_expires_at DateTime?
 
   // Relationships
-  assigned_keys  GeminiKey[]         @relation("AssignedKeys")
-  assignments    UserKeyAssignment[]
-  daily_usages   DailyUsage[]
-  audit_logs     AuditLog[]          @relation("UserAuditLogs")
-  
+  assigned_keys GeminiKey[]         @relation("AssignedKeys")
+  assignments   UserKeyAssignment[]
+  daily_usages  DailyUsage[]
+  audit_logs    AuditLog[]          @relation("UserAuditLogs")
+
   @@map("users")
 }
 
 model GeminiKey {
-  id                String    @id @default(uuid())
-  encrypted_api_key String    @unique
-  status            String    // "AVAILABLE" | "ASSIGNED" | "COOLDOWN" | "DISABLED"
-  
-  assigned_user_id  String?
-  assigned_user     User?     @relation("AssignedKeys", fields: [assigned_user_id], references: [id], onDelete: SetNull)
+  id                String @id @default(uuid())
+  encrypted_api_key String @unique
+  status            String // "AVAILABLE" | "ASSIGNED" | "COOLDOWN" | "DISABLED"
 
-  priority          Int       @default(0)
-  last_used_at      DateTime?
-  failure_count     Int       @default(0)
-  cooldown_until    DateTime?
-  
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  assigned_user_id String?
+  assigned_user    User?   @relation("AssignedKeys", fields: [assigned_user_id], references: [id], onDelete: SetNull)
+
+  priority       Int       @default(0)
+  last_used_at   DateTime?
+  failure_count  Int       @default(0)
+  cooldown_until DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   // Relationships
-  assignments       UserKeyAssignment[]
-  
+  assignments UserKeyAssignment[]
+
+  @@index([assigned_user_id, status])
   @@map("gemini_keys")
 }
 
 model UserKeyAssignment {
-  id              String    @id @default(uuid())
-  
-  user_id         String
-  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  
-  gemini_key_id   String
-  gemini_key      GeminiKey @relation(fields: [gemini_key_id], references: [id], onDelete: Cascade)
-  
-  assigned_at     DateTime  @default(now())
-  released_at     DateTime?
-  release_reason  String?   // "REGISTER" | "PREMIUM_UPGRADE" | "PREMIUM_DOWNGRADE" | "USER_BLOCKED" | "USER_DELETED" | "ADMIN_RELEASE"
+  id String @id @default(uuid())
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  gemini_key_id String
+  gemini_key    GeminiKey @relation(fields: [gemini_key_id], references: [id], onDelete: Cascade)
+
+  assigned_at    DateTime  @default(now())
+  released_at    DateTime?
+  release_reason String? // "REGISTER" | "PREMIUM_UPGRADE" | "PREMIUM_DOWNGRADE" | "USER_BLOCKED" | "USER_DELETED" | "ADMIN_RELEASE"
 
   @@map("user_key_assignments")
 }
 
 model DailyUsage {
-  id            String   @id @default(uuid())
-  
-  user_id       String
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  
+  id String @id @default(uuid())
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   usage_date    DateTime // Store as purely Date object or DateTime string truncated to the day
   requests_used Int      @default(0)
   daily_limit   Int
-  
-  updated_at    DateTime @updatedAt
+
+  updated_at DateTime @updatedAt
 
   // Composite unique key to ensure one record per user per day
   @@unique([user_id, usage_date])
@@ -101,16 +102,16 @@ model DailyUsage {
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  action      String
-  
-  user_id     String?
-  user        User?    @relation("UserAuditLogs", fields: [user_id], references: [id], onDelete: SetNull)
-  
-  admin_id    String?
-  metadata    String?  // JSON string
-  
-  created_at  DateTime @default(now())
+  id     String @id @default(uuid())
+  action String
+
+  user_id String?
+  user    User?   @relation("UserAuditLogs", fields: [user_id], references: [id], onDelete: SetNull)
+
+  admin_id String?
+  metadata String? // JSON string
+
+  created_at DateTime @default(now())
 
   @@map("audit_logs")
 }

@@ -38,7 +38,7 @@ describe('Key Rotation Service (Round Robin)', () => {
       { id: 'key-1', last_used_at: new Date('2026-01-01') },
       { id: 'key-2', last_used_at: null }, // Should be selected
     ];
-    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as any);
+    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as never);
     
     const selected = await getHealthyKeyForUser('user-1');
     expect(selected.id).toBe('key-2');
@@ -50,7 +50,7 @@ describe('Key Rotation Service (Round Robin)', () => {
       { id: 'key-2', last_used_at: new Date('2026-01-01') }, // used 2 days ago -> should pick this
       { id: 'key-3', last_used_at: new Date('2026-01-03') }, // used today
     ];
-    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as any);
+    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as never);
     
     const selected = await getHealthyKeyForUser('user-1');
     expect(selected.id).toBe('key-2');
@@ -73,7 +73,7 @@ describe('Key Assignment & Release', () => {
       { id: 'key-2', created_at: new Date('2026-01-02') },
       { id: 'key-3', created_at: new Date('2026-01-01') },
     ];
-    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as any);
+    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as never);
     
     // Release 2 keys
     const released = await releaseKeys('user-1', 2, 'PREMIUM_DOWNGRADE');

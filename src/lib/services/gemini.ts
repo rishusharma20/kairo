@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getHealthyKeyForUser, markKeyCooldown, NoHealthyKeyError } from "@/lib/services/keys";
+import { decryptKey } from "@/lib/services/encryption";
 import { buildPrompt, QueryFeature, ResponseFormat } from "@/lib/services/prompts";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 
@@ -27,9 +28,8 @@ export async function processGeminiQuery(
     }
 
     try {
-      // NOTE: For Phase-5 we assume `encrypted_api_key` stores the raw API key.
-      // In a fully productionized vault, you would decrypt this string here securely.
-      const genAI = new GoogleGenerativeAI(key.encrypted_api_key);
+      const decryptedKey = decryptKey(key.encrypted_api_key);
+      const genAI = new GoogleGenerativeAI(decryptedKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       // Call API
@@ -37,11 +37,12 @@ export async function processGeminiQuery(
       const response = await result.response;
       return response.text();
 
-    } catch (apiError: any) {
+    } catch (err: unknown) {
+      const apiError = err as { status?: number; message?: string };
       console.error(`Gemini API Error with key ${key.id}:`, apiError);
       
       // If it's a rate limit (429) or temporary server error (500/503)
-      const isTemporary = apiError.status === 429 || apiError.status >= 500 || apiError.message?.includes('fetch failed');
+      const isTemporary = apiError.status === 429 || (apiError.status ?? 0) >= 500 || apiError.message?.includes('fetch failed');
       
       if (isTemporary || apiError.status === 400 || apiError.status === 401 || apiError.status === 403) {
         // Punish the key with a 5 minute timeout and proceed to the next iteration

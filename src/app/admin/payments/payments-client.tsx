@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { fetchPaymentsAction, approvePaymentAction, rejectPaymentAction } from "./actions";
-import { Search, ShieldAlert, CheckCircle2, XCircle, Clock, FileText, X, AlertTriangle, Loader2, User as UserIcon } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldAlert, Loader2, FileText, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export type PaymentRequestType = {
@@ -33,7 +33,7 @@ export function PaymentsClient({ initialPayments }: { initialPayments: PaymentRe
   const handleRefresh = async () => {
     setIsSearching(true);
     try {
-      const results = await fetchPaymentsAction(statusFilter ? (statusFilter as any) : undefined);
+      const results = await fetchPaymentsAction(statusFilter ? (statusFilter as "PENDING" | "APPROVED" | "REJECTED") : undefined);
       setPayments(results);
     } catch (error) {
       console.error("Refresh failed", error);
@@ -62,8 +62,8 @@ export function PaymentsClient({ initialPayments }: { initialPayments: PaymentRe
         setViewPayment(null);
       }
       setActionModal(null);
-    } catch (error: any) {
-      setErrorMsg(error.message || `An error occurred during ${actionModal.type}.`);
+    } catch (error: unknown) {
+      setErrorMsg((error as Error).message || `An error occurred during ${actionModal.type}.`);
     } finally {
       setIsProcessing(false);
     }

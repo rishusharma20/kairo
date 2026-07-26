@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { fetchUsersAction, performAdminAction } from "./actions";
-import { Search, Filter, Shield, MoreVertical, X, AlertTriangle, Loader2, User as UserIcon, Mail, Crown, Activity } from "lucide-react";
+import { Search, MoreVertical, X, AlertTriangle, Loader2, User as UserIcon, Crown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLANS = ["FREE", "PREMIUM_7_DAYS", "PREMIUM_30_DAYS"];
@@ -65,7 +65,7 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
       
       const result = await performAdminAction(
         actionModal.user.id, 
-        actionModal.type as any,
+        actionModal.type as "block" | "unblock" | "delete" | "change_tier",
         { targetPlan }
       );
       // Update local state smoothly
@@ -74,8 +74,8 @@ export function UsersClient({ initialUsers }: { initialUsers: UserType[] }) {
         setViewUser(prev => prev ? { ...prev, ...result } : null);
       }
       setActionModal(null);
-    } catch (error: any) {
-      setErrorMsg(error.message || "An error occurred during this action.");
+    } catch (error: unknown) {
+      setErrorMsg((error as Error).message || "An error occurred during this action.");
     } finally {
       setIsProcessing(false);
     }

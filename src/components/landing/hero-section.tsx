@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ParticleField } from "@/components/effects/particle-field";
 import { TextReveal, CharReveal } from "@/components/effects/text-reveal";
@@ -11,9 +11,14 @@ export function HeroSection() {
   const [isMac, setIsMac] = useState(true);
 
   useEffect(() => {
-    setIsMac(navigator.platform.toUpperCase().includes("MAC"));
+    const macTimer = setTimeout(() => {
+      setIsMac(navigator.platform.toUpperCase().includes("MAC"));
+    }, 0);
     const timer = setTimeout(() => setShowShortcut(true), 1800);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(macTimer);
+      clearTimeout(timer);
+    };
   }, []);
 
   return (

@@ -69,7 +69,7 @@ export function AuditClient({ initialLogs }: { initialLogs: AuditLogType[] }) {
     if (!metadataString) return null;
     try {
       return JSON.stringify(JSON.parse(metadataString), null, 2);
-    } catch (e) {
+    } catch {
       return metadataString;
     }
   };

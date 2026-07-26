@@ -58,7 +58,8 @@ export default function VerifyPage() {
 
   useEffect(() => {
     if (otp.every((d) => d)) {
-      handleSubmit();
+      const t = setTimeout(() => handleSubmit(), 0);
+      return () => clearTimeout(t);
     }
   }, [otp, handleSubmit]);
 

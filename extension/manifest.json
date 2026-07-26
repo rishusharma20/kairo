@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Kairo",
+  "version": "0.1.0",
+  "description": "Kairo AI Assistant Extension",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://localhost/*"],
+      "js": ["pageContext.js", "content.js"]
+    }
+  ],
+  "commands": {
+    "_toggle_kairo": {
+      "suggested_key": {
+        "default": "Alt+D",
+        "mac": "Alt+D"
+      },
+      "description": "Toggle Kairo"
+    }
+  }
+}

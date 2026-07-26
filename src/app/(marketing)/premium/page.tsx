@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { ArrowDown, Check, ChevronRight } from "lucide-react";
+import { ArrowDown, ChevronRight } from "lucide-react";
 import { ParticleField } from "@/components/effects/particle-field";
 import { cn } from "@/lib/utils";
 

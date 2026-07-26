@@ -23,11 +23,14 @@ export function KairoOverlay({ isOpen, onClose, context }: KairoOverlayProps) {
 
   useEffect(() => {
     if (isOpen) {
-      setTask(null);
-      setFlow("idle");
-      setInput("");
-      setResponse("");
-      setTimeout(() => inputRef.current?.focus(), 100);
+      const t = setTimeout(() => {
+        setTask(null);
+        setFlow("idle");
+        setInput("");
+        setResponse("");
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(t);
     }
   }, [isOpen]);
 
@@ -45,7 +48,7 @@ export function KairoOverlay({ isOpen, onClose, context }: KairoOverlayProps) {
     e.preventDefault();
     if (!input && !task) return;
 
-    let currentTask = task || "ask";
+    const currentTask = task || "ask";
     if (currentTask === "text" && !context.selectedText) {
       setResponse("Error: No text selected on the page.");
       setFlow("done");
@@ -79,7 +82,7 @@ export function KairoOverlay({ isOpen, onClose, context }: KairoOverlayProps) {
         }
       }, 600);
       
-    } catch (err: any) {
+    } catch {
       setFlow("done");
       setResponse("Critical Error: Intelligence disconnected.");
     }
@@ -91,10 +94,7 @@ export function KairoOverlay({ isOpen, onClose, context }: KairoOverlayProps) {
     exit: { opacity: 0, scale: 0.98, filter: "blur(10px)", transition: { duration: 0.3 } },
   };
 
-  const textVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-  };
+
 
   if (!isOpen) return null;
 

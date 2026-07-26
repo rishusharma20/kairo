@@ -79,7 +79,7 @@ export default async function DashboardHome() {
 
            <h2 className="text-text-muted text-sm font-medium tracking-wide uppercase mb-6 flex items-center gap-2">
              <Activity className="w-4 h-4" />
-             Today's Usage
+             Today&apos;s Usage
            </h2>
 
            <div className="space-y-6">

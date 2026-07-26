@@ -1,6 +1,11 @@
 import { prisma } from '../src/lib/db'
+import { encryptKey } from '../src/lib/services/encryption'
 
 async function main() {
+  if (process.env.NODE_ENV === "production") {
+    console.error("Development seed is disabled in production. Aborting to prevent dummy data creation.");
+    process.exit(1);
+  }
   console.log('Clearing database...')
   await prisma.auditLog.deleteMany()
   await prisma.dailyUsage.deleteMany()
@@ -21,8 +26,10 @@ async function main() {
   })
 
   console.log('Creating Free User...')
-  const freeUser = await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'free@gmail.com' },
+    update: {},
+    create: {
       full_name: 'Free Trial User',
       email: 'free@gmail.com',
       password_hash: 'hashed_password', // Placeholder
@@ -47,24 +54,28 @@ async function main() {
   console.log('Creating Gemini API Keys...')
   const key1 = await prisma.geminiKey.create({
     data: {
-      encrypted_api_key: 'enc_abc123',
+      encrypted_api_key: encryptKey('enc_abc123'),
       status: 'ASSIGNED',
       assigned_user_id: premiumUser.id,
       priority: 10,
     },
   })
 
-  const key2 = await prisma.geminiKey.create({
-    data: {
-      encrypted_api_key: 'enc_def456',
+  await prisma.geminiKey.upsert({
+    where: { encrypted_api_key: encryptKey('enc_def456') },
+    update: {},
+    create: {
+      encrypted_api_key: encryptKey('enc_def456'),
       status: 'AVAILABLE',
       priority: 5,
     },
   })
 
-  const key3 = await prisma.geminiKey.create({
-    data: {
-      encrypted_api_key: 'enc_ghi789',
+  await prisma.geminiKey.upsert({
+    where: { encrypted_api_key: encryptKey('enc_ghi789') },
+    update: {},
+    create: {
+      encrypted_api_key: encryptKey('enc_ghi789'),
       status: 'AVAILABLE',
       priority: 1,
     },

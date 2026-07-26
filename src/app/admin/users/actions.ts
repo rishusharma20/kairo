@@ -53,7 +53,7 @@ export async function performAdminAction(
       break;
     case "change_tier": 
       if (!options?.targetPlan) throw new Error("targetPlan is required for change_tier");
-      result = await changeUserTierAdmin(userId, options.targetPlan, null); 
+      result = await changeUserTierAdmin(userId, options.targetPlan); 
       break;
     case "delete": 
       result = await deleteUser(userId); 

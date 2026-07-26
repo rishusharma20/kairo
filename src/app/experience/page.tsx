@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { useState, useEffect } from "react";
 import { Command, Keyboard } from "lucide-react";
 import { KairoOverlay } from "@/components/experience/kairo-overlay";
@@ -15,7 +15,7 @@ export default function ExperienceSimulator() {
   });
 
   useEffect(() => {
-    setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+    const t = setTimeout(() => setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0), 0);
     
     const handleKeyDown = (e: KeyboardEvent) => {
       // Option + D (Mac) or Alt + D (Windows)
@@ -33,7 +33,10 @@ export default function ExperienceSimulator() {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(t);
+    };
   }, []);
 
   return (
@@ -68,7 +71,7 @@ export default function ExperienceSimulator() {
           <div className="bg-black/5 p-6 rounded-lg my-8">
             <h3 className="font-bold mb-2">Quote of the Day</h3>
             <p className="italic text-black/70">
-              "You have power over your mind - not outside events. Realize this, and you will find strength." — Marcus Aurelius
+              &quot;You have power over your mind - not outside events. Realize this, and you will find strength.&quot; — Marcus Aurelius
             </p>
           </div>
 

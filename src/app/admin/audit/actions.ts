@@ -31,7 +31,7 @@ export async function fetchAuditLogsAction(limit = 100, offset = 0) {
 
   const res = await fetch(url, {
     method: "GET",
-    headers: { "x-admin-key": ADMIN_API_KEY },
+    headers: { "x-admin-key": ADMIN_API_KEY as string },
     cache: "no-store"
   });
 

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getPaymentRequests } from "@/lib/services/payment";
-import { Users, Shield, Crown, Clock, Activity, BarChart3 } from "lucide-react";
+import { Users, Activity, Shield, Clock, Crown } from "lucide-react";
 
 export default async function AdminOverview() {
   // Fetch real authoritative data for the overview

@@ -13,9 +13,9 @@ async function handler(request: Request) {
     const users = await searchUsers({ email, status, plan, id });
 
     return NextResponse.json({ success: true, data: users });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin Users Error:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message || "Internal Server Error" }, { status: 500 });
   }
 }
 

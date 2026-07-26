@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { prisma } from '@/lib/db';
-import { blockUser, unblockUser, deleteUser, changeUserTierAdmin } from '@/lib/services/admin';
-import { changeUserTier } from '@/lib/services/plan';
-import { upgradeToPremium, downgradeToFree } from '@/lib/services/plan';
+import { blockUser, unblockUser, deleteUser } from '@/lib/services/admin';
+import { assignKeys, releaseKeys } from '@/lib/services/keys';
 import { logSystemEventInBackground } from '@/lib/services/audit';
 import { withAdminValidation } from '@/lib/middlewares/withAdmin';
 import { NextRequest } from 'next/server';
@@ -22,8 +21,7 @@ vi.mock('@/lib/services/keys', () => ({
 }));
 
 vi.mock('@/lib/services/plan', () => ({
-  upgradeToPremium: vi.fn(),
-  downgradeToFree: vi.fn(),
+  changeUserTier: vi.fn(),
 }));
 
 vi.mock('@/lib/services/audit', () => ({
@@ -42,13 +40,13 @@ describe('Admin User Services', () => {
     });
 
     it('throws if user already blocked', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED' } as never);
       await expect(blockUser('123')).rejects.toThrow("User is already blocked");
     });
 
     it('blocks user successfully and releases keys', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as any);
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'BLOCKED' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as never);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'BLOCKED' } as never);
 
       await blockUser('123');
 
@@ -60,13 +58,13 @@ describe('Admin User Services', () => {
 
   describe('unblockUser', () => {
     it('throws if user not blocked', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as never);
       await expect(unblockUser('123')).rejects.toThrow("User is not blocked");
     });
 
     it('unblocks and assigns 3 keys if PREMIUM', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED', plan: 'PREMIUM' } as any);
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'ACTIVE' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED', plan: 'PREMIUM' } as never);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'ACTIVE' } as never);
 
       await unblockUser('123');
 
@@ -76,8 +74,8 @@ describe('Admin User Services', () => {
     });
     
     it('unblocks and assigns 1 key if FREE', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED', plan: 'FREE' } as any);
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'ACTIVE' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'BLOCKED', plan: 'FREE' } as never);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'ACTIVE' } as never);
 
       await unblockUser('123');
 
@@ -87,13 +85,13 @@ describe('Admin User Services', () => {
 
   describe('deleteUser', () => {
     it('throws if user already deleted', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'DELETED' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'DELETED' } as never);
       await expect(deleteUser('123')).rejects.toThrow("User is already deleted");
     });
 
     it('deletes user successfully', async () => {
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as any);
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'DELETED' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ status: 'ACTIVE' } as never);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ status: 'DELETED' } as never);
 
       await deleteUser('123');
 
@@ -113,7 +111,7 @@ describe('Admin Middleware', () => {
       headers: { 'Authorization': 'Bearer wrong-key' }
     });
     
-    const res = await middleware(req as any);
+    const res = await middleware(req as never);
     expect(res.status).toBe(401);
     expect(handler).not.toHaveBeenCalled();
   });
@@ -122,13 +120,12 @@ describe('Admin Middleware', () => {
     const handler = vi.fn().mockResolvedValue({ status: 200 });
     const middleware = withAdminValidation(handler);
     
-    const originalKey = process.env.ADMIN_API_KEY;
     // The middleware defaults to 'kairo-local-admin-key' if not defined
     const req = new NextRequest('http://localhost', {
       headers: { 'x-admin-key': process.env.ADMIN_API_KEY || 'kairo-local-admin-key' }
     });
     
-    await middleware(req as any);
+    await middleware(req as never);
     expect(handler).toHaveBeenCalled();
   });
 });

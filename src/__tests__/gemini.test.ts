@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { processGeminiQuery } from '@/lib/services/gemini';
 import { getHealthyKeyForUser, markKeyCooldown, NoHealthyKeyError } from '@/lib/services/keys';
 import { buildPrompt } from '@/lib/services/prompts';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Mock dependencies
 vi.mock('@/lib/services/keys', () => ({
@@ -56,7 +55,7 @@ describe('Gemini Failover Engine', () => {
   });
 
   it('succeeds on first try if API is healthy', async () => {
-    vi.mocked(getHealthyKeyForUser).mockResolvedValueOnce({ id: 'key-1', encrypted_api_key: 'abc' } as any);
+    vi.mocked(getHealthyKeyForUser).mockResolvedValueOnce({ id: 'key-1', encrypted_api_key: 'AIza_abc' } as never);
     mocks.generateContentMock.mockResolvedValueOnce({
       response: { text: () => 'Mock API Response' }
     });
@@ -69,8 +68,8 @@ describe('Gemini Failover Engine', () => {
   it('fails over to second key if first key hits rate limit (429)', async () => {
     // 1st call returns key-1, 2nd call returns key-2
     vi.mocked(getHealthyKeyForUser)
-      .mockResolvedValueOnce({ id: 'key-1', encrypted_api_key: 'abc' } as any)
-      .mockResolvedValueOnce({ id: 'key-2', encrypted_api_key: 'def' } as any);
+      .mockResolvedValueOnce({ id: 'key-1', encrypted_api_key: 'AIza_abc' } as never)
+      .mockResolvedValueOnce({ id: 'key-2', encrypted_api_key: 'AIza_def' } as never);
 
     // 1st API call fails with 429
     mocks.generateContentMock.mockRejectedValueOnce({ status: 429, message: 'Too Many Requests' });
@@ -88,7 +87,7 @@ describe('Gemini Failover Engine', () => {
   });
 
   it('exhausts all keys and throws error if they all fail', async () => {
-    vi.mocked(getHealthyKeyForUser).mockResolvedValue({ id: 'key-X', encrypted_api_key: 'xxx' } as any);
+    vi.mocked(getHealthyKeyForUser).mockResolvedValue({ id: 'key-X', encrypted_api_key: 'AIza_xxx' } as never);
     mocks.generateContentMock.mockRejectedValue({ status: 503, message: 'Service Unavailable' });
 
     await expect(processGeminiQuery('user-1', 'ask', 'Hello', 'General')).rejects.toThrow('No healthy Gemini key available.');

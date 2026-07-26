@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, XCircle, Loader2, AlertCircle, Inbox } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Inbox } from "lucide-react";
 
 // -- Premium Loading Spinner --
 export function KairoLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
@@ -88,6 +88,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 export function ChartSkeleton() {
+  const heights = [40, 75, 50, 90, 35, 80, 60];
   return (
     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)] p-6">
       <Skeleton className="h-4 w-1/4 mb-6" />
@@ -96,7 +97,7 @@ export function ChartSkeleton() {
           <Skeleton
             key={i}
             className="flex-1 rounded-t-md"
-            style={{ height: `${30 + Math.random() * 70}%` }}
+            style={{ height: `${heights[i % heights.length]}%` }}
           />
         ))}
       </div>

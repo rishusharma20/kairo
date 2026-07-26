@@ -1,4 +1,4 @@
-export type QueryFeature = "ask" | "page" | "text";
+export type QueryFeature = "ask" | "page" | "text" | "page_analyze";
 export type ResponseFormat = "MCQ" | "Coding" | "Interview" | "General";
 
 interface PromptPayload {
@@ -23,6 +23,10 @@ export function buildPrompt(payload: PromptPayload): string {
     case "text":
       if (!payload.context) throw new Error("Selected text analysis requires context");
       baseContext = `Context (Selected Text): ${payload.context}\nUser Query: ${payload.query}`;
+      break;
+    case "page_analyze":
+      if (!payload.context) throw new Error("Page analysis requires context");
+      baseContext = `Context (Page Content): ${payload.context}\nUser Instruction: Analyze the provided page context and return the most useful concise assistance based only on the available content. If the page contains a clear informational topic, explain or summarize the important content. If it contains code or a technical error, explain the relevant issue and likely solution. If the page does not contain enough meaningful information, say so briefly. Do not fabricate missing context.`;
       break;
   }
 

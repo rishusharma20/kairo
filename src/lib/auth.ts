@@ -1,11 +1,11 @@
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-// In production, this should be in an environment variable (e.g. process.env.JWT_SECRET)
-const JWT_SECRET = new TextEncoder().encode(
-  "kairo-intelligence-super-secret-key-that-must-be-very-long"
-);
+// In production, this MUST be in an environment variable (e.g. process.env.JWT_SECRET)
+const jwtSecretString = process.env.JWT_SECRET || "kairo-intelligence-super-secret-key-that-must-be-very-long";
+
+const JWT_SECRET = new TextEncoder().encode(jwtSecretString);
 
 const SESSION_COOKIE_NAME = "kairo_session";
 
@@ -29,7 +29,7 @@ export async function createSession(payload: SessionPayload) {
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
@@ -41,7 +41,7 @@ export async function verifySession(token: string | undefined) {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload as unknown as SessionPayload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

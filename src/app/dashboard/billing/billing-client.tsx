@@ -39,8 +39,8 @@ export default function BillingClient({ user }: BillingClientProps) {
       setPaymentStatus("PENDING");
       setShowModal(false);
       setUtr("");
-    } catch (err: any) {
-      setErrorMsg(err.message || "An error occurred while submitting payment.");
+    } catch (err: unknown) {
+      setErrorMsg((err as Error).message || "An error occurred while submitting payment.");
     } finally {
       setSubmitting(false);
     }

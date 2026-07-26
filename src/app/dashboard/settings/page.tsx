@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { getCachedUser } from "@/lib/services/user";
 import { redirect } from "next/navigation";
-import { Settings, Shield, Key, Bell, LayoutDashboard } from "lucide-react";
+import { Shield, Key, Bell, LayoutDashboard } from "lucide-react";
 
 export default async function SettingsDashboard() {
   const session = await getSession();
