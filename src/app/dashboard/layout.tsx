@@ -5,6 +5,7 @@ import { getCachedUser } from "@/lib/services/user";
 
 const DASHBOARD_ITEMS = [
   { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
+  { label: "Kairo Chat", href: "/dashboard/chat", icon: "MessageSquare" },
   { label: "Profile", href: "/dashboard/profile", icon: "User" },
   { label: "Billing", href: "/dashboard/billing", icon: "Crown" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },

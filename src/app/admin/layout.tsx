@@ -7,6 +7,7 @@ const ADMIN_ITEMS = [
   { label: "Users", href: "/admin/users", icon: "Users" },
   { label: "Payment Requests", href: "/admin/payments", icon: "Crown" },
   { label: "Audit Logs", href: "/admin/audit", icon: "FileText" },
+  { label: "Kairo Chat", href: "/admin/chat", icon: "MessageSquare" },
 ];
 
 export default async function AdminLayout({

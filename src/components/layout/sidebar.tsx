@@ -7,13 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, BarChart3, Clock, Crown, Users, HelpCircle,
   Settings, ChevronLeft, ChevronRight, LogOut, User, Activity,
-  Code2, FileText, Wrench, Shield,
+  Code2, FileText, Wrench, Shield, MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard, BarChart3, Clock, Crown, Users, HelpCircle,
-  Settings, Activity, Code2, FileText, Wrench, Shield, User,
+  Settings, Activity, Code2, FileText, Wrench, Shield, User, MessageSquare
 };
 
 interface NavItem {
