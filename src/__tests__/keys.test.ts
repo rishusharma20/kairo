@@ -60,6 +60,31 @@ describe('Key Rotation Service (Round Robin)', () => {
       expect.objectContaining({ where: { id: 'key-2' } })
     );
   });
+
+  it('considers expired cooldown keys as eligible and restores status to ASSIGNED', async () => {
+    const expiredCooldownDate = new Date(Date.now() - 1000);
+    const keys = [
+      { id: 'key-1', status: 'COOLDOWN', cooldown_until: expiredCooldownDate, last_used_at: new Date('2026-01-01') },
+    ];
+    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce(keys as never);
+    
+    const selected = await getHealthyKeyForUser('user-1');
+    expect(selected.id).toBe('key-1');
+    expect(prisma.geminiKey.update).toHaveBeenCalledWith({
+      where: { id: 'key-1' },
+      data: {
+        last_used_at: expect.any(Date),
+        status: 'ASSIGNED',
+        cooldown_until: null,
+        failure_count: 0
+      }
+    });
+  });
+
+  it('skips non-expired cooldown keys', async () => {
+    vi.mocked(prisma.geminiKey.findMany).mockResolvedValueOnce([]);
+    await expect(getHealthyKeyForUser('user-1')).rejects.toThrow(NoHealthyKeyError);
+  });
 });
 
 describe('Key Assignment & Release', () => {

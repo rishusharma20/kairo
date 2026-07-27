@@ -109,13 +109,14 @@ export async function getHealthyKeyForUser(userId: string) {
   const keys = await prisma.geminiKey.findMany({
     where: {
       assigned_user_id: userId,
-      status: "ASSIGNED", // Must be ASSIGNED (Not COOLDOWN or DISABLED)
       OR: [
-        { cooldown_until: null },
-        { cooldown_until: { lt: new Date() } }
+        { status: "ASSIGNED" },
+        {
+          status: "COOLDOWN",
+          cooldown_until: { lt: new Date() }
+        }
       ]
     },
-    // We sort by last_used_at asc. Keys never used (null) will typically come first, then oldest used.
   });
 
   if (keys.length === 0) {
@@ -133,10 +134,16 @@ export async function getHealthyKeyForUser(userId: string) {
 
   const selectedKey = keys[0];
 
-  // Update last_used_at for the selected key to rotate it to the back of the queue
+  // Update last_used_at for the selected key to rotate it to the back of the queue.
+  // If it was in COOLDOWN, restore status to ASSIGNED and clear cooldown/failure state.
   await prisma.geminiKey.update({
     where: { id: selectedKey.id },
-    data: { last_used_at: new Date() }
+    data: {
+      last_used_at: new Date(),
+      status: "ASSIGNED",
+      cooldown_until: null,
+      failure_count: 0
+    }
   });
 
   return selectedKey;
