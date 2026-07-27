@@ -8,15 +8,24 @@ import { verifyUsageLimits, DailyLimitExceededError } from "@/lib/services/usage
  */
 export function withUsageValidation<T extends unknown[]>(handler: (request: Request, ...args: T) => Promise<Response>) {
   return async (request: Request, ...args: T): Promise<Response> => {
+    const origin = request.headers.get('origin') || '';
+    const isExtension = origin.startsWith('chrome-extension://');
+    
+    const headers = new Headers();
+    if (isExtension) {
+      headers.set('Access-Control-Allow-Origin', origin);
+      headers.set('Access-Control-Allow-Credentials', 'true');
+    }
+
     try {
       const session = await getSession();
 
       if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers });
       }
 
       if (session.status === "BLOCKED" || session.status === "DELETED") {
-        return NextResponse.json({ error: "Forbidden: Invalid user state" }, { status: 403 });
+        return NextResponse.json({ error: "Forbidden: Invalid user state" }, { status: 403, headers });
       }
 
       // Atomically check limits and reset counters if it's a new day (without incrementing)
@@ -40,11 +49,11 @@ export function withUsageValidation<T extends unknown[]>(handler: (request: Requ
 
     } catch (error) {
       if (error instanceof DailyLimitExceededError) {
-        return NextResponse.json({ error: (error as Error).message }, { status: 429 });
+        return NextResponse.json({ error: (error as Error).message }, { status: 429, headers });
       }
 
       console.error("Usage Validation Error:", error);
-      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500, headers });
     }
   };
 }

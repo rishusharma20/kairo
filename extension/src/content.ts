@@ -30,15 +30,15 @@ function initKairo() {
       --foreground: #fafafa;
       --surface: #0a0a0a;
       --card: rgba(255, 255, 255, 0.03);
-      --border: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
       --border-focus: rgba(0, 212, 255, 0.5);
       --text-primary: #fafafa;
-      --text-muted: rgba(255, 255, 255, 0.4);
+      --text-muted: rgba(255, 255, 255, 0.45);
       --accent: #00D4FF;
       --accent-dim: rgba(0, 212, 255, 0.15);
       --destructive: #ff3b30;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-blur: 16px;
+      --glass-bg: rgba(10, 10, 10, 0.75);
+      --glass-blur: 24px;
       
       font-family: system-ui, -apple-system, sans-serif;
       box-sizing: border-box;
@@ -60,7 +60,7 @@ function initKairo() {
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
       color: var(--text-primary);
     }
     
@@ -74,36 +74,115 @@ function initKairo() {
       flex-shrink: 0;
     }
     
-    .kairo-title { font-size: 14px; font-weight: 500; letter-spacing: 0.5px; margin: 0; }
+    .kairo-title { font-size: 14px; font-weight: 600; letter-spacing: 0.5px; margin: 0; }
     .kairo-subtitle { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0; }
     
     .kairo-close {
       background: transparent; border: none; color: var(--text-muted); cursor: pointer;
       padding: 4px; display: flex; align-items: center; justify-content: center;
-      border-radius: 4px; transition: color 0.2s, background 0.2s;
+      border-radius: 6px; transition: color 0.2s, background 0.2s;
     }
-    .kairo-close:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.1); }
+    .kairo-close:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.08); }
     
     /* State Views */
     .state-container {
       flex: 1; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; text-align: center; padding: 24px;
+      justify-content: center; text-align: center; padding: 28px;
     }
-    .state-title { font-size: 18px; font-weight: 500; margin: 0 0 8px 0; }
-    .state-subtitle { font-size: 14px; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5; }
+    .state-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.02em; }
+    .state-subtitle { font-size: 14px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.5; }
     
     .kairo-button {
       background: var(--text-primary); color: var(--background); border: none;
-      border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: opacity 0.2s;
+      border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s; width: 100%;
     }
-    .kairo-button:hover { opacity: 0.9; }
+    .kairo-button:hover { opacity: 0.95; }
     
     .spinner {
-      width: 24px; height: 24px; border: 3px solid var(--border);
+      width: 28px; height: 28px; border: 3px solid var(--border);
       border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Login Form styles */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+    
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+    
+    .form-link {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .form-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Meta Bar Info */
+    .meta-bar {
+      padding: 8px 16px;
+      background: rgba(10, 10, 10, 0.4);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    
+    .meta-plan {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+    }
+
+    .meta-credits {
+      font-weight: 500;
+    }
+
+    .logout-link {
+      background: transparent;
+      border: none;
+      color: var(--destructive);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+      font-weight: 600;
+    }
+    .logout-link:hover {
+      text-decoration: underline;
+    }
 
     /* Chat View */
     .chat-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
@@ -114,7 +193,7 @@ function initKairo() {
     .kairo-messages::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
     
     .kairo-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.5; text-align: center; }
-    .kairo-empty-title { font-size: 18px; font-weight: 500; margin: 0 0 8px 0; }
+    .kairo-empty-title { font-size: 18px; font-weight: 600; margin: 0 0 8px 0; }
     .kairo-empty-subtitle { font-size: 14px; margin: 0; }
     
     .message-row { display: flex; width: 100%; }
@@ -129,7 +208,7 @@ function initKairo() {
     .message-bubble.kairo { background: transparent; color: var(--text-primary); }
     .message-bubble.error { background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.2); color: var(--destructive); border-radius: 16px; border-top-left-radius: 4px; }
     
-    .message-meta { font-size: 10px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .message-meta { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
     .message-row.user .message-meta { text-align: right; }
     
     .kairo-input-area { padding: 16px; background: rgba(10, 10, 10, 0.5); border-top: 1px solid var(--border); flex-shrink: 0; }
@@ -179,7 +258,16 @@ function initKairo() {
     <div id="state-unauth" class="state-container hidden">
       <h3 class="state-title">Kairo</h3>
       <p class="state-subtitle">Sign in to Kairo to continue.</p>
-      <button class="kairo-button" id="btn-signin">Sign In</button>
+      <form id="login-form" class="login-form">
+        <input type="email" id="login-email" class="form-input" placeholder="Email" required />
+        <input type="password" id="login-password" class="form-input" placeholder="Password" required />
+        <button type="submit" class="kairo-button" id="btn-submit-signin">Sign In</button>
+      </form>
+      <div id="login-error" class="message-bubble error hidden" style="margin-top: 12px; font-size: 12px; width: 100%;"></div>
+      <div class="form-footer">
+        <a class="form-link" id="link-forgot">Forgot Password?</a>
+        <a class="form-link" id="link-website">Open Website</a>
+      </div>
     </div>
     
     <div id="state-error" class="state-container hidden">
@@ -194,6 +282,11 @@ function initKairo() {
     </div>
     
     <div id="chat-view" class="chat-view hidden">
+      <div id="meta-bar" class="meta-bar">
+        <span id="meta-plan" class="meta-plan">Plan: -</span>
+        <span id="meta-credits" class="meta-credits">- / - used</span>
+        <button id="btn-logout" class="logout-link">Logout</button>
+      </div>
       <div class="kairo-messages" id="kairo-messages">
         <div class="kairo-empty" id="kairo-empty">
           <h3 class="kairo-empty-title">Kairo</h3>
@@ -241,19 +334,81 @@ function initKairo() {
         return;
       }
       switch (response.status) {
-        case 'AUTHENTICATED': showView(viewChat); break;
-        case 'UNAUTHENTICATED': showView(viewUnauth); break;
-        case 'BLOCKED': showView(viewBlocked); break;
-        case 'ERROR': default: showView(viewError); break;
+        case 'AUTHENTICATED':
+          const metaPlan = shadow.querySelector('#meta-plan') as HTMLSpanElement;
+          const metaCredits = shadow.querySelector('#meta-credits') as HTMLSpanElement;
+          if (response.user) {
+            metaPlan.textContent = `Plan: ${response.user.plan}`;
+            metaCredits.textContent = `${response.user.requests_used} / ${response.user.daily_limit} used`;
+          }
+          showView(viewChat);
+          break;
+        case 'UNAUTHENTICATED':
+          showView(viewUnauth);
+          break;
+        case 'BLOCKED':
+          showView(viewBlocked);
+          break;
+        case 'ERROR':
+        default:
+          showView(viewError);
+          break;
       }
     });
   }
 
-  const btnSignin = shadow.querySelector('#btn-signin') as HTMLButtonElement;
+  // Login Form Handlers
+  const loginForm = shadow.querySelector('#login-form') as HTMLFormElement;
+  const loginEmail = shadow.querySelector('#login-email') as HTMLInputElement;
+  const loginPassword = shadow.querySelector('#login-password') as HTMLInputElement;
+  const loginError = shadow.querySelector('#login-error') as HTMLDivElement;
   const btnRetry = shadow.querySelector('#btn-retry') as HTMLButtonElement;
   const closeBtn = shadow.querySelector('.kairo-close') as HTMLButtonElement;
-  
-  btnSignin.addEventListener('click', () => window.open('http://localhost:3000/auth/login', '_blank'));
+  const linkForgot = shadow.querySelector('#link-forgot') as HTMLAnchorElement;
+  const linkWebsite = shadow.querySelector('#link-website') as HTMLAnchorElement;
+  const btnLogout = shadow.querySelector('#btn-logout') as HTMLButtonElement;
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    loginError.classList.add('hidden');
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+
+    showView(viewLoading);
+    chrome.runtime.sendMessage({ type: 'LOGIN', payload: { email, password } }, (response) => {
+      if (chrome.runtime.lastError || !response) {
+        showView(viewUnauth);
+        loginError.textContent = 'Connection error.';
+        loginError.classList.remove('hidden');
+        return;
+      }
+      if (response.status === 'SUCCESS') {
+        loginEmail.value = '';
+        loginPassword.value = '';
+        checkAuth();
+      } else {
+        showView(viewUnauth);
+        loginError.textContent = response.error || 'Invalid credentials.';
+        loginError.classList.remove('hidden');
+      }
+    });
+  });
+
+  linkForgot.addEventListener('click', () => {
+    window.open('https://aikairo.vercel.app/auth/forgot-password', '_blank');
+  });
+
+  linkWebsite.addEventListener('click', () => {
+    window.open('https://aikairo.vercel.app', '_blank');
+  });
+
+  btnLogout.addEventListener('click', () => {
+    showView(viewLoading);
+    chrome.runtime.sendMessage({ type: 'LOGOUT' }, () => {
+      checkAuth();
+    });
+  });
+
   btnRetry.addEventListener('click', checkAuth);
   closeBtn.addEventListener('click', () => host.style.display = 'none');
 
@@ -361,7 +516,6 @@ function initKairo() {
         indicator.classList.remove('hidden');
       }
     } else if (!text) {
-      // Empty prompt + no context = show error without network request
       isProcessing = false;
       updateInputState();
       
@@ -408,14 +562,16 @@ function initKairo() {
 
       if (response.status === 'SUCCESS') {
         addMessage('kairo', response.data);
+        checkAuth(); // Update credits bar
       } else if (response.status === 'UNAUTHENTICATED' || response.status === 'BLOCKED') {
-        checkAuth(); // Re-sync auth state natively
+        checkAuth();
       } else {
         addMessage('error', response.error || 'An error occurred.');
       }
     });
   }
 
+  // Toggle Listener
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'TOGGLE_KAIRO') {
       if (host.style.display === 'none') {
@@ -426,6 +582,19 @@ function initKairo() {
       } else {
         host.style.display = 'none';
       }
+    }
+  });
+
+  // Escape key hides Kairo panel (both globally and within Shadow DOM)
+  container.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      host.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && host.style.display !== 'none') {
+      host.style.display = 'none';
     }
   });
 

@@ -8,11 +8,11 @@
     "type": "module"
   },
   "host_permissions": [
-    "http://localhost:3000/*"
+    "https://aikairo.vercel.app/*"
   ],
   "content_scripts": [
     {
-      "matches": ["http://localhost/*"],
+      "matches": ["<all_urls>"],
       "js": ["pageContext.js", "content.js"]
     }
   ],

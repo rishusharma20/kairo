@@ -18,13 +18,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ authenticated: false }, { status: 401, headers });
     }
 
+    const { getUsageQuota } = await import("@/lib/services/usage");
+    const quota = await getUsageQuota(session.userId);
+
     return NextResponse.json({
       authenticated: true,
       user: {
         id: session.userId,
         email: session.email,
         plan: session.plan,
-        status: session.status
+        status: session.status,
+        requests_used: quota.requests_used,
+        daily_limit: quota.daily_limit
       }
     }, { headers });
   } catch (error) {

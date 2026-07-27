@@ -1,6 +1,6 @@
 // Kairo Extension Background Script
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = "https://aikairo.vercel.app";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'AUTH_CHECK') {
@@ -11,13 +11,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handleAIQuery(message.payload).then(sendResponse);
     return true;
   }
+  if (message.type === 'LOGIN') {
+    handleLogin(message.payload).then(sendResponse);
+    return true;
+  }
+  if (message.type === 'LOGOUT') {
+    handleLogout().then(sendResponse);
+    return true;
+  }
 });
 
 async function handleAuthCheck() {
   try {
     const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
       method: 'GET',
-      credentials: 'include' // This relies on host_permissions to attach SameSite=Lax cookies
+      credentials: 'include' // This relies on host_permissions to attach SameSite=Lax/None cookies
     });
 
     if (!response.ok) {
@@ -44,6 +52,48 @@ async function handleAuthCheck() {
   } catch (error) {
     console.error('Kairo Auth Check Error:', error);
     return { status: 'ERROR', error: (error as Error).message };
+  }
+}
+
+async function handleLogin(payload: { email: string, password: string }) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        email: payload.email,
+        password: payload.password
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { status: 'ERROR', error: data.error || 'Login failed.' };
+    }
+    return { status: 'SUCCESS', user: data.user };
+  } catch (error) {
+    console.error('Kairo Login Error:', error);
+    return { status: 'ERROR', error: 'Network error during login.' };
+  }
+}
+
+async function handleLogout() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      return { status: 'ERROR', error: 'Logout failed.' };
+    }
+    return { status: 'SUCCESS' };
+  } catch (error) {
+    console.error('Kairo Logout Error:', error);
+    return { status: 'ERROR', error: 'Network error during logout.' };
   }
 }
 
