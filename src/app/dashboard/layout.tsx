@@ -8,6 +8,7 @@ const DASHBOARD_ITEMS = [
   { label: "Kairo Chat", href: "/dashboard/chat", icon: "MessageSquare" },
   { label: "Profile", href: "/dashboard/profile", icon: "User" },
   { label: "Billing", href: "/dashboard/billing", icon: "Crown" },
+  { label: "Get Extension", href: "#get-extension", icon: "Puzzle" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
 
