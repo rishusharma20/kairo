@@ -19,6 +19,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handleLogout().then(sendResponse);
     return true;
   }
+  if (message.type === 'GET_QUOTA') {
+    handleGetQuota().then(sendResponse);
+    return true;
+  }
 });
 
 async function handleAuthCheck() {
@@ -51,6 +55,28 @@ async function handleAuthCheck() {
     return { status: 'UNAUTHENTICATED' };
   } catch (error) {
     console.error('Kairo Auth Check Error:', error);
+    return { status: 'ERROR', error: (error as Error).message };
+  }
+}
+
+async function handleGetQuota() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/auth/me?quota=true`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      return { status: 'ERROR', error: 'Failed to fetch quota' };
+    }
+
+    const data = await response.json();
+    if (data.authenticated) {
+      return { status: 'SUCCESS', user: data.user };
+    }
+    return { status: 'UNAUTHENTICATED' };
+  } catch (error) {
+    console.error('Kairo Quota Check Error:', error);
     return { status: 'ERROR', error: (error as Error).message };
   }
 }

@@ -18,8 +18,22 @@ export async function GET(request: Request) {
       return NextResponse.json({ authenticated: false }, { status: 401, headers });
     }
 
-    const { getUsageQuota } = await import("@/lib/services/usage");
-    const quota = await getUsageQuota(session.userId);
+    const { searchParams } = new URL(request.url);
+    const fetchQuota = searchParams.get('quota') === 'true';
+
+    let requests_used = null;
+    let daily_limit = null;
+
+    if (fetchQuota) {
+      try {
+        const { getUsageQuota } = await import("@/lib/services/usage");
+        const quota = await getUsageQuota(session.userId);
+        requests_used = quota.requests_used;
+        daily_limit = quota.daily_limit;
+      } catch (err) {
+        console.error("Failed to fetch quota:", err);
+      }
+    }
 
     return NextResponse.json({
       authenticated: true,
@@ -28,8 +42,8 @@ export async function GET(request: Request) {
         email: session.email,
         plan: session.plan,
         status: session.status,
-        requests_used: quota.requests_used,
-        daily_limit: quota.daily_limit
+        requests_used,
+        daily_limit
       }
     }, { headers });
   } catch (error) {

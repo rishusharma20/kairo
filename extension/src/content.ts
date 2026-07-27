@@ -339,9 +339,15 @@ function initKairo() {
           const metaCredits = shadow.querySelector('#meta-credits') as HTMLSpanElement;
           if (response.user) {
             metaPlan.textContent = `Plan: ${response.user.plan}`;
-            metaCredits.textContent = `${response.user.requests_used} / ${response.user.daily_limit} used`;
           }
           showView(viewChat);
+          
+          // Asynchronously load database quota to prevent UI rendering delays
+          chrome.runtime.sendMessage({ type: 'GET_QUOTA' }, (quotaResponse) => {
+            if (!chrome.runtime.lastError && quotaResponse && quotaResponse.status === 'SUCCESS' && quotaResponse.user) {
+              metaCredits.textContent = `${quotaResponse.user.requests_used} / ${quotaResponse.user.daily_limit} used`;
+            }
+          });
           break;
         case 'UNAUTHENTICATED':
           showView(viewUnauth);
