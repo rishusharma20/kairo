@@ -36,4 +36,23 @@ try {
   process.exit(1);
 }
 
+// 4. Copy Icons
+try {
+  const assetsIconDir = path.join(EXTENSION_DIR, 'assets', 'icons');
+  const distIconDir = path.join(DIST_DIR, 'icons');
+  if (fs.existsSync(assetsIconDir)) {
+    fs.mkdirSync(distIconDir, { recursive: true });
+    const icons = fs.readdirSync(assetsIconDir);
+    for (const icon of icons) {
+      if (icon.endsWith('.png')) {
+        fs.copyFileSync(path.join(assetsIconDir, icon), path.join(distIconDir, icon));
+      }
+    }
+    console.log('Copied icons to dist.');
+  }
+} catch (err) {
+  console.error('Failed to copy icons:', err);
+  process.exit(1);
+}
+
 console.log('Build completed successfully. Output in extension/dist/');
