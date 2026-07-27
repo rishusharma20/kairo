@@ -30,7 +30,7 @@ export async function processGeminiQuery(
     try {
       const decryptedKey = decryptKey(key.encrypted_api_key);
       const genAI = new GoogleGenerativeAI(decryptedKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
 
       // Call API
       const result = await model.generateContent(prompt);
