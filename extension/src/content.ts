@@ -508,9 +508,21 @@ function initKairo() {
     updateInputState();
 
     let contextText = '';
+    let detectedFormat = 'General';
     const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
     if (ctx) {
-      contextText = ctx.text;
+      const parts = [];
+      if (ctx.url) parts.push(`Page URL: ${ctx.url}`);
+      if (ctx.title) parts.push(`Page Title: ${ctx.title}`);
+      if (ctx.selectedText) {
+        parts.push(`[SELECTED TEXT]\n${ctx.selectedText}\n[/SELECTED TEXT]`);
+      }
+      if (ctx.text) {
+        parts.push(`[VISIBLE PAGE CONTENT]\n${ctx.text}\n[/VISIBLE PAGE CONTENT]`);
+      }
+      contextText = parts.join('\n\n');
+      detectedFormat = ctx.format;
+      
       const indicator = shadow.querySelector('#kairo-context-indicator');
       if (indicator) {
         indicator.classList.remove('hidden');
@@ -518,18 +530,7 @@ function initKairo() {
     } else if (!text) {
       isProcessing = false;
       updateInputState();
-      
-      const errRow = document.createElement('div');
-      errRow.className = `message-row kairo`;
-      const errBubbleWrapper = document.createElement('div');
-      errBubbleWrapper.className = 'message-bubble-wrapper kairo';
-      const errBubble = document.createElement('div');
-      errBubble.className = `message-bubble kairo`;
-      errBubble.textContent = "No useful page content was found to analyze.";
-      errBubbleWrapper.appendChild(errBubble);
-      errRow.appendChild(errBubbleWrapper);
-      messagesEl.appendChild(errRow);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      addMessage('error', 'Ask Kairo something.');
       return;
     }
 
@@ -545,7 +546,14 @@ function initKairo() {
     messagesEl.appendChild(loadingRow);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
-    chrome.runtime.sendMessage({ type: 'AI_QUERY', payload: { query: text, context: contextText } }, (response) => {
+    chrome.runtime.sendMessage({ 
+      type: 'AI_QUERY', 
+      payload: { 
+        query: text, 
+        context: contextText, 
+        format: detectedFormat 
+      } 
+    }, (response) => {
       const loader = shadow.querySelector('#kairo-loading');
       if (loader) loader.remove();
       
@@ -581,6 +589,18 @@ function initKairo() {
     if (host.style.display === 'none') {
       host.style.display = 'block';
       checkAuth(); // Validate auth and refresh limits on opening
+      
+      // Update context indicator on open
+      const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
+      const indicator = shadow.querySelector('#kairo-context-indicator');
+      if (indicator) {
+        if (ctx && (ctx.selectedText || ctx.text)) {
+          indicator.classList.remove('hidden');
+        } else {
+          indicator.classList.add('hidden');
+        }
+      }
+
       setTimeout(() => {
         const inputField = shadow.querySelector('#kairo-input') as HTMLTextAreaElement;
         if (inputField) inputField.focus();

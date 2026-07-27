@@ -6,6 +6,24 @@ interface PageContext {
   title?: string;
   url?: string;
   text: string;
+  selectedText?: string;
+  format: "MCQ" | "Coding" | "Interview" | "General";
+}
+
+function detectPageFormat(text: string): "MCQ" | "Coding" | "Interview" | "General" {
+  // MCQ Detection: search for choice patterns (e.g., A., B., C., D. or a), b), c), d))
+  const hasChoices = /(?:^|\s|\n)(?:[A-D]\s*[\.\)]|[a-d]\s*[\.\)])\s+[A-Za-z0-9]/m.test(text);
+  if (hasChoices) {
+    return "MCQ";
+  }
+  
+  // Coding Problem Detection
+  const hasCodingKeywords = /CONSTRAINTS|INPUT FORMAT|OUTPUT FORMAT|EXAMPLE\s*[1-9]|COMPLEXITY|TIME LIMIT/i.test(text);
+  if (hasCodingKeywords) {
+    return "Coding";
+  }
+  
+  return "General";
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,12 +33,10 @@ function extractPageContext(): PageContext | null {
   function isElementVisible(el: HTMLElement): boolean {
     if (!el || !el.getBoundingClientRect) return false;
     
-    // Fast checks first
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return false;
     if (el.getAttribute('aria-hidden') === 'true' || el.hasAttribute('hidden')) return false;
     
-    // Expensive check last
     const style = window.getComputedStyle(el);
     if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
     
@@ -31,7 +47,6 @@ function extractPageContext(): PageContext | null {
   const BUFFER = 500;
 
   function walk(node: Node, textArray: string[]) {
-    // Abort early if we have enough context
     if (currentLength > MAX_PAGE_CONTEXT_CHARS + BUFFER) {
       return;
     }
@@ -40,7 +55,7 @@ function extractPageContext(): PageContext | null {
       const txt = node.textContent?.trim();
       if (txt) {
         textArray.push(txt);
-        currentLength += txt.length + 1; // +1 for assumed space joining later
+        currentLength += txt.length + 1;
       }
       return;
     }
@@ -58,7 +73,6 @@ function extractPageContext(): PageContext | null {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
         const type = el.getAttribute('type')?.toLowerCase();
         if (type === 'password' || type === 'hidden') return;
-        // Skip extracting any values from forms to avoid sensitive data leakage
         return;
       }
 
@@ -67,10 +81,8 @@ function extractPageContext(): PageContext | null {
         return;
       }
 
-      // Check visibility - if not visible, prune entire subtree!
       if (!isElementVisible(el)) return;
 
-      // Add structural formatting hints
       const isHeader = /^H[1-6]$/.test(el.tagName);
       const isListItem = el.tagName === 'LI';
       const isPre = el.tagName === 'PRE' || el.tagName === 'CODE';
@@ -93,15 +105,15 @@ function extractPageContext(): PageContext | null {
   const textParts: string[] = [];
   walk(document.body, textParts);
 
-  // Clean and normalize text
   let rawText = textParts.join(' ');
-  // Remove consecutive newlines exceeding 2
   rawText = rawText.replace(/\n{3,}/g, '\n\n');
-  // Remove excessive spaces while preserving line breaks
   rawText = rawText.replace(/ {2,}/g, ' ');
   rawText = rawText.trim();
 
-  if (!rawText) return null;
+  // Extract selected text
+  const selectedText = window.getSelection()?.toString().trim() || "";
+
+  if (!rawText && !selectedText) return null;
 
   if (rawText.length > MAX_PAGE_CONTEXT_CHARS) {
     rawText = rawText.substring(0, MAX_PAGE_CONTEXT_CHARS) + '\n...[Content truncated]';
@@ -109,8 +121,9 @@ function extractPageContext(): PageContext | null {
 
   return {
     title: document.title,
-    // Sanitize URL by removing hash and query parameters that might contain sensitive tokens
     url: window.location.origin + window.location.pathname,
-    text: rawText
+    text: rawText,
+    selectedText: selectedText || undefined,
+    format: detectPageFormat(selectedText || rawText)
   };
 }

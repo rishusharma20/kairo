@@ -97,7 +97,7 @@ async function handleLogout() {
   }
 }
 
-async function handleAIQuery(payload: { query: string, context?: string }) {
+async function handleAIQuery(payload: { query: string, context?: string, format?: string }) {
   try {
     const response = await fetch(`${BACKEND_URL}/api/extension/query`, {
       method: 'POST',
@@ -106,9 +106,9 @@ async function handleAIQuery(payload: { query: string, context?: string }) {
       },
       credentials: 'include',
       body: JSON.stringify({
-        feature: payload.query ? 'ask' : 'page_analyze',
+        feature: payload.query ? (payload.context ? 'page' : 'ask') : 'page_analyze',
         query: payload.query || '',
-        format: 'General',
+        format: payload.format || 'General',
         context: payload.context || ''
       })
     });
