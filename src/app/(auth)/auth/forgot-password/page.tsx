@@ -31,9 +31,21 @@ export default function ForgotPasswordPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setState("otp");
+    try {
+      const res = await fetch("/api/auth/forgot-password/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      
+      setLoading(false);
+      setState("otp");
+    } catch (err: unknown) {
+      setLoading(false);
+      setError((err as Error).message || "An error occurred.");
+    }
   };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
@@ -44,9 +56,21 @@ export default function ForgotPasswordPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setState("reset");
+    try {
+      const res = await fetch("/api/auth/forgot-password/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Verification failed");
+      
+      setLoading(false);
+      setState("reset");
+    } catch (err: unknown) {
+      setLoading(false);
+      setError((err as Error).message || "An error occurred.");
+    }
   };
 
   const handleResetSubmit = async (e: React.FormEvent) => {
@@ -57,9 +81,21 @@ export default function ForgotPasswordPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setState("success");
+    try {
+      const res = await fetch("/api/auth/forgot-password/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Reset failed");
+      
+      setLoading(false);
+      setState("success");
+    } catch (err: unknown) {
+      setLoading(false);
+      setError((err as Error).message || "An error occurred.");
+    }
   };
 
   const fadeUp = {

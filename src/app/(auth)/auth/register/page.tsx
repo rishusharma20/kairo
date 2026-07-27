@@ -64,15 +64,34 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    // Simulate API call to verify OTP and create account
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setSuccess(true);
-    
-    // In a real app, redirect here
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1500);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      setLoading(false);
+      setSuccess(true);
+      
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : "An error occurred during registration.");
+    }
   };
 
   return (
