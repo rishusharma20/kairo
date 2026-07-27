@@ -1,12 +1,18 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
+function getTransporter() {
+  const user = process.env.EMAIL_USER || process.env.GMAIL_USER;
+  const pass = process.env.EMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
+
+  if (!user || !pass) {
+    throw new Error("SMTP Configuration Error: EMAIL_USER and EMAIL_APP_PASSWORD must be configured.");
+  }
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass },
+  });
+}
 
 export async function sendResetOtpEmail(to: string, fullName: string, otp: string) {
   const htmlContent = `
@@ -110,10 +116,28 @@ export async function sendResetOtpEmail(to: string, fullName: string, otp: strin
     </html>
   `;
 
+  const textContent = `
+Reset Your Password
+
+Use the verification code below to reset your Kairo credentials:
+
+${otp}
+
+Hi ${fullName},
+We received a request to reset your password. This code will expire in 10 minutes. If you did not request this, you can safely ignore this email.
+
+Invisible Intelligence for your browser.
+https://aikairo.vercel.app
+  `.trim();
+
+  const user = process.env.EMAIL_USER || process.env.GMAIL_USER;
+  const transporter = getTransporter();
+
   await transporter.sendMail({
-    from: `"KAIRO" <${process.env.GMAIL_USER}>`,
+    from: `"KAIRO" <${user}>`,
     to,
     subject: "Kairo Password Recovery Code",
+    text: textContent,
     html: htmlContent,
   });
 }

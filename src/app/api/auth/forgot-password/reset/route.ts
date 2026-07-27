@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const { email, otp, password } = await request.json();
-    if (!email || !otp || !password || typeof email !== 'string' || typeof otp !== 'string' || typeof password !== 'string') {
+    const { email, resetToken, password } = await request.json();
+    if (!email || !resetToken || !password || typeof email !== 'string' || typeof resetToken !== 'string' || typeof password !== 'string') {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -17,9 +17,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const latestOtpLog = await prisma.auditLog.findFirst({
+    // Find the matching authorization token
+    const latestAuthLog = await prisma.auditLog.findFirst({
       where: {
-        action: "PASSWORD_RESET_OTP",
+        action: "PASSWORD_RESET_AUTHORIZED",
         user_id: user.id
       },
       orderBy: {
@@ -27,21 +28,25 @@ export async function POST(request: Request) {
       }
     });
 
-    if (!latestOtpLog) {
-      return NextResponse.json({ error: "No verification code requested." }, { status: 400 });
+    if (!latestAuthLog) {
+      return NextResponse.json({ error: "Reset authorization not found or expired." }, { status: 400 });
     }
 
-    const { otp: savedOtp, expiresAt } = JSON.parse(latestOtpLog.metadata || "{}");
+    const metadata = JSON.parse(latestAuthLog.metadata || "{}");
 
-    if (savedOtp !== otp.trim()) {
-      return NextResponse.json({ error: "Invalid verification code." }, { status: 400 });
+    if (metadata.resetToken !== resetToken.trim()) {
+      return NextResponse.json({ error: "Invalid reset authorization token." }, { status: 400 });
     }
 
-    if (new Date(expiresAt).getTime() < Date.now()) {
-      return NextResponse.json({ error: "Verification code has expired." }, { status: 400 });
+    if (metadata.used) {
+      return NextResponse.json({ error: "This reset link has already been used." }, { status: 400 });
     }
 
-    // Hash the new password
+    if (new Date(metadata.expiresAt).getTime() < Date.now()) {
+      return NextResponse.json({ error: "Reset authorization has expired." }, { status: 400 });
+    }
+
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
 
@@ -52,7 +57,18 @@ export async function POST(request: Request) {
         data: { password_hash }
       });
 
-      // Delete/consume the OTP so it can't be used again (or log it as used)
+      // Mark token as used
+      await tx.auditLog.update({
+        where: { id: latestAuthLog.id },
+        data: {
+          metadata: JSON.stringify({
+            ...metadata,
+            used: true
+          })
+        }
+      });
+      
+      // Log successful reset event
       await tx.auditLog.create({
         data: {
           action: "PASSWORD_RESET_SUCCESS",

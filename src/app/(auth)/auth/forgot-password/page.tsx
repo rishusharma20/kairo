@@ -14,6 +14,7 @@ export default function ForgotPasswordPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resetToken, setResetToken] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +66,7 @@ export default function ForgotPasswordPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed");
       
+      setResetToken(data.resetToken);
       setLoading(false);
       setState("reset");
     } catch (err: unknown) {
@@ -85,7 +87,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, password })
+        body: JSON.stringify({ email, resetToken, password })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Reset failed");
