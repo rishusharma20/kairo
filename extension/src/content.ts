@@ -17,7 +17,7 @@ function initKairo() {
   host.style.bottom = '24px';
   host.style.right = '24px';
   host.style.zIndex = '2147483647';
-  host.style.display = 'block';
+  host.style.display = 'none'; // Initial state is CLOSED
 
   document.body.appendChild(host);
 
@@ -571,17 +571,37 @@ function initKairo() {
     });
   }
 
-  // Toggle Listener
+  // Handle panel toggle cleanly (Debounced to prevent double toggling when both keyboard & chrome commands fire)
+  let lastToggleTime = 0;
+  function toggleKairo() {
+    const now = Date.now();
+    if (now - lastToggleTime < 200) return;
+    lastToggleTime = now;
+
+    if (host.style.display === 'none') {
+      host.style.display = 'block';
+      checkAuth(); // Validate auth and refresh limits on opening
+      setTimeout(() => {
+        const inputField = shadow.querySelector('#kairo-input') as HTMLTextAreaElement;
+        if (inputField) inputField.focus();
+      }, 50);
+    } else {
+      host.style.display = 'none';
+    }
+  }
+
+  // Toggle message Listener (from background script commands)
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'TOGGLE_KAIRO') {
-      if (host.style.display === 'none') {
-        host.style.display = 'block';
-        if (!viewChat.classList.contains('hidden') && !isProcessing) {
-          inputEl.focus();
-        }
-      } else {
-        host.style.display = 'none';
-      }
+      toggleKairo();
+    }
+  });
+
+  // Local keydown listener for Alt+D/Option+D direct page toggles
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.code === 'KeyD') {
+      e.preventDefault();
+      toggleKairo();
     }
   });
 
@@ -597,8 +617,6 @@ function initKairo() {
       host.style.display = 'none';
     }
   });
-
-  checkAuth();
 }
 
 initKairo();
