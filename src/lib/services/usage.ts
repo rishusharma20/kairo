@@ -59,7 +59,9 @@ export async function atomicReserveUsage(userId: string) {
     where: {
       user_id_usage_date: { user_id: userId, usage_date: today }
     },
-    update: {},
+    update: {
+      daily_limit: user.daily_limit
+    },
     create: {
       user_id: userId,
       usage_date: today,
