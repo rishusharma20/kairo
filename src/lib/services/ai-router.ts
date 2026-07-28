@@ -52,9 +52,10 @@ export async function executeSharedAiRoute(
     healthyKeys = await getHealthyCredentials();
   } catch (poolErr: unknown) {
     if (poolErr instanceof Prisma.PrismaClientKnownRequestError) {
-      trace("POOL_QUERY_FAILURE", `PrismaClientKnownRequestError code=${poolErr.code}`);
+      trace("POOL_QUERY_FAILURE", `errorName=${poolErr.name} prismaCode=${poolErr.code}`);
     } else {
-      trace("POOL_QUERY_FAILURE", `Unknown error: ${poolErr instanceof Error ? poolErr.name : "unknown"}`);
+      const errorName = poolErr instanceof Error ? poolErr.name : "UnknownError";
+      trace("POOL_QUERY_FAILURE", `errorName=${errorName}`);
     }
     throw poolErr;
   }
