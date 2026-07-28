@@ -6,6 +6,7 @@ import { buildPrompt, QueryFeature, ResponseFormat } from "@/lib/services/prompt
 import { ROUTER_CONFIG } from "@/lib/services/ai-router.config";
 import type { TaskCategory } from "@/lib/services/models";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/generated/prisma/client/client";
 import { randomUUID } from "crypto";
 import { logSystemEvent } from "@/lib/services/audit";
 
@@ -46,7 +47,17 @@ export async function executeSharedAiRoute(
   let credentialsTried = 0;
   
   trace("POOL_LOAD_START");
-  const healthyKeys = await getHealthyCredentials();
+  let healthyKeys;
+  try {
+    healthyKeys = await getHealthyCredentials();
+  } catch (poolErr: unknown) {
+    if (poolErr instanceof Prisma.PrismaClientKnownRequestError) {
+      trace("POOL_QUERY_FAILURE", `PrismaClientKnownRequestError code=${poolErr.code}`);
+    } else {
+      trace("POOL_QUERY_FAILURE", `Unknown error: ${poolErr instanceof Error ? poolErr.name : "unknown"}`);
+    }
+    throw poolErr;
+  }
   
   // Group keys by project to respect project awareness
   const keysByProject = new Map<string, typeof healthyKeys>();
@@ -256,6 +267,10 @@ export async function executeSharedAiRoute(
     }
     if (err instanceof Error && err.message.includes("400 Bad Request")) {
       trace("ROUTER_FATAL", "BadRequestError");
+      throw err;
+    }
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      trace("ROUTER_FATAL", `PrismaClientKnownRequestError code=${err.code}`);
       throw err;
     }
     const safeErrorName = err instanceof Error ? err.name || "UnknownError" : "UnknownError";
