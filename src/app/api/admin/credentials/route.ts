@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { withSessionAdmin } from "@/lib/middlewares/withAdmin";
 import { prisma } from "@/lib/db";
 import { logSystemEventInBackground } from "@/lib/services/audit";
-import { encryptKey } from "@/lib/services/encryption";
+import { encryptKey, generateKeyFingerprint } from "@/lib/services/encryption";
 import { validateCredentialWithProvider, validateProjectModels } from "@/lib/services/discovery";
-import crypto from "crypto";
 
 async function handler(request: Request) {
   try {
@@ -19,7 +18,7 @@ async function handler(request: Request) {
     }
 
     // Fingerprint for duplicate detection
-    const fingerprint = crypto.createHash('sha256').update(apiKey).digest('hex');
+    const fingerprint = generateKeyFingerprint(apiKey);
     
     // Check for duplicates
     const existing = await prisma.geminiKey.findFirst({

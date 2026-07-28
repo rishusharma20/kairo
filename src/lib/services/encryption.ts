@@ -51,3 +51,7 @@ export function decryptKey(encryptedText: string): string {
   
   return decrypted;
 }
+
+export function generateKeyFingerprint(plaintextApiKey: string): string {
+  return crypto.createHash('sha256').update(plaintextApiKey).digest('hex');
+}
