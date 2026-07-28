@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+extension/dist-firefox/
+extension/dist-firefox-private/
+extension/*.zip
+scripts/provision.config.json

@@ -39,8 +39,10 @@ export type GeminiKeySumAggregateOutputType = {
 export type GeminiKeyMinAggregateOutputType = {
   id: string | null
   encrypted_api_key: string | null
+  key_fingerprint: string | null
   status: string | null
   assigned_user_id: string | null
+  project_id: string | null
   priority: number | null
   last_used_at: Date | null
   failure_count: number | null
@@ -52,8 +54,10 @@ export type GeminiKeyMinAggregateOutputType = {
 export type GeminiKeyMaxAggregateOutputType = {
   id: string | null
   encrypted_api_key: string | null
+  key_fingerprint: string | null
   status: string | null
   assigned_user_id: string | null
+  project_id: string | null
   priority: number | null
   last_used_at: Date | null
   failure_count: number | null
@@ -65,8 +69,10 @@ export type GeminiKeyMaxAggregateOutputType = {
 export type GeminiKeyCountAggregateOutputType = {
   id: number
   encrypted_api_key: number
+  key_fingerprint: number
   status: number
   assigned_user_id: number
+  project_id: number
   priority: number
   last_used_at: number
   failure_count: number
@@ -90,8 +96,10 @@ export type GeminiKeySumAggregateInputType = {
 export type GeminiKeyMinAggregateInputType = {
   id?: true
   encrypted_api_key?: true
+  key_fingerprint?: true
   status?: true
   assigned_user_id?: true
+  project_id?: true
   priority?: true
   last_used_at?: true
   failure_count?: true
@@ -103,8 +111,10 @@ export type GeminiKeyMinAggregateInputType = {
 export type GeminiKeyMaxAggregateInputType = {
   id?: true
   encrypted_api_key?: true
+  key_fingerprint?: true
   status?: true
   assigned_user_id?: true
+  project_id?: true
   priority?: true
   last_used_at?: true
   failure_count?: true
@@ -116,8 +126,10 @@ export type GeminiKeyMaxAggregateInputType = {
 export type GeminiKeyCountAggregateInputType = {
   id?: true
   encrypted_api_key?: true
+  key_fingerprint?: true
   status?: true
   assigned_user_id?: true
+  project_id?: true
   priority?: true
   last_used_at?: true
   failure_count?: true
@@ -216,8 +228,10 @@ export type GeminiKeyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type GeminiKeyGroupByOutputType = {
   id: string
   encrypted_api_key: string
+  key_fingerprint: string | null
   status: string
   assigned_user_id: string | null
+  project_id: string | null
   priority: number
   last_used_at: Date | null
   failure_count: number
@@ -252,8 +266,10 @@ export type GeminiKeyWhereInput = {
   NOT?: Prisma.GeminiKeyWhereInput | Prisma.GeminiKeyWhereInput[]
   id?: Prisma.StringFilter<"GeminiKey"> | string
   encrypted_api_key?: Prisma.StringFilter<"GeminiKey"> | string
+  key_fingerprint?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
   status?: Prisma.StringFilter<"GeminiKey"> | string
   assigned_user_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
+  project_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
   priority?: Prisma.IntFilter<"GeminiKey"> | number
   last_used_at?: Prisma.DateTimeNullableFilter<"GeminiKey"> | Date | string | null
   failure_count?: Prisma.IntFilter<"GeminiKey"> | number
@@ -261,14 +277,17 @@ export type GeminiKeyWhereInput = {
   created_at?: Prisma.DateTimeFilter<"GeminiKey"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"GeminiKey"> | Date | string
   assigned_user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProviderProjectNullableScalarRelationFilter, Prisma.ProviderProjectWhereInput> | null
   assignments?: Prisma.UserKeyAssignmentListRelationFilter
 }
 
 export type GeminiKeyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   encrypted_api_key?: Prisma.SortOrder
+  key_fingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   assigned_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  project_id?: Prisma.SortOrderInput | Prisma.SortOrder
   priority?: Prisma.SortOrder
   last_used_at?: Prisma.SortOrderInput | Prisma.SortOrder
   failure_count?: Prisma.SortOrder
@@ -276,17 +295,20 @@ export type GeminiKeyOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   assigned_user?: Prisma.UserOrderByWithRelationInput
+  project?: Prisma.ProviderProjectOrderByWithRelationInput
   assignments?: Prisma.UserKeyAssignmentOrderByRelationAggregateInput
 }
 
 export type GeminiKeyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   encrypted_api_key?: string
+  key_fingerprint?: string
   AND?: Prisma.GeminiKeyWhereInput | Prisma.GeminiKeyWhereInput[]
   OR?: Prisma.GeminiKeyWhereInput[]
   NOT?: Prisma.GeminiKeyWhereInput | Prisma.GeminiKeyWhereInput[]
   status?: Prisma.StringFilter<"GeminiKey"> | string
   assigned_user_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
+  project_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
   priority?: Prisma.IntFilter<"GeminiKey"> | number
   last_used_at?: Prisma.DateTimeNullableFilter<"GeminiKey"> | Date | string | null
   failure_count?: Prisma.IntFilter<"GeminiKey"> | number
@@ -294,14 +316,17 @@ export type GeminiKeyWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"GeminiKey"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"GeminiKey"> | Date | string
   assigned_user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProviderProjectNullableScalarRelationFilter, Prisma.ProviderProjectWhereInput> | null
   assignments?: Prisma.UserKeyAssignmentListRelationFilter
-}, "id" | "encrypted_api_key">
+}, "id" | "encrypted_api_key" | "key_fingerprint">
 
 export type GeminiKeyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   encrypted_api_key?: Prisma.SortOrder
+  key_fingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   assigned_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  project_id?: Prisma.SortOrderInput | Prisma.SortOrder
   priority?: Prisma.SortOrder
   last_used_at?: Prisma.SortOrderInput | Prisma.SortOrder
   failure_count?: Prisma.SortOrder
@@ -321,8 +346,10 @@ export type GeminiKeyScalarWhereWithAggregatesInput = {
   NOT?: Prisma.GeminiKeyScalarWhereWithAggregatesInput | Prisma.GeminiKeyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"GeminiKey"> | string
   encrypted_api_key?: Prisma.StringWithAggregatesFilter<"GeminiKey"> | string
+  key_fingerprint?: Prisma.StringNullableWithAggregatesFilter<"GeminiKey"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"GeminiKey"> | string
   assigned_user_id?: Prisma.StringNullableWithAggregatesFilter<"GeminiKey"> | string | null
+  project_id?: Prisma.StringNullableWithAggregatesFilter<"GeminiKey"> | string | null
   priority?: Prisma.IntWithAggregatesFilter<"GeminiKey"> | number
   last_used_at?: Prisma.DateTimeNullableWithAggregatesFilter<"GeminiKey"> | Date | string | null
   failure_count?: Prisma.IntWithAggregatesFilter<"GeminiKey"> | number
@@ -334,6 +361,7 @@ export type GeminiKeyScalarWhereWithAggregatesInput = {
 export type GeminiKeyCreateInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   priority?: number
   last_used_at?: Date | string | null
@@ -342,14 +370,17 @@ export type GeminiKeyCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   assigned_user?: Prisma.UserCreateNestedOneWithoutAssigned_keysInput
+  project?: Prisma.ProviderProjectCreateNestedOneWithoutCredentialsInput
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutGemini_keyInput
 }
 
 export type GeminiKeyUncheckedCreateInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   assigned_user_id?: string | null
+  project_id?: string | null
   priority?: number
   last_used_at?: Date | string | null
   failure_count?: number
@@ -362,6 +393,7 @@ export type GeminiKeyUncheckedCreateInput = {
 export type GeminiKeyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -370,14 +402,17 @@ export type GeminiKeyUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assigned_user?: Prisma.UserUpdateOneWithoutAssigned_keysNestedInput
+  project?: Prisma.ProviderProjectUpdateOneWithoutCredentialsNestedInput
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutGemini_keyNestedInput
 }
 
 export type GeminiKeyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   assigned_user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  project_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failure_count?: Prisma.IntFieldUpdateOperationsInput | number
@@ -390,8 +425,10 @@ export type GeminiKeyUncheckedUpdateInput = {
 export type GeminiKeyCreateManyInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   assigned_user_id?: string | null
+  project_id?: string | null
   priority?: number
   last_used_at?: Date | string | null
   failure_count?: number
@@ -403,6 +440,7 @@ export type GeminiKeyCreateManyInput = {
 export type GeminiKeyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -415,8 +453,10 @@ export type GeminiKeyUpdateManyMutationInput = {
 export type GeminiKeyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   assigned_user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  project_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failure_count?: Prisma.IntFieldUpdateOperationsInput | number
@@ -438,8 +478,10 @@ export type GeminiKeyOrderByRelationAggregateInput = {
 export type GeminiKeyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   encrypted_api_key?: Prisma.SortOrder
+  key_fingerprint?: Prisma.SortOrder
   status?: Prisma.SortOrder
   assigned_user_id?: Prisma.SortOrder
+  project_id?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   last_used_at?: Prisma.SortOrder
   failure_count?: Prisma.SortOrder
@@ -456,8 +498,10 @@ export type GeminiKeyAvgOrderByAggregateInput = {
 export type GeminiKeyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   encrypted_api_key?: Prisma.SortOrder
+  key_fingerprint?: Prisma.SortOrder
   status?: Prisma.SortOrder
   assigned_user_id?: Prisma.SortOrder
+  project_id?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   last_used_at?: Prisma.SortOrder
   failure_count?: Prisma.SortOrder
@@ -469,8 +513,10 @@ export type GeminiKeyMaxOrderByAggregateInput = {
 export type GeminiKeyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   encrypted_api_key?: Prisma.SortOrder
+  key_fingerprint?: Prisma.SortOrder
   status?: Prisma.SortOrder
   assigned_user_id?: Prisma.SortOrder
+  project_id?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   last_used_at?: Prisma.SortOrder
   failure_count?: Prisma.SortOrder
@@ -549,9 +595,52 @@ export type GeminiKeyUpdateOneRequiredWithoutAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.GeminiKeyUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.GeminiKeyUpdateWithoutAssignmentsInput>, Prisma.GeminiKeyUncheckedUpdateWithoutAssignmentsInput>
 }
 
+export type GeminiKeyCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput> | Prisma.GeminiKeyCreateWithoutProjectInput[] | Prisma.GeminiKeyUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.GeminiKeyCreateOrConnectWithoutProjectInput | Prisma.GeminiKeyCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.GeminiKeyCreateManyProjectInputEnvelope
+  connect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+}
+
+export type GeminiKeyUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput> | Prisma.GeminiKeyCreateWithoutProjectInput[] | Prisma.GeminiKeyUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.GeminiKeyCreateOrConnectWithoutProjectInput | Prisma.GeminiKeyCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.GeminiKeyCreateManyProjectInputEnvelope
+  connect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+}
+
+export type GeminiKeyUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput> | Prisma.GeminiKeyCreateWithoutProjectInput[] | Prisma.GeminiKeyUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.GeminiKeyCreateOrConnectWithoutProjectInput | Prisma.GeminiKeyCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.GeminiKeyUpsertWithWhereUniqueWithoutProjectInput | Prisma.GeminiKeyUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.GeminiKeyCreateManyProjectInputEnvelope
+  set?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  disconnect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  delete?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  connect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  update?: Prisma.GeminiKeyUpdateWithWhereUniqueWithoutProjectInput | Prisma.GeminiKeyUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.GeminiKeyUpdateManyWithWhereWithoutProjectInput | Prisma.GeminiKeyUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.GeminiKeyScalarWhereInput | Prisma.GeminiKeyScalarWhereInput[]
+}
+
+export type GeminiKeyUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput> | Prisma.GeminiKeyCreateWithoutProjectInput[] | Prisma.GeminiKeyUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.GeminiKeyCreateOrConnectWithoutProjectInput | Prisma.GeminiKeyCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.GeminiKeyUpsertWithWhereUniqueWithoutProjectInput | Prisma.GeminiKeyUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.GeminiKeyCreateManyProjectInputEnvelope
+  set?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  disconnect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  delete?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  connect?: Prisma.GeminiKeyWhereUniqueInput | Prisma.GeminiKeyWhereUniqueInput[]
+  update?: Prisma.GeminiKeyUpdateWithWhereUniqueWithoutProjectInput | Prisma.GeminiKeyUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.GeminiKeyUpdateManyWithWhereWithoutProjectInput | Prisma.GeminiKeyUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.GeminiKeyScalarWhereInput | Prisma.GeminiKeyScalarWhereInput[]
+}
+
 export type GeminiKeyCreateWithoutAssigned_userInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   priority?: number
   last_used_at?: Date | string | null
@@ -559,13 +648,16 @@ export type GeminiKeyCreateWithoutAssigned_userInput = {
   cooldown_until?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  project?: Prisma.ProviderProjectCreateNestedOneWithoutCredentialsInput
   assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutGemini_keyInput
 }
 
 export type GeminiKeyUncheckedCreateWithoutAssigned_userInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
+  project_id?: string | null
   priority?: number
   last_used_at?: Date | string | null
   failure_count?: number
@@ -607,8 +699,10 @@ export type GeminiKeyScalarWhereInput = {
   NOT?: Prisma.GeminiKeyScalarWhereInput | Prisma.GeminiKeyScalarWhereInput[]
   id?: Prisma.StringFilter<"GeminiKey"> | string
   encrypted_api_key?: Prisma.StringFilter<"GeminiKey"> | string
+  key_fingerprint?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
   status?: Prisma.StringFilter<"GeminiKey"> | string
   assigned_user_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
+  project_id?: Prisma.StringNullableFilter<"GeminiKey"> | string | null
   priority?: Prisma.IntFilter<"GeminiKey"> | number
   last_used_at?: Prisma.DateTimeNullableFilter<"GeminiKey"> | Date | string | null
   failure_count?: Prisma.IntFilter<"GeminiKey"> | number
@@ -620,6 +714,7 @@ export type GeminiKeyScalarWhereInput = {
 export type GeminiKeyCreateWithoutAssignmentsInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   priority?: number
   last_used_at?: Date | string | null
@@ -628,13 +723,16 @@ export type GeminiKeyCreateWithoutAssignmentsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   assigned_user?: Prisma.UserCreateNestedOneWithoutAssigned_keysInput
+  project?: Prisma.ProviderProjectCreateNestedOneWithoutCredentialsInput
 }
 
 export type GeminiKeyUncheckedCreateWithoutAssignmentsInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
   assigned_user_id?: string | null
+  project_id?: string | null
   priority?: number
   last_used_at?: Date | string | null
   failure_count?: number
@@ -662,6 +760,7 @@ export type GeminiKeyUpdateToOneWithWhereWithoutAssignmentsInput = {
 export type GeminiKeyUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -670,13 +769,16 @@ export type GeminiKeyUpdateWithoutAssignmentsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assigned_user?: Prisma.UserUpdateOneWithoutAssigned_keysNestedInput
+  project?: Prisma.ProviderProjectUpdateOneWithoutCredentialsNestedInput
 }
 
 export type GeminiKeyUncheckedUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   assigned_user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  project_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failure_count?: Prisma.IntFieldUpdateOperationsInput | number
@@ -685,10 +787,68 @@ export type GeminiKeyUncheckedUpdateWithoutAssignmentsInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type GeminiKeyCreateWithoutProjectInput = {
+  id?: string
+  encrypted_api_key: string
+  key_fingerprint?: string | null
+  status: string
+  priority?: number
+  last_used_at?: Date | string | null
+  failure_count?: number
+  cooldown_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  assigned_user?: Prisma.UserCreateNestedOneWithoutAssigned_keysInput
+  assignments?: Prisma.UserKeyAssignmentCreateNestedManyWithoutGemini_keyInput
+}
+
+export type GeminiKeyUncheckedCreateWithoutProjectInput = {
+  id?: string
+  encrypted_api_key: string
+  key_fingerprint?: string | null
+  status: string
+  assigned_user_id?: string | null
+  priority?: number
+  last_used_at?: Date | string | null
+  failure_count?: number
+  cooldown_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  assignments?: Prisma.UserKeyAssignmentUncheckedCreateNestedManyWithoutGemini_keyInput
+}
+
+export type GeminiKeyCreateOrConnectWithoutProjectInput = {
+  where: Prisma.GeminiKeyWhereUniqueInput
+  create: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput>
+}
+
+export type GeminiKeyCreateManyProjectInputEnvelope = {
+  data: Prisma.GeminiKeyCreateManyProjectInput | Prisma.GeminiKeyCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type GeminiKeyUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.GeminiKeyWhereUniqueInput
+  update: Prisma.XOR<Prisma.GeminiKeyUpdateWithoutProjectInput, Prisma.GeminiKeyUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.GeminiKeyCreateWithoutProjectInput, Prisma.GeminiKeyUncheckedCreateWithoutProjectInput>
+}
+
+export type GeminiKeyUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.GeminiKeyWhereUniqueInput
+  data: Prisma.XOR<Prisma.GeminiKeyUpdateWithoutProjectInput, Prisma.GeminiKeyUncheckedUpdateWithoutProjectInput>
+}
+
+export type GeminiKeyUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.GeminiKeyScalarWhereInput
+  data: Prisma.XOR<Prisma.GeminiKeyUpdateManyMutationInput, Prisma.GeminiKeyUncheckedUpdateManyWithoutProjectInput>
+}
+
 export type GeminiKeyCreateManyAssigned_userInput = {
   id?: string
   encrypted_api_key: string
+  key_fingerprint?: string | null
   status: string
+  project_id?: string | null
   priority?: number
   last_used_at?: Date | string | null
   failure_count?: number
@@ -700,6 +860,7 @@ export type GeminiKeyCreateManyAssigned_userInput = {
 export type GeminiKeyUpdateWithoutAssigned_userInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -707,13 +868,16 @@ export type GeminiKeyUpdateWithoutAssigned_userInput = {
   cooldown_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProviderProjectUpdateOneWithoutCredentialsNestedInput
   assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutGemini_keyNestedInput
 }
 
 export type GeminiKeyUncheckedUpdateWithoutAssigned_userInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  project_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failure_count?: Prisma.IntFieldUpdateOperationsInput | number
@@ -726,7 +890,67 @@ export type GeminiKeyUncheckedUpdateWithoutAssigned_userInput = {
 export type GeminiKeyUncheckedUpdateManyWithoutAssigned_userInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  project_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failure_count?: Prisma.IntFieldUpdateOperationsInput | number
+  cooldown_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type GeminiKeyCreateManyProjectInput = {
+  id?: string
+  encrypted_api_key: string
+  key_fingerprint?: string | null
+  status: string
+  assigned_user_id?: string | null
+  priority?: number
+  last_used_at?: Date | string | null
+  failure_count?: number
+  cooldown_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type GeminiKeyUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failure_count?: Prisma.IntFieldUpdateOperationsInput | number
+  cooldown_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assigned_user?: Prisma.UserUpdateOneWithoutAssigned_keysNestedInput
+  assignments?: Prisma.UserKeyAssignmentUpdateManyWithoutGemini_keyNestedInput
+}
+
+export type GeminiKeyUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failure_count?: Prisma.IntFieldUpdateOperationsInput | number
+  cooldown_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.UserKeyAssignmentUncheckedUpdateManyWithoutGemini_keyNestedInput
+}
+
+export type GeminiKeyUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  encrypted_api_key?: Prisma.StringFieldUpdateOperationsInput | string
+  key_fingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   last_used_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failure_count?: Prisma.IntFieldUpdateOperationsInput | number
@@ -769,8 +993,10 @@ export type GeminiKeyCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime
 export type GeminiKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   encrypted_api_key?: boolean
+  key_fingerprint?: boolean
   status?: boolean
   assigned_user_id?: boolean
+  project_id?: boolean
   priority?: boolean
   last_used_at?: boolean
   failure_count?: boolean
@@ -778,6 +1004,7 @@ export type GeminiKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   created_at?: boolean
   updated_at?: boolean
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
   assignments?: boolean | Prisma.GeminiKey$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.GeminiKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["geminiKey"]>
@@ -785,8 +1012,10 @@ export type GeminiKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type GeminiKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   encrypted_api_key?: boolean
+  key_fingerprint?: boolean
   status?: boolean
   assigned_user_id?: boolean
+  project_id?: boolean
   priority?: boolean
   last_used_at?: boolean
   failure_count?: boolean
@@ -794,13 +1023,16 @@ export type GeminiKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
 }, ExtArgs["result"]["geminiKey"]>
 
 export type GeminiKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   encrypted_api_key?: boolean
+  key_fingerprint?: boolean
   status?: boolean
   assigned_user_id?: boolean
+  project_id?: boolean
   priority?: boolean
   last_used_at?: boolean
   failure_count?: boolean
@@ -808,13 +1040,16 @@ export type GeminiKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
 }, ExtArgs["result"]["geminiKey"]>
 
 export type GeminiKeySelectScalar = {
   id?: boolean
   encrypted_api_key?: boolean
+  key_fingerprint?: boolean
   status?: boolean
   assigned_user_id?: boolean
+  project_id?: boolean
   priority?: boolean
   last_used_at?: boolean
   failure_count?: boolean
@@ -823,30 +1058,36 @@ export type GeminiKeySelectScalar = {
   updated_at?: boolean
 }
 
-export type GeminiKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "encrypted_api_key" | "status" | "assigned_user_id" | "priority" | "last_used_at" | "failure_count" | "cooldown_until" | "created_at" | "updated_at", ExtArgs["result"]["geminiKey"]>
+export type GeminiKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "encrypted_api_key" | "key_fingerprint" | "status" | "assigned_user_id" | "project_id" | "priority" | "last_used_at" | "failure_count" | "cooldown_until" | "created_at" | "updated_at", ExtArgs["result"]["geminiKey"]>
 export type GeminiKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
   assignments?: boolean | Prisma.GeminiKey$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.GeminiKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type GeminiKeyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
 }
 export type GeminiKeyIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_user?: boolean | Prisma.GeminiKey$assigned_userArgs<ExtArgs>
+  project?: boolean | Prisma.GeminiKey$projectArgs<ExtArgs>
 }
 
 export type $GeminiKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "GeminiKey"
   objects: {
     assigned_user: Prisma.$UserPayload<ExtArgs> | null
+    project: Prisma.$ProviderProjectPayload<ExtArgs> | null
     assignments: Prisma.$UserKeyAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     encrypted_api_key: string
+    key_fingerprint: string | null
     status: string
     assigned_user_id: string | null
+    project_id: string | null
     priority: number
     last_used_at: Date | null
     failure_count: number
@@ -1248,6 +1489,7 @@ readonly fields: GeminiKeyFieldRefs;
 export interface Prisma__GeminiKeyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   assigned_user<T extends Prisma.GeminiKey$assigned_userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GeminiKey$assigned_userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.GeminiKey$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GeminiKey$projectArgs<ExtArgs>>): Prisma.Prisma__ProviderProjectClient<runtime.Types.Result.GetResult<Prisma.$ProviderProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignments<T extends Prisma.GeminiKey$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GeminiKey$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserKeyAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1280,8 +1522,10 @@ export interface Prisma__GeminiKeyClient<T, Null = never, ExtArgs extends runtim
 export interface GeminiKeyFieldRefs {
   readonly id: Prisma.FieldRef<"GeminiKey", 'String'>
   readonly encrypted_api_key: Prisma.FieldRef<"GeminiKey", 'String'>
+  readonly key_fingerprint: Prisma.FieldRef<"GeminiKey", 'String'>
   readonly status: Prisma.FieldRef<"GeminiKey", 'String'>
   readonly assigned_user_id: Prisma.FieldRef<"GeminiKey", 'String'>
+  readonly project_id: Prisma.FieldRef<"GeminiKey", 'String'>
   readonly priority: Prisma.FieldRef<"GeminiKey", 'Int'>
   readonly last_used_at: Prisma.FieldRef<"GeminiKey", 'DateTime'>
   readonly failure_count: Prisma.FieldRef<"GeminiKey", 'Int'>
@@ -1705,6 +1949,25 @@ export type GeminiKey$assigned_userArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * GeminiKey.project
+ */
+export type GeminiKey$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderProject
+   */
+  select?: Prisma.ProviderProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderProject
+   */
+  omit?: Prisma.ProviderProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderProjectInclude<ExtArgs> | null
+  where?: Prisma.ProviderProjectWhereInput
 }
 
 /**

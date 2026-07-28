@@ -297,14 +297,14 @@ export function Sidebar({ items, title = "KAIRO", badge, user }: SidebarProps) {
                 {/* Primary CTA */}
                 <div className="text-center">
                   <a
-                    href="/downloads/kairo-extension-1.0.0.zip"
+                    href="/downloads/kairo-extension-1.1.0.zip"
                     download
                     className="inline-flex items-center justify-center w-full py-3 px-4 bg-accent text-[var(--background)] font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm no-underline cursor-pointer"
                   >
                     Download Extension
                   </a>
                   <div className="mt-2 text-xs text-text-muted flex items-center justify-center gap-4">
-                    <span>Version 1.0.0</span>
+                    <span>Version 1.1.0</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--border)]" />
                     <span>Chrome / Chromium</span>
                   </div>

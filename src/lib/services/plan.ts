@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/db";
-import { assignKeys, releaseKeys } from "@/lib/services/keys";
 
 export const PLANS = [
   "FREE",
@@ -9,21 +8,19 @@ export const PLANS = [
 
 export type PlanTier = typeof PLANS[number];
 
-export const PLAN_CONFIGS: Record<PlanTier, { dailyLimit: number; keysRequired: number }> = {
-  FREE: { dailyLimit: 1, keysRequired: 1 },
-  PREMIUM_7_DAYS: { dailyLimit: 3000, keysRequired: 3 },
-  PREMIUM_30_DAYS: { dailyLimit: 3000, keysRequired: 3 },
+export const PLAN_CONFIGS: Record<PlanTier, { dailyLimit: number }> = {
+  FREE: { dailyLimit: 1 },
+  PREMIUM_7_DAYS: { dailyLimit: 3000 },
+  PREMIUM_30_DAYS: { dailyLimit: 3000 },
 };
 
 /**
- * Change a user's subscription tier, adjusting limits and API keys automatically.
+ * Change a user's subscription tier, adjusting limits automatically.
  */
 export async function changeUserTier(userId: string, targetPlan: PlanTier) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
 
-  const currentPlan = (user.plan as PlanTier) || "FREE";
-  const currentConfig = PLAN_CONFIGS[currentPlan] || PLAN_CONFIGS.FREE;
   const targetConfig = PLAN_CONFIGS[targetPlan];
 
   if (!targetConfig) throw new Error(`Invalid plan: ${targetPlan}`);
@@ -38,21 +35,11 @@ export async function changeUserTier(userId: string, targetPlan: PlanTier) {
     planExpiresAt.setDate(planExpiresAt.getDate() + 30);
   }
 
-  // Determine Key Delta
-  const keyDelta = targetConfig.keysRequired - currentConfig.keysRequired;
-
   // Perform Update
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: { plan: targetPlan, daily_limit: targetConfig.dailyLimit, plan_expires_at: planExpiresAt }
   });
-
-  // Adjust Keys
-  if (keyDelta > 0) {
-    await assignKeys(userId, keyDelta, "PLAN_UPGRADE");
-  } else if (keyDelta < 0) {
-    await releaseKeys(userId, Math.abs(keyDelta), "PLAN_DOWNGRADE");
-  }
 
   return updatedUser;
 }

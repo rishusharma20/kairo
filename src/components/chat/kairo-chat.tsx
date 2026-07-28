@@ -1,13 +1,71 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User, AlertCircle } from "lucide-react";
+import { Send, Loader2, Bot, User, AlertCircle, Copy, Check } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type Message = {
   id: string;
   role: "user" | "kairo" | "error";
   content: string;
 };
+
+import { ReactNode, ComponentPropsWithoutRef } from 'react';
+
+type CodeBlockProps = ComponentPropsWithoutRef<'code'> & {
+  inline?: boolean;
+};
+
+function CodeBlock({ inline, className, children, ...props }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+  const match = /language-(\w+)/.exec(className || '');
+  const language = match ? match[1] : '';
+  const codeString = String(children).replace(/\n$/, '');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(codeString);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!inline && match) {
+    return (
+      <div className="relative group my-4 rounded-xl overflow-hidden border border-[var(--border)]">
+        <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface)] border-b border-[var(--border)]">
+          <span className="text-xs text-text-muted uppercase tracking-wider font-mono">{language}</span>
+          <button
+            onClick={handleCopy}
+            className="text-xs text-text-muted hover:text-accent transition-colors flex items-center gap-1.5"
+            aria-label="Copy code"
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? "Copied!" : "Copy Code"}
+          </button>
+        </div>
+        <div className="overflow-x-auto text-sm font-mono max-w-full">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <SyntaxHighlighter
+            {...props}
+            style={vscDarkPlus as any}
+            language={language}
+            PreTag="div"
+            customStyle={{ margin: 0, background: 'transparent', padding: '1rem', minWidth: 'max-content' }}
+          >
+            {codeString}
+          </SyntaxHighlighter>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <code className="bg-accent/10 text-accent px-1.5 py-0.5 rounded text-xs font-mono break-all whitespace-pre-wrap" {...props}>
+      {children}
+    </code>
+  );
+}
 
 export function KairoChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -77,30 +135,7 @@ export function KairoChat() {
     }
   };
 
-  const renderContent = (content: string) => {
-    // Simple markdown renderer for code blocks
-    const parts = content.split(/(```[\s\S]*?```)/g);
-    
-    return parts.map((part, i) => {
-      if (part.startsWith("```") && part.endsWith("```")) {
-        // It's a code block
-        const codeContent = part.substring(3, part.length - 3).replace(/^[a-z]+[ \t]*\n/, () => ""); // strip optional language tag like ```python
-        
-        return (
-          <pre key={i} className="my-3 p-4 rounded-xl bg-[var(--background)] border border-[var(--border)] overflow-x-auto text-sm font-mono text-text-primary">
-            <code>{codeContent.trim()}</code>
-          </pre>
-        );
-      }
-      
-      // Regular text
-      return (
-        <span key={i} className="whitespace-pre-wrap leading-relaxed">
-          {part}
-        </span>
-      );
-    });
-  };
+
 
   return (
     <div className="w-full max-w-4xl h-[calc(100vh-8rem)] min-h-[500px] flex flex-col glass border border-[var(--border)] rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -161,7 +196,35 @@ export function KairoChat() {
                   </div>
                 )}
                 <div className={`text-sm ${msg.role === "kairo" ? "text-text-primary/90" : ""}`}>
-                  {renderContent(msg.content)}
+                  {msg.role === "kairo" ? (
+                    <div className="space-y-4 leading-relaxed">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code: CodeBlock,
+                          h1: ({children}) => <h1 className="text-2xl font-bold mb-4 mt-6 text-text-primary">{children}</h1>,
+                          h2: ({children}) => <h2 className="text-xl font-bold mb-3 mt-5 text-text-primary">{children}</h2>,
+                          h3: ({children}) => <h3 className="text-lg font-semibold mb-3 mt-4 text-text-primary">{children}</h3>,
+                          p: ({children}) => <p className="mb-4 last:mb-0 text-text-primary/90">{children}</p>,
+                          ul: ({children}) => <ul className="list-disc pl-6 mb-4 space-y-2">{children}</ul>,
+                          ol: ({children}) => <ol className="list-decimal pl-6 mb-4 space-y-2">{children}</ol>,
+                          li: ({children}) => <li className="text-text-primary/90">{children}</li>,
+                          blockquote: ({children}) => <blockquote className="border-l-2 border-accent pl-4 my-4 italic text-text-muted">{children}</blockquote>,
+                          a: ({href, children}) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">{children}</a>,
+                          table: ({children}) => <div className="overflow-x-auto my-6"><table className="w-full text-sm border-collapse border border-[var(--border)]">{children}</table></div>,
+                          thead: ({children}) => <thead className="bg-[var(--surface)] text-text-primary uppercase text-xs">{children}</thead>,
+                          tbody: ({children}) => <tbody className="divide-y divide-[var(--border)]">{children}</tbody>,
+                          tr: ({children}) => <tr>{children}</tr>,
+                          th: ({children}) => <th className="border border-[var(--border)] px-4 py-3 font-medium text-left">{children}</th>,
+                          td: ({children}) => <td className="border border-[var(--border)] px-4 py-3 text-text-primary/90">{children}</td>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                  )}
                 </div>
               </div>
             </div>

@@ -27,7 +27,7 @@ function detectPageFormat(text: string): "MCQ" | "Coding" | "Interview" | "Gener
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function extractPageContext(): PageContext | null {
+export function extractPageContext(): PageContext | null {
   const EXCLUDED_TAGS = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'IFRAME', 'CANVAS', 'SVG'];
 
   function isElementVisible(el: HTMLElement): boolean {

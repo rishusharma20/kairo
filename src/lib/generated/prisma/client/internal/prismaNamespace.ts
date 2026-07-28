@@ -401,7 +401,9 @@ export const ModelName = {
   GeminiKey: 'GeminiKey',
   UserKeyAssignment: 'UserKeyAssignment',
   DailyUsage: 'DailyUsage',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  ProviderProject: 'ProviderProject',
+  ProjectModelAvailability: 'ProjectModelAvailability'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "geminiKey" | "userKeyAssignment" | "dailyUsage" | "auditLog"
+    modelProps: "user" | "geminiKey" | "userKeyAssignment" | "dailyUsage" | "auditLog" | "providerProject" | "projectModelAvailability"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -791,6 +793,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProviderProject: {
+      payload: Prisma.$ProviderProjectPayload<ExtArgs>
+      fields: Prisma.ProviderProjectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderProjectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderProjectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderProjectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderProjectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderProjectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>[]
+        }
+        create: {
+          args: Prisma.ProviderProjectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        createMany: {
+          args: Prisma.ProviderProjectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderProjectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderProjectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        update: {
+          args: Prisma.ProviderProjectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderProjectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderProjectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderProjectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderProjectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderProjectPayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderProjectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderProject>
+        }
+        groupBy: {
+          args: Prisma.ProviderProjectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderProjectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderProjectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderProjectCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProjectModelAvailability: {
+      payload: Prisma.$ProjectModelAvailabilityPayload<ExtArgs>
+      fields: Prisma.ProjectModelAvailabilityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectModelAvailabilityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectModelAvailabilityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectModelAvailabilityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectModelAvailabilityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        findMany: {
+          args: Prisma.ProjectModelAvailabilityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>[]
+        }
+        create: {
+          args: Prisma.ProjectModelAvailabilityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        createMany: {
+          args: Prisma.ProjectModelAvailabilityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectModelAvailabilityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectModelAvailabilityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        update: {
+          args: Prisma.ProjectModelAvailabilityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectModelAvailabilityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectModelAvailabilityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectModelAvailabilityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectModelAvailabilityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectModelAvailabilityPayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectModelAvailabilityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectModelAvailability>
+        }
+        groupBy: {
+          args: Prisma.ProjectModelAvailabilityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectModelAvailabilityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectModelAvailabilityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectModelAvailabilityCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -849,8 +999,10 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const GeminiKeyScalarFieldEnum = {
   id: 'id',
   encrypted_api_key: 'encrypted_api_key',
+  key_fingerprint: 'key_fingerprint',
   status: 'status',
   assigned_user_id: 'assigned_user_id',
+  project_id: 'project_id',
   priority: 'priority',
   last_used_at: 'last_used_at',
   failure_count: 'failure_count',
@@ -896,6 +1048,32 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const ProviderProjectScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  external_project_id: 'external_project_id',
+  display_name: 'display_name',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ProviderProjectScalarFieldEnum = (typeof ProviderProjectScalarFieldEnum)[keyof typeof ProviderProjectScalarFieldEnum]
+
+
+export const ProjectModelAvailabilityScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  model_id: 'model_id',
+  status: 'status',
+  last_checked_at: 'last_checked_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ProjectModelAvailabilityScalarFieldEnum = (typeof ProjectModelAvailabilityScalarFieldEnum)[keyof typeof ProjectModelAvailabilityScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1139,6 +1317,8 @@ export type GlobalOmitConfig = {
   userKeyAssignment?: Prisma.UserKeyAssignmentOmit
   dailyUsage?: Prisma.DailyUsageOmit
   auditLog?: Prisma.AuditLogOmit
+  providerProject?: Prisma.ProviderProjectOmit
+  projectModelAvailability?: Prisma.ProjectModelAvailabilityOmit
 }
 
 /* Types for Logging */

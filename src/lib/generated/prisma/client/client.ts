@@ -66,3 +66,13 @@ export type DailyUsage = Prisma.DailyUsageModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model ProviderProject
+ * 
+ */
+export type ProviderProject = Prisma.ProviderProjectModel
+/**
+ * Model ProjectModelAvailability
+ * 
+ */
+export type ProjectModelAvailability = Prisma.ProjectModelAvailabilityModel

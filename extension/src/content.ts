@@ -1,9 +1,30 @@
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
 // Kairo Extension Content Script
 // Objective 7: Safe Page Context Extraction
 
-declare function extractPageContext(): { title?: string, url?: string, text: string } | null;
+import { extractPageContext } from './pageContext';
 
 const KAIRO_ROOT_ID = 'kairo-extension-root';
+
+marked.use({
+  renderer: {
+    code({ text, lang }: any) {
+      const escapedText = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const escapedLang = String(lang || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      return `
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-lang">${escapedLang}</span>
+            <button class="kairo-copy-btn">Copy</button>
+          </div>
+          <pre class="markdown-code"><code>${escapedText}</code></pre>
+        </div>
+      `;
+    }
+  }
+});
 
 function initKairo() {
   if (document.getElementById(KAIRO_ROOT_ID)) {
@@ -223,9 +244,29 @@ function initKairo() {
     .loading-bubble { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-muted); padding: 12px 0; }
     .loading-spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     
-    .markdown-code { background: var(--background); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px; overflow-x: auto; margin: 8px 0; white-space: pre; }
-    
     .context-indicator { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Markdown Styles */
+    .markdown-body { font-size: 14px; line-height: 1.5; color: var(--text-primary); word-break: break-word; }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin: 16px 0 8px; }
+    .markdown-body p { margin: 0 0 12px 0; }
+    .markdown-body p:last-child { margin-bottom: 0; }
+    .markdown-body ul, .markdown-body ol { margin: 0 0 12px 0; padding-left: 24px; }
+    .markdown-body blockquote { border-left: 2px solid var(--accent); margin: 12px 0; padding-left: 12px; color: var(--text-muted); font-style: italic; }
+    .markdown-body a { color: var(--accent); text-decoration: none; }
+    .markdown-body a:hover { text-decoration: underline; }
+    .markdown-body code:not(pre code) { background: var(--accent-dim); color: var(--accent); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+    .markdown-body table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+    .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
+    .markdown-body th { background: rgba(10, 10, 10, 0.5); font-weight: 500; }
+    
+    /* Code Blocks */
+    .code-block-wrapper { margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .code-block-header { background: rgba(10, 10, 10, 0.5); padding: 6px 12px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); align-items: center; }
+    .code-lang { font-size: 10px; color: var(--text-muted); font-family: monospace; text-transform: uppercase; }
+    .kairo-copy-btn { background: transparent; border: none; color: var(--text-muted); font-size: 10px; cursor: pointer; padding: 4px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+    .kairo-copy-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.1); }
+    .markdown-code { margin: 0; padding: 12px; font-family: monospace; font-size: 12px; overflow-x: auto; background: var(--background); white-space: pre; }
     
     @media (max-width: 480px) {
       .kairo-panel { width: calc(100vw - 32px); height: calc(100vh - 32px); }
@@ -237,17 +278,19 @@ function initKairo() {
   container.className = 'kairo-panel';
   container.innerHTML = `
     <div class="kairo-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 28px; height: 28px; border-radius: 8px; background: var(--accent-dim); border: 1px solid rgba(0, 212, 255, 0.2); display: flex; align-items: center; justify-content: center;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 6px; background: var(--accent-dim); border: 1px solid rgba(0, 212, 255, 0.2); display: flex; align-items: center; justify-content: center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
         </div>
-        <div>
-          <h2 class="kairo-title">Kairo</h2>
-          <p class="kairo-subtitle">AI Assistant</p>
+        <h2 class="kairo-title">Kairo</h2>
+        <div id="header-meta" class="hidden" style="display: flex; align-items: center; gap: 8px; margin-left: 8px; border-left: 1px solid var(--border); padding-left: 8px; font-size: 11px;">
+          <span id="meta-plan" class="meta-plan"></span>
+          <span id="meta-credits" class="meta-credits" style="color: var(--text-muted)"></span>
+          <button id="btn-logout" class="logout-link" style="margin-left: 4px;">Logout</button>
         </div>
       </div>
       <button class="kairo-close" aria-label="Close Kairo">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
     
@@ -282,11 +325,6 @@ function initKairo() {
     </div>
     
     <div id="chat-view" class="chat-view hidden">
-      <div id="meta-bar" class="meta-bar">
-        <span id="meta-plan" class="meta-plan">Plan: -</span>
-        <span id="meta-credits" class="meta-credits">- / - used</span>
-        <button id="btn-logout" class="logout-link">Logout</button>
-      </div>
       <div class="kairo-messages" id="kairo-messages">
         <div class="kairo-empty" id="kairo-empty">
           <h3 class="kairo-empty-title">Kairo</h3>
@@ -296,7 +334,7 @@ function initKairo() {
       
       <div class="kairo-input-area">
         <div id="kairo-context-indicator" class="context-indicator hidden">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           Includes page context
         </div>
         <div class="kairo-input-wrapper">
@@ -319,11 +357,17 @@ function initKairo() {
   const viewError = shadow.querySelector('#state-error') as HTMLDivElement;
   const viewBlocked = shadow.querySelector('#state-blocked') as HTMLDivElement;
   const viewChat = shadow.querySelector('#chat-view') as HTMLDivElement;
+  const headerMeta = shadow.querySelector('#header-meta') as HTMLDivElement;
   const allViews = [viewLoading, viewUnauth, viewError, viewBlocked, viewChat];
 
   function showView(view: HTMLDivElement) {
     allViews.forEach(v => v.classList.add('hidden'));
     view.classList.remove('hidden');
+    if (view === viewChat) {
+      headerMeta.classList.remove('hidden');
+    } else {
+      headerMeta.classList.add('hidden');
+    }
   }
 
   function checkAuth() {
@@ -338,14 +382,14 @@ function initKairo() {
           const metaPlan = shadow.querySelector('#meta-plan') as HTMLSpanElement;
           const metaCredits = shadow.querySelector('#meta-credits') as HTMLSpanElement;
           if (response.user) {
-            metaPlan.textContent = `Plan: ${response.user.plan}`;
+            metaPlan.textContent = response.user.plan;
           }
           showView(viewChat);
           
           // Asynchronously load database quota to prevent UI rendering delays
           chrome.runtime.sendMessage({ type: 'GET_QUOTA' }, (quotaResponse) => {
             if (!chrome.runtime.lastError && quotaResponse && quotaResponse.status === 'SUCCESS' && quotaResponse.user) {
-              metaCredits.textContent = `${quotaResponse.user.requests_used} / ${quotaResponse.user.daily_limit} used`;
+              metaCredits.textContent = `${quotaResponse.user.requests_used} / ${quotaResponse.user.daily_limit}`;
             }
           });
           break;
@@ -442,26 +486,27 @@ function initKairo() {
 
   sendBtn.addEventListener('click', handleSubmit);
 
-  function parseAndRenderMarkdown(content: string, container: HTMLElement) {
-    const parts = content.split(/(```[\s\S]*?```)/g);
-    parts.forEach(part => {
-      if (part.startsWith('```') && part.endsWith('```')) {
-        const codeContent = part.substring(3, part.length - 3).replace(/^[a-z]+[ \t]*\n/, () => "");
-        const pre = document.createElement('pre');
-        pre.className = 'markdown-code';
-        const code = document.createElement('code');
-        code.textContent = codeContent.trim();
-        pre.appendChild(code);
-        container.appendChild(pre);
-      } else if (part) {
-        const span = document.createElement('span');
-        span.textContent = part;
-        container.appendChild(span);
-      }
+  async function parseAndRenderMarkdown(content: string, container: HTMLElement) {
+    const rawHtml = await marked.parse(content);
+    const cleanHtml = DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
+    container.innerHTML = `<div class="markdown-body">${cleanHtml}</div>`;
+    
+    // Attach event listeners to copy buttons
+    const copyBtns = container.querySelectorAll('.kairo-copy-btn');
+    copyBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wrapper = btn.closest('.code-block-wrapper');
+        const codeEl = wrapper?.querySelector('code');
+        if (codeEl) {
+          navigator.clipboard.writeText(codeEl.textContent || '');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        }
+      });
     });
   }
 
-  function addMessage(role: 'user' | 'kairo' | 'error', text: string) {
+  async function addMessage(role: 'user' | 'kairo' | 'error', text: string) {
     if (emptyEl && !emptyEl.classList.contains('hidden')) {
       emptyEl.classList.add('hidden');
     }
@@ -488,7 +533,7 @@ function initKairo() {
     bubble.className = `message-bubble ${role}`;
     
     if (role === 'kairo') {
-      parseAndRenderMarkdown(text, bubble);
+      await parseAndRenderMarkdown(text, bubble);
     } else {
       bubble.textContent = text;
     }
@@ -499,7 +544,7 @@ function initKairo() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (isProcessing) return;
     const text = inputEl.value.trim();
 
@@ -507,7 +552,7 @@ function initKairo() {
     updateInputState();
     
     if (text) {
-      addMessage('user', text);
+      await addMessage('user', text);
     }
     
     inputEl.value = '';
@@ -536,7 +581,7 @@ function initKairo() {
     } else if (!text) {
       isProcessing = false;
       updateInputState();
-      addMessage('error', 'Ask Kairo something.');
+      await addMessage('error', 'Ask Kairo something.');
       return;
     }
 
@@ -559,7 +604,7 @@ function initKairo() {
         context: contextText, 
         format: detectedFormat 
       } 
-    }, (response) => {
+    }, async (response) => {
       const loader = shadow.querySelector('#kairo-loading');
       if (loader) loader.remove();
       
@@ -570,17 +615,17 @@ function initKairo() {
       updateInputState();
 
       if (chrome.runtime.lastError || !response) {
-        addMessage('error', 'Failed to communicate with Kairo.');
+        await addMessage('error', 'Failed to communicate with Kairo.');
         return;
       }
 
       if (response.status === 'SUCCESS') {
-        addMessage('kairo', response.data);
+        await addMessage('kairo', response.data);
         checkAuth(); // Update credits bar
       } else if (response.status === 'UNAUTHENTICATED' || response.status === 'BLOCKED') {
         checkAuth();
       } else {
-        addMessage('error', response.error || 'An error occurred.');
+        await addMessage('error', response.error || 'An error occurred.');
       }
     });
   }

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { withUsageValidation } from "@/lib/middlewares/withUsage";
-import { processGeminiQuery } from "@/lib/services/gemini";
+import { executeKairoQuery } from "@/lib/services/inference";
 import { QueryFeature, ResponseFormat } from "@/lib/services/prompts";
-import { atomicReserveUsage, refundUsage } from "@/lib/services/usage";
 import { logRequestEventInBackground } from "@/lib/services/audit";
 
 async function queryHandler(request: Request) {
@@ -62,23 +61,13 @@ async function queryHandler(request: Request) {
       return NextResponse.json({ error: "Invalid format requested" }, { status: 400, headers });
     }
 
-    // Phase-4: Atomic Quota Reservation
-    await atomicReserveUsage(userId);
-
-    let responseText;
-    try {
-      // Process the query using Phase-4 Key Rotation and Phase-5 Gemini Engine
-      responseText = await processGeminiQuery(
-        userId,
-        feature as QueryFeature,
-        query,
-        format as ResponseFormat,
-        context
-      );
-    } catch (error) {
-      await refundUsage(userId);
-      throw error;
-    }
+    const responseText = await executeKairoQuery({
+      userId,
+      feature: feature as QueryFeature,
+      query,
+      format: format as ResponseFormat,
+      context
+    });
 
     // Phase-6: Fire and Forget Background Tasks
     logRequestEventInBackground(userId, feature, "SUCCESS");
@@ -89,7 +78,7 @@ async function queryHandler(request: Request) {
     }, { headers });
 
   } catch (error: unknown) {
-    if ((error as Error).message === "No healthy Gemini key available.") {
+    if ((error as Error).message === "AI_TEMPORARILY_UNAVAILABLE") {
       return NextResponse.json({ error: (error as Error).message }, { status: 503, headers });
     }
 

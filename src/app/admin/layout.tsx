@@ -7,6 +7,7 @@ const ADMIN_ITEMS = [
   { label: "Users", href: "/admin/users", icon: "Users" },
   { label: "Payment Requests", href: "/admin/payments", icon: "Crown" },
   { label: "Audit Logs", href: "/admin/audit", icon: "FileText" },
+  { label: "AI Infrastructure", href: "/admin/ai-infrastructure", icon: "Activity" },
   { label: "Kairo Chat", href: "/admin/chat", icon: "MessageSquare" },
 ];
 

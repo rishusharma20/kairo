@@ -55,7 +55,9 @@ export const ModelName = {
   GeminiKey: 'GeminiKey',
   UserKeyAssignment: 'UserKeyAssignment',
   DailyUsage: 'DailyUsage',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  ProviderProject: 'ProviderProject',
+  ProjectModelAvailability: 'ProjectModelAvailability'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -93,8 +95,10 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const GeminiKeyScalarFieldEnum = {
   id: 'id',
   encrypted_api_key: 'encrypted_api_key',
+  key_fingerprint: 'key_fingerprint',
   status: 'status',
   assigned_user_id: 'assigned_user_id',
+  project_id: 'project_id',
   priority: 'priority',
   last_used_at: 'last_used_at',
   failure_count: 'failure_count',
@@ -140,6 +144,32 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const ProviderProjectScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  external_project_id: 'external_project_id',
+  display_name: 'display_name',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ProviderProjectScalarFieldEnum = (typeof ProviderProjectScalarFieldEnum)[keyof typeof ProviderProjectScalarFieldEnum]
+
+
+export const ProjectModelAvailabilityScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  model_id: 'model_id',
+  status: 'status',
+  last_checked_at: 'last_checked_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ProjectModelAvailabilityScalarFieldEnum = (typeof ProjectModelAvailabilityScalarFieldEnum)[keyof typeof ProjectModelAvailabilityScalarFieldEnum]
 
 
 export const SortOrder = {

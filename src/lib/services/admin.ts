@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client/client";
-import { assignKeys, releaseKeys } from "@/lib/services/keys";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 import { changeUserTier } from "@/lib/services/plan";
 import { getTodayUTC } from "@/lib/services/usage";
@@ -13,9 +12,6 @@ export async function blockUser(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
   if (user.status === "BLOCKED") throw new Error("User is already blocked");
-
-  // Release all assigned keys
-  await releaseKeys(userId, 9999, "USER_BLOCKED");
 
   // Change status
   const updated = await prisma.user.update({
@@ -38,11 +34,7 @@ export async function unblockUser(userId: string) {
     data: { status: "ACTIVE" }
   });
 
-  // Reassign keys based on plan
-  const count = user.plan === "PREMIUM" ? 3 : 1;
-  await assignKeys(userId, count, "ADMIN_RELEASE");
-
-  logSystemEventInBackground("USER_UNBLOCKED", userId, { adminAction: true, keysAssigned: count });
+  logSystemEventInBackground("USER_UNBLOCKED", userId, { adminAction: true });
   return updated;
 }
 
@@ -50,9 +42,6 @@ export async function deleteUser(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("User not found");
   if (user.status === "DELETED") throw new Error("User is already deleted");
-
-  // Release all assigned keys
-  await releaseKeys(userId, 9999, "USER_DELETED");
 
   const updated = await prisma.user.update({
     where: { id: userId },
