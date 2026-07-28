@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAdminValidation } from "@/lib/middlewares/withAdmin";
+import { withSessionAdmin } from "@/lib/middlewares/withAdmin";
 import { prisma } from "@/lib/db";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 
@@ -41,4 +41,4 @@ async function patchHandler(request: Request, context: { params: { id: string } 
   }
 }
 
-export const PATCH = withAdminValidation(patchHandler as any);
+export const PATCH = withSessionAdmin(patchHandler as any);

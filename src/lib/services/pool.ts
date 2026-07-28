@@ -11,6 +11,14 @@ import type { GeminiKey } from "@/lib/generated/prisma/client/client";
  * 
  * Disabled keys and active cooldown keys are excluded.
  */
+export function isCredentialEligible(key: { status: string; cooldown_until: Date | null }, now: Date = new Date()): boolean {
+  if (key.status === "DISABLED") return false;
+  if (key.status === "COOLDOWN") {
+    return key.cooldown_until !== null && key.cooldown_until < now;
+  }
+  return ["AVAILABLE", "ACTIVE", "ASSIGNED"].includes(key.status);
+}
+
 export async function getHealthyCredentials(): Promise<GeminiKey[]> {
   const now = new Date();
   

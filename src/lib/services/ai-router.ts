@@ -87,8 +87,26 @@ export async function executeSharedAiRoute(
       let modelsTried = 0;
       let credentialIsDead = false;
 
-      const decryptedKey = decryptKey(key.encrypted_api_key);
-      const genAI = new GoogleGenerativeAI(decryptedKey);
+      let decryptedKey: string;
+      let genAI: GoogleGenerativeAI;
+      try {
+        decryptedKey = decryptKey(key.encrypted_api_key);
+        genAI = new GoogleGenerativeAI(decryptedKey);
+      } catch (_err: unknown) {
+        totalAttempts++;
+        telemetryLog.push({
+          requestId,
+          projectId,
+          credentialId: key.id,
+          modelId: null,
+          taskType,
+          attemptNumber: totalAttempts,
+          latencyMs: 0,
+          result: "FAILURE",
+          failureCategory: "DECRYPTION_ERROR"
+        });
+        continue;
+      }
 
       for (const modelConfig of availableModels) {
         if (modelsTried >= ROUTER_CONFIG.MAX_MODELS_PER_CREDENTIAL) break;

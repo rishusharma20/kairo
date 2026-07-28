@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/admin/ai-infrastructure/route';
 import { prisma } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+
+vi.mock('@/lib/auth', () => ({
+  getSession: vi.fn(),
+}));
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -37,12 +42,12 @@ describe('AI Infrastructure Admin API', () => {
   });
 
   const createAdminRequest = () => {
-    return new NextRequest('http://localhost:3000/api/admin/ai-infrastructure', {
-      headers: { 'x-admin-key': process.env.ADMIN_API_KEY || 'kairo-local-admin-key' }
-    });
+    vi.mocked(getSession).mockResolvedValue({ email: process.env.ADMIN_EMAIL || "admin@gmail.com" } as any);
+    return new NextRequest('http://localhost:3000/api/admin/ai-infrastructure');
   };
 
   const createUnauthorizedRequest = () => {
+    vi.mocked(getSession).mockResolvedValue(null);
     return new NextRequest('http://localhost:3000/api/admin/ai-infrastructure');
   };
 

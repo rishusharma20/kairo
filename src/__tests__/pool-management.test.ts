@@ -6,6 +6,11 @@ import { POST as CredentialPost } from '@/app/api/admin/credentials/route';
 import { PATCH as CredentialPatch } from '@/app/api/admin/credentials/[id]/route';
 import { prisma } from '@/lib/db';
 import crypto from 'crypto';
+import { getSession } from '@/lib/auth';
+
+vi.mock('@/lib/auth', () => ({
+  getSession: vi.fn(),
+}));
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -38,13 +43,15 @@ vi.mock('@/lib/services/discovery', () => ({
 
 // Create authenticated admin requests
 const createAdminRequest = (url: string, method: string, body: any) => {
+  vi.mocked(getSession).mockResolvedValue({ email: process.env.ADMIN_EMAIL || "admin@gmail.com" } as any);
   return new NextRequest(url, {
     method,
-    headers: { 'x-admin-key': process.env.ADMIN_API_KEY || 'kairo-local-admin-key', 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body)
   });
 };
 const createUnauthorizedRequest = (url: string, method: string, body: any) => {
+  vi.mocked(getSession).mockResolvedValue(null);
   return new NextRequest(url, {
     method,
     headers: { 'content-type': 'application/json' },

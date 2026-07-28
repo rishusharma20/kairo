@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAdminValidation } from "@/lib/middlewares/withAdmin";
+import { withSessionAdmin } from "@/lib/middlewares/withAdmin";
 import { prisma } from "@/lib/db";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 import { validateProjectModels } from "@/lib/services/discovery";
@@ -31,4 +31,4 @@ async function postHandler(request: Request, context: { params: { id: string } }
   }
 }
 
-export const POST = withAdminValidation(postHandler as any);
+export const POST = withSessionAdmin(postHandler as any);

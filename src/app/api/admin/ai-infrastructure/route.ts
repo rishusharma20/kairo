@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { withAdminValidation } from "@/lib/middlewares/withAdmin";
+import { withSessionAdmin } from "@/lib/middlewares/withAdmin";
 import { prisma } from "@/lib/db";
 import { MODEL_REGISTRY } from "@/lib/services/models";
-import { ROUTER_CONFIG } from "@/lib/services/ai-router.config";
+import { isCredentialEligible } from "@/lib/services/pool";
 
-async function handler(request: Request) {
+async function handler(_request: Request) {
   try {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -43,18 +43,14 @@ async function handler(request: Request) {
         disabledKeysCount++;
       } else if (key.cooldown_until && key.cooldown_until > now) {
         cooldownKeysCount++;
-      } else if (key.status === "AVAILABLE" || key.status === "ASSIGNED") {
+      } else if (isCredentialEligible(key, now)) {
         healthyKeysCount++;
       }
     }
 
     let availableRoutes = 0;
     for (const key of keys) {
-      if (
-        (key.status !== "AVAILABLE" && key.status !== "ASSIGNED") ||
-        (key.cooldown_until && key.cooldown_until > now) ||
-        !key.project_id
-      ) {
+      if (!isCredentialEligible(key, now) || !key.project_id) {
         continue;
       }
       const p = projects.find((p) => p.id === key.project_id);
@@ -121,7 +117,8 @@ async function handler(request: Request) {
         const telemetryArray = meta.telemetry || [];
         if (!Array.isArray(telemetryArray) || telemetryArray.length === 0) continue;
 
-        metrics.providerAttempts += telemetryArray.length;
+        const actualProviderAttempts = telemetryArray.filter(t => t.failureCategory !== 'DECRYPTION_ERROR').length;
+        metrics.providerAttempts += actualProviderAttempts;
         metrics.failovers += telemetryArray.length - 1;
 
         const lastAttempt = telemetryArray[telemetryArray.length - 1];
@@ -182,9 +179,7 @@ async function handler(request: Request) {
           return {
             ...p,
             credentialCount: pKeys.length,
-            healthyCredentials: pKeys.filter(
-              (k) => (k.status === "AVAILABLE" || k.status === "ASSIGNED") && (!k.cooldown_until || k.cooldown_until <= now)
-            ).length,
+            healthyCredentials: pKeys.filter((k) => isCredentialEligible(k, now)).length,
             cooldownCredentials: pKeys.filter((k) => k.cooldown_until && k.cooldown_until > now).length,
             disabledCredentials: pKeys.filter((k) => k.status === "DISABLED").length,
             availableModels: pModels.filter((pm) => pm.status === "AVAILABLE").length,
@@ -208,4 +203,4 @@ async function handler(request: Request) {
   }
 }
 
-export const GET = withAdminValidation(handler);
+export const GET = withSessionAdmin(handler);

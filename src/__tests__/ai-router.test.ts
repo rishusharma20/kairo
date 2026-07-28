@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { executeSharedAiRoute } from '@/lib/services/ai-router';
+import { executeSharedAiRoute, type RouterTelemetry } from '@/lib/services/ai-router';
 import * as poolService from '@/lib/services/pool';
 import * as discoveryService from '@/lib/services/discovery';
 import * as encryptionService from '@/lib/services/encryption';
@@ -22,6 +22,10 @@ vi.mock('@/lib/services/pool', () => ({
 
 vi.mock('@/lib/services/discovery', () => ({
   getAvailableModelsForProject: vi.fn(),
+}));
+
+vi.mock('@/lib/services/audit', () => ({
+  logSystemEventInBackground: vi.fn(),
 }));
 
 vi.mock('@/lib/services/encryption', () => ({
@@ -234,5 +238,146 @@ describe('AI Router Engine', () => {
 
     await expect(executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General')).rejects.toThrow(/AI_UNAVAILABLE/);
     expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  // TEST DEC_A: FIRST CREDENTIAL DECRYPTION FAILURE
+  it('TEST DEC_A: Credential A decrypt throws, Credential B valid, Provider success. DECRYPTION_ERROR telemetry exists.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_bad' } as never,
+      { id: 'B1', project_id: 'ProjB', encrypted_api_key: 'enc_good' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+
+    vi.mocked(encryptionService.decryptKey).mockImplementation((key) => {
+      if (key === 'enc_bad') throw new Error('Auth tag mismatch');
+      return 'decrypted_good';
+    });
+
+    mockGenerateContent.mockResolvedValueOnce({ response: { text: () => 'B1 success' } });
+
+    const { text, telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
+    
+    expect(text).toBe('B1 success');
+    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+    expect(telemetry.length).toBe(2);
+    expect(telemetry[0].failureCategory).toBe('DECRYPTION_ERROR');
+    expect(telemetry[0].credentialId).toBe('A1');
+    expect(telemetry[1].credentialId).toBe('B1');
+    expect(telemetry[1].result).toBe('SUCCESS');
+    
+    // Check that we didn't log sensitive info
+    const logStr = JSON.stringify(telemetry);
+    expect(logStr).not.toContain('enc_bad');
+    expect(logStr).not.toContain('Auth tag mismatch');
+  });
+
+  // TEST DEC_B: ALL CREDENTIALS IN PROJECT FAIL DECRYPTION
+  it('TEST DEC_B: Project A keys fail decrypt, Project B succeeds. Fails over correctly.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_bad1' } as never,
+      { id: 'A2', project_id: 'ProjA', encrypted_api_key: 'enc_bad2' } as never,
+      { id: 'B1', project_id: 'ProjB', encrypted_api_key: 'enc_good' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+
+    vi.mocked(encryptionService.decryptKey).mockImplementation((key) => {
+      if (key.startsWith('enc_bad')) throw new Error('Bad key');
+      return 'decrypted_good';
+    });
+
+    mockGenerateContent.mockResolvedValueOnce({ response: { text: () => 'B1 success' } });
+
+    const { text, telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
+    
+    expect(text).toBe('B1 success');
+    expect(telemetry.length).toBe(3);
+    expect(telemetry[0].failureCategory).toBe('DECRYPTION_ERROR');
+    expect(telemetry[0].credentialId).toBe('A1');
+    expect(telemetry[1].failureCategory).toBe('DECRYPTION_ERROR');
+    expect(telemetry[1].credentialId).toBe('A2');
+    expect(telemetry[2].result).toBe('SUCCESS');
+    expect(telemetry[2].credentialId).toBe('B1');
+  });
+
+  // TEST DEC_C: ALL CREDENTIALS FAIL DECRYPTION
+  it('TEST DEC_C: All credentials fail decryption, throws AI_UNAVAILABLE, records telemetry.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_bad' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+
+    vi.mocked(encryptionService.decryptKey).mockImplementation(() => {
+      throw new Error('Bad key');
+    });
+
+    await expect(executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General')).rejects.toThrow(/AI_UNAVAILABLE/);
+    
+    // Ensure mockGenerateContent was never called
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+    
+    // Check if telemetry was logged via logSystemEventInBackground
+    const { logSystemEventInBackground } = await import('@/lib/services/audit');
+    expect(logSystemEventInBackground).toHaveBeenCalled();
+    
+    const calls = vi.mocked(logSystemEventInBackground).mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    
+    const callArgs = calls[0];
+    expect(callArgs).toBeDefined();
+    expect(callArgs?.[0]).toBe('ROUTER_TELEMETRY');
+    
+    const payload = callArgs?.[2] as { telemetry?: RouterTelemetry[] } | undefined;
+    expect(payload).toBeDefined();
+    
+    const telemetryLogged = payload!.telemetry;
+    expect(telemetryLogged).toBeDefined();
+    expect(Array.isArray(telemetryLogged)).toBe(true);
+    expect(telemetryLogged!.length).toBe(1);
+    expect(telemetryLogged![0].failureCategory).toBe('DECRYPTION_ERROR');
+  });
+
+  // TEST DEC_D: SECRET SAFETY
+  it('TEST DEC_D: Telemetry logs contain no sensitive info upon decryption crash.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'super_secret_cipher' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+
+    process.env.GEMINI_ENCRYPTION_KEY = 'super_secret_key_environment';
+
+    vi.mocked(encryptionService.decryptKey).mockImplementation(() => {
+      throw new Error('Raw crypto error iv authTag');
+    });
+
+    await expect(executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General')).rejects.toThrow();
+
+    const { logSystemEventInBackground } = await import('@/lib/services/audit');
+    const calls = vi.mocked(logSystemEventInBackground).mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    
+    const callArgs = calls[0];
+    expect(callArgs).toBeDefined();
+    
+    const payload = callArgs?.[2] as { telemetry?: RouterTelemetry[] } | undefined;
+    expect(payload).toBeDefined();
+    
+    const telemetryLogged = payload!.telemetry;
+    expect(telemetryLogged).toBeDefined();
+    expect(Array.isArray(telemetryLogged)).toBe(true);
+    
+    const logStr = JSON.stringify(telemetryLogged);
+    expect(logStr).not.toContain('super_secret_cipher');
+    expect(logStr).not.toContain('super_secret_key_environment');
+    expect(logStr).not.toContain('Raw crypto error');
+    expect(logStr).not.toContain('iv');
+    expect(logStr).not.toContain('authTag');
   });
 });
