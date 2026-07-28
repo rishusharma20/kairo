@@ -14,6 +14,13 @@ async function queryHandler(request: Request) {
     headers.set('Access-Control-Allow-Credentials', 'true');
   }
 
+  const requestId = request.headers.get("x-kairo-request-id") || "unknown";
+  const startTimeStr = request.headers.get("x-kairo-start-time");
+  const startTime = startTimeStr ? parseInt(startTimeStr, 10) : Date.now();
+  const trace = (stage: string, extra = "") => {
+    console.log(`[KAIRO_TRACE] requestId=${requestId} stage=${stage} elapsedMs=${Date.now() - startTime} ${extra}`.trim());
+  };
+
   try {
     const userId = request.headers.get("x-kairo-user-id");
     if (!userId) throw new Error("Unauthorized");
@@ -66,11 +73,15 @@ async function queryHandler(request: Request) {
       feature: feature as QueryFeature,
       query,
       format: format as ResponseFormat,
-      context
+      context,
+      requestId,
+      startTime
     });
 
     // Phase-6: Fire and Forget Background Tasks
     logRequestEventInBackground(userId, feature, "SUCCESS");
+
+    trace("QUERY_SUCCESS");
 
     return NextResponse.json({
       success: true,
@@ -79,6 +90,7 @@ async function queryHandler(request: Request) {
 
   } catch (error: unknown) {
     if ((error as Error).message === "AI_TEMPORARILY_UNAVAILABLE") {
+      trace("QUERY_503");
       return NextResponse.json({ error: (error as Error).message }, { status: 503, headers });
     }
 

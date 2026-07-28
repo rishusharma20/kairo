@@ -25,7 +25,6 @@ vi.mock('@/lib/services/discovery', () => ({
 }));
 
 vi.mock('@/lib/services/audit', () => ({
-  logSystemEventInBackground: vi.fn(),
   logSystemEvent: vi.fn(),
 }));
 

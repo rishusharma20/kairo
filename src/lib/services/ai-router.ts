@@ -27,16 +27,25 @@ export async function executeSharedAiRoute(
   feature: QueryFeature,
   query: string,
   format: ResponseFormat,
-  context?: string
+  context?: string,
+  requestId: string = randomUUID(),
+  startTime: number = Date.now()
 ): Promise<{ text: string; telemetry: RouterTelemetry[] }> {
-  
-  const requestId = randomUUID();
+  const trace = (stage: string, extra = "") => {
+    console.log(`[KAIRO_TRACE] requestId=${requestId} stage=${stage} elapsedMs=${Date.now() - startTime} ${extra}`.trim());
+  };
+  try {
+    trace("ROUTER_ENTER");
+    const isEnvKeyPresent = !!process.env.GEMINI_ENCRYPTION_KEY;
+    trace("GEMINI_ENCRYPTION_KEY_PRESENT", isEnvKeyPresent.toString());
+
   const prompt = buildPrompt({ feature, query, format, context });
   const telemetryLog: RouterTelemetry[] = [];
   
   let totalAttempts = 0;
   let credentialsTried = 0;
   
+  trace("POOL_LOAD_START");
   const healthyKeys = await getHealthyCredentials();
   
   // Group keys by project to respect project awareness
@@ -57,9 +66,11 @@ export async function executeSharedAiRoute(
     }
   }
 
+  trace("POOL_LOAD_SUCCESS", `projectCount=${orderedProjects.length} credentialCount=${healthyKeys.length}`);
   const excludedProjects = new Set<string>();
 
   for (const projectId of orderedProjects) {
+    trace("PROJECT_SELECTED", `projectId=${projectId}`);
     if (excludedProjects.has(projectId)) continue;
     
     // Check limits
@@ -68,6 +79,7 @@ export async function executeSharedAiRoute(
     const projectKeys = keysByProject.get(projectId) || [];
     
     for (const key of projectKeys) {
+      trace("CREDENTIAL_SELECTED", `credentialId=${key.id}`);
       if (credentialsTried >= ROUTER_CONFIG.MAX_CREDENTIALS_PER_REQUEST) {
         break; // Stop completely if credential limit reached
       }
@@ -76,7 +88,9 @@ export async function executeSharedAiRoute(
         break; // If a previous key caused this project to be excluded, skip remaining keys
       }
 
+      trace("MODEL_LOAD_START");
       const availableModels = await getAvailableModelsForProject(projectId, taskType);
+      trace("MODEL_LOAD_SUCCESS", `modelCount=${availableModels.length}`);
       if (availableModels.length === 0) {
         // No available models for this project + task, skip to next project
         excludedProjects.add(projectId);
@@ -89,10 +103,13 @@ export async function executeSharedAiRoute(
 
       let decryptedKey: string;
       let genAI: GoogleGenerativeAI;
+      trace("DECRYPT_START");
       try {
         decryptedKey = decryptKey(key.encrypted_api_key);
+        trace("DECRYPT_SUCCESS");
         genAI = new GoogleGenerativeAI(decryptedKey);
       } catch (_err: unknown) {
+        trace("DECRYPT_FAILURE");
         totalAttempts++;
         telemetryLog.push({
           requestId,
@@ -109,6 +126,7 @@ export async function executeSharedAiRoute(
       }
 
       for (const modelConfig of availableModels) {
+        trace("MODEL_SELECTED", `modelId=${modelConfig.id}`);
         if (modelsTried >= ROUTER_CONFIG.MAX_MODELS_PER_CREDENTIAL) break;
         if (totalAttempts >= ROUTER_CONFIG.MAX_TOTAL_ATTEMPTS) break;
         if (credentialIsDead) break;
@@ -122,6 +140,7 @@ export async function executeSharedAiRoute(
           const model = genAI.getGenerativeModel({ model: modelConfig.id });
           
           // Timeout wrapper
+          trace("PROVIDER_START");
           const result = await Promise.race([
             model.generateContent(prompt),
             new Promise<never>((_, reject) => 
@@ -131,6 +150,7 @@ export async function executeSharedAiRoute(
 
           const response = await result.response;
           const text = response.text();
+          trace("PROVIDER_RESPONSE", "status=200");
 
           // SUCCESS
           await markKeyUsed(key.id);
@@ -153,10 +173,12 @@ export async function executeSharedAiRoute(
               console.error("[Router Telemetry Error]", telemetryErr);
             }
           }
+          trace("ROUTER_SUCCESS");
           return { text, telemetry: telemetryLog };
 
         } catch (err: unknown) {
           const apiError = err as { status?: number; message?: string };
+          trace("PROVIDER_RESPONSE", `status=${apiError.status || "unknown"}`);
           const latencyMs = Date.now() - startTime;
           let failureCategory = "UNKNOWN_ERROR";
 
@@ -227,4 +249,17 @@ export async function executeSharedAiRoute(
     }
   }
   throw new Error("AI_UNAVAILABLE: All router attempts exhausted or no available routes.");
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.startsWith("AI_UNAVAILABLE")) {
+      trace("ROUTER_EXHAUSTED");
+      throw err;
+    }
+    if (err instanceof Error && err.message.includes("400 Bad Request")) {
+      trace("ROUTER_FATAL", "BadRequestError");
+      throw err;
+    }
+    const safeErrorName = err instanceof Error ? err.name || "UnknownError" : "UnknownError";
+    trace("ROUTER_FATAL", safeErrorName);
+    throw err;
+  }
 }

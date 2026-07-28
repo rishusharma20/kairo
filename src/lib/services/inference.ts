@@ -8,32 +8,48 @@ export async function executeKairoQuery({
   feature,
   query,
   format,
-  context
+  context,
+  requestId = "unknown",
+  startTime = Date.now()
 }: {
   userId: string;
   feature: QueryFeature;
   query: string;
   format: ResponseFormat;
   context?: string;
+  requestId?: string;
+  startTime?: number;
 }) {
+  const trace = (stage: string, extra = "") => {
+    console.log(`[KAIRO_TRACE] requestId=${requestId} stage=${stage} elapsedMs=${Date.now() - startTime} ${extra}`.trim());
+  };
+
+  trace("INFERENCE_ENTER");
   // 1. Reserve Kairo user quota EXACTLY ONCE
+  trace("USAGE_RESERVE_START");
   await atomicReserveUsage(userId);
+  trace("USAGE_RESERVED");
 
   try {
     // Shared Infrastructure Routing
     const taskCategory: TaskCategory = format === 'Coding' ? 'CODING' : 'GENERAL';
+    trace("ROUTER_CALL_START");
     const result = await executeSharedAiRoute(
       taskCategory,
       feature,
       query,
       format,
-      context
+      context,
+      requestId,
+      startTime
     );
     
     return result.text;
   } catch (error: unknown) {
     // 2. Refund EXACTLY ONCE on complete provider failure
+    trace("REFUND_START");
     await refundUsage(userId);
+    trace("REFUND_SUCCESS");
     
     // 3. Error Sanitization
     const msg = (error as Error).message || "";

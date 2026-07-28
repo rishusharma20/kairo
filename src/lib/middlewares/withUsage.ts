@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { verifyUsageLimits, DailyLimitExceededError } from "@/lib/services/usage";
+import { randomUUID } from "crypto";
 
 /**
  * Higher-order function to wrap future Next.js Route Handlers.
@@ -10,6 +11,13 @@ export function withUsageValidation<T extends unknown[]>(handler: (request: Requ
   return async (request: Request, ...args: T): Promise<Response> => {
     const origin = request.headers.get('origin') || '';
     const isExtension = origin.startsWith('chrome-extension://');
+    const requestId = randomUUID();
+    const startTime = Date.now();
+    const trace = (stage: string, extra = "") => {
+      console.log(`[KAIRO_TRACE] requestId=${requestId} stage=${stage} elapsedMs=${Date.now() - startTime} ${extra}`.trim());
+    };
+
+    trace("QUERY_ENTER");
     
     const headers = new Headers();
     if (isExtension) {
@@ -18,6 +26,7 @@ export function withUsageValidation<T extends unknown[]>(handler: (request: Requ
     }
 
     try {
+      trace("AUTH_START");
       const session = await getSession();
 
       if (!session) {
@@ -28,14 +37,20 @@ export function withUsageValidation<T extends unknown[]>(handler: (request: Requ
         return NextResponse.json({ error: "Forbidden: Invalid user state" }, { status: 403, headers });
       }
 
+      trace("AUTH_SUCCESS");
+
       // Atomically check limits and reset counters if it's a new day (without incrementing)
+      trace("QUOTA_CHECK_START");
       const limitsResult = await verifyUsageLimits(session.userId);
+      trace("QUOTA_CHECK_SUCCESS");
 
       // Attach session payload to request headers to avoid duplicate getSession
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set("x-kairo-user-id", session.userId);
       requestHeaders.set("x-kairo-plan", session.plan);
       requestHeaders.set("x-kairo-daily-limit", String(limitsResult.daily_limit));
+      requestHeaders.set("x-kairo-request-id", requestId);
+      requestHeaders.set("x-kairo-start-time", startTime.toString());
       
       const modifiedRequest = new Request(request.url, {
         method: request.method,
