@@ -7,7 +7,7 @@ import { ROUTER_CONFIG } from "@/lib/services/ai-router.config";
 import type { TaskCategory } from "@/lib/services/models";
 import { prisma } from "@/lib/db";
 import { randomUUID } from "crypto";
-import { logSystemEventInBackground } from "@/lib/services/audit";
+import { logSystemEvent } from "@/lib/services/audit";
 
 // For telemetry
 export interface RouterTelemetry {
@@ -147,7 +147,11 @@ export async function executeSharedAiRoute(
           });
 
           if (telemetryLog.length > 0) {
-            logSystemEventInBackground("ROUTER_TELEMETRY", null, { telemetry: telemetryLog });
+            try {
+              await logSystemEvent("ROUTER_TELEMETRY", null, { telemetry: telemetryLog });
+            } catch (telemetryErr) {
+              console.error("[Router Telemetry Error]", telemetryErr);
+            }
           }
           return { text, telemetry: telemetryLog };
 
@@ -161,6 +165,11 @@ export async function executeSharedAiRoute(
           if (apiError.status === 400) {
             failureCategory = "BAD_REQUEST";
             telemetryLog.push({ requestId, projectId, credentialId: key.id, modelId: modelConfig.id, taskType, attemptNumber: totalAttempts, latencyMs, result: "FAILURE", failureCategory });
+            try {
+              await logSystemEvent("ROUTER_TELEMETRY", null, { telemetry: telemetryLog });
+            } catch (telemetryErr) {
+              console.error("[Router Telemetry Error]", telemetryErr);
+            }
             throw new Error(`AI Router Error: 400 Bad Request. ${apiError.message}`);
           }
           
@@ -211,7 +220,11 @@ export async function executeSharedAiRoute(
   }
 
   if (telemetryLog.length > 0) {
-    logSystemEventInBackground("ROUTER_TELEMETRY", null, { telemetry: telemetryLog });
+    try {
+      await logSystemEvent("ROUTER_TELEMETRY", null, { telemetry: telemetryLog });
+    } catch (telemetryErr) {
+      console.error("[Router Telemetry Error]", telemetryErr);
+    }
   }
   throw new Error("AI_UNAVAILABLE: All router attempts exhausted or no available routes.");
 }

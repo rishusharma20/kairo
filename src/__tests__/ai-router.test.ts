@@ -26,6 +26,7 @@ vi.mock('@/lib/services/discovery', () => ({
 
 vi.mock('@/lib/services/audit', () => ({
   logSystemEventInBackground: vi.fn(),
+  logSystemEvent: vi.fn(),
 }));
 
 vi.mock('@/lib/services/encryption', () => ({
@@ -321,11 +322,11 @@ describe('AI Router Engine', () => {
     // Ensure mockGenerateContent was never called
     expect(mockGenerateContent).not.toHaveBeenCalled();
     
-    // Check if telemetry was logged via logSystemEventInBackground
-    const { logSystemEventInBackground } = await import('@/lib/services/audit');
-    expect(logSystemEventInBackground).toHaveBeenCalled();
+    // Check if telemetry was logged via logSystemEvent
+    const { logSystemEvent } = await import('@/lib/services/audit');
+    expect(logSystemEvent).toHaveBeenCalled();
     
-    const calls = vi.mocked(logSystemEventInBackground).mock.calls;
+    const calls = vi.mocked(logSystemEvent).mock.calls;
     expect(calls.length).toBeGreaterThan(0);
     
     const callArgs = calls[0];
@@ -359,8 +360,8 @@ describe('AI Router Engine', () => {
 
     await expect(executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General')).rejects.toThrow();
 
-    const { logSystemEventInBackground } = await import('@/lib/services/audit');
-    const calls = vi.mocked(logSystemEventInBackground).mock.calls;
+    const { logSystemEvent } = await import('@/lib/services/audit');
+    const calls = vi.mocked(logSystemEvent).mock.calls;
     expect(calls.length).toBeGreaterThan(0);
     
     const callArgs = calls[0];
@@ -379,5 +380,58 @@ describe('AI Router Engine', () => {
     expect(logStr).not.toContain('Raw crypto error');
     expect(logStr).not.toContain('iv');
     expect(logStr).not.toContain('authTag');
+  });
+  // TEST TEL_B: Successful provider route persists telemetry
+  it('TEST TEL_B: Successful provider route persists telemetry.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_good' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+    vi.mocked(encryptionService.decryptKey).mockReturnValue('decrypted_key');
+    mockGenerateContent.mockResolvedValueOnce({ response: { text: () => 'success text' } });
+
+    const result = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
+    expect(result.text).toBe('success text');
+
+    const { logSystemEvent } = await import('@/lib/services/audit');
+    expect(logSystemEvent).toHaveBeenCalled();
+  });
+
+  // TEST TEL_C: Telemetry DB failure does NOT change successful inference result
+  it('TEST TEL_C: Telemetry DB failure does NOT change successful inference result.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_good' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+    vi.mocked(encryptionService.decryptKey).mockReturnValue('decrypted_key');
+    mockGenerateContent.mockResolvedValueOnce({ response: { text: () => 'success text 2' } });
+
+    const { logSystemEvent } = await import('@/lib/services/audit');
+    vi.mocked(logSystemEvent).mockRejectedValueOnce(new Error('DB failure'));
+
+    const result = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
+    expect(result.text).toBe('success text 2');
+  });
+
+  // TEST TEL_D: Telemetry DB failure during complete routing failure still results in AI_UNAVAILABLE
+  it('TEST TEL_D: Telemetry DB failure during complete routing failure still results in AI_UNAVAILABLE.', async () => {
+    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
+      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc_bad' } as never
+    ]);
+    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue([
+      { id: 'model-1', enabled: true, priority: 1, provider: 'google', capabilities: { textOutput: true, mcq: true, coding: true, generalText: true } }
+    ]);
+    vi.mocked(encryptionService.decryptKey).mockImplementation(() => {
+      throw new Error('Bad key');
+    });
+
+    const { logSystemEvent } = await import('@/lib/services/audit');
+    vi.mocked(logSystemEvent).mockRejectedValueOnce(new Error('DB failure'));
+
+    await expect(executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General')).rejects.toThrow(/AI_UNAVAILABLE/);
   });
 });
