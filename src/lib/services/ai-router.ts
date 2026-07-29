@@ -102,6 +102,10 @@ export async function executeSharedAiRoute(
 
       trace("MODEL_LOAD_START");
       const availableModels = await getAvailableModelsForProject(projectId, taskType);
+      
+      // Enforce deterministic global model priority regardless of discovery/database order
+      availableModels.sort((a, b) => a.priority - b.priority);
+      
       trace("MODEL_LOAD_SUCCESS", `modelCount=${availableModels.length}`);
       if (availableModels.length === 0) {
         // No available models for this project + task, skip to next project

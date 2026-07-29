@@ -21,21 +21,21 @@ export interface ModelConfig {
  */
 export const MODEL_REGISTRY: ModelConfig[] = [
   {
-    id: "gemini-3.6-flash",
+    id: "gemini-3.5-flash-lite",
     provider: "google",
     priority: 1,
     enabled: true,
     capabilities: { textOutput: true, coding: true, mcq: true, generalText: true }
   },
   {
-    id: "gemini-3.5-flash",
+    id: "gemini-3.6-flash",
     provider: "google",
     priority: 2,
     enabled: true,
     capabilities: { textOutput: true, coding: true, mcq: true, generalText: true }
   },
   {
-    id: "gemini-3.5-flash-lite",
+    id: "gemini-3.5-flash",
     provider: "google",
     priority: 3,
     enabled: true,
@@ -67,23 +67,9 @@ export function getEnabledModels(): ModelConfig[] {
 }
 
 /**
- * Returns all enabled models compatible with the given task category,
- * ordered by priority ascending.
+ * Returns all enabled models, completely ignoring task category to guarantee
+ * deterministic global model priority.
  */
 export function getModelsForTask(task: TaskCategory): ModelConfig[] {
-  return getEnabledModels().filter(model => {
-    // All tasks currently require text output implicitly in this architecture
-    if (!model.capabilities.textOutput) return false;
-    
-    switch (task) {
-      case "MCQ":
-        return model.capabilities.mcq;
-      case "CODING":
-        return model.capabilities.coding;
-      case "GENERAL":
-        return model.capabilities.generalText;
-      default:
-        return false;
-    }
-  });
+  return getEnabledModels();
 }

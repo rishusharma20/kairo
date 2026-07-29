@@ -295,6 +295,7 @@ export default function AdminAiInfrastructurePage() {
         <table className="w-full text-left text-sm">
           <thead className="bg-zinc-800/50 text-zinc-400">
             <tr>
+              <th className="p-4 font-medium">Priority</th>
               <th className="p-4 font-medium">Model</th>
               {data.projects.map((p: any) => (
                 <th key={p.id} className="p-4 font-medium">{p.display_name}</th>
@@ -302,8 +303,9 @@ export default function AdminAiInfrastructurePage() {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(data.modelMatrix).map(([model, projectStatuses]: [string, any]) => (
+            {Object.entries(data.modelMatrix).map(([model, projectStatuses]: [string, any], i) => (
               <tr key={model} className="border-t border-zinc-800">
+                <td className="p-4 font-mono text-zinc-400">{i + 1}</td>
                 <td className="p-4 font-mono">{model}</td>
                 {data.projects.map((p: any) => {
                   const status = projectStatuses[p.id];
