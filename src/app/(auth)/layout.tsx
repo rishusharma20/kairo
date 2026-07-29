@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ParticleField } from "@/components/effects/particle-field";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 export default function AuthLayout({
   children,
@@ -37,10 +38,8 @@ export default function AuthLayout({
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="absolute top-12 md:top-16 left-1/2 -translate-x-1/2 flex flex-col items-center"
         >
-          <Link href="/" className="group flex flex-col items-center">
-            <span className="text-text-primary/70 font-medium tracking-[0.3em] text-xs uppercase group-hover:text-accent transition-colors duration-500">
-              KAIRO
-            </span>
+          <Link href="/" className="group hover:opacity-80 transition-opacity">
+            <KairoBrand variant="default" className="flex-col gap-3" />
           </Link>
         </motion.div>
 

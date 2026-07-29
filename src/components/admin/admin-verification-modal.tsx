@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 export function AdminVerificationModal() {
   const [code, setCode] = useState("");
@@ -44,12 +45,14 @@ export function AdminVerificationModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-sm bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="text-center mb-8 space-y-2">
-          <h2 className="text-sm font-bold text-text-primary tracking-widest uppercase">Kairo Admin</h2>
-          <h3 className="text-xl font-semibold text-text-primary">Admin Verification</h3>
-          <p className="text-sm text-text-muted">
-            Additional verification is required to access the administration console.
-          </p>
+        <div className="flex flex-col items-center text-center mb-8 space-y-4">
+          <KairoBrand variant="admin" />
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-text-primary">Admin Verification</h3>
+            <p className="text-sm text-text-muted">
+              Additional verification is required to access the administration console.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

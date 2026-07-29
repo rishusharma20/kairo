@@ -7,6 +7,7 @@ import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/lib/constants";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -40,16 +41,8 @@ export function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between relative">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20 group-hover:border-accent/40 transition-colors">
-                <span className="text-accent font-bold text-sm tracking-wider">K</span>
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-accent/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            <span className="text-text-primary font-medium tracking-[0.2em] text-sm">
-              KAIRO
-            </span>
+          <Link href="/" className="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+            <KairoBrand variant="default" />
           </Link>
 
           {/* Desktop Nav */}

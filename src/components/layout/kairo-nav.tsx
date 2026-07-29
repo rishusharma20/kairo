@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DASHBOARD_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 export function KairoNav() {
   const pathname = usePathname();
@@ -16,10 +17,8 @@ export function KairoNav() {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
       className="w-full fixed top-0 left-0 z-50 flex items-center justify-between px-8 py-6 pointer-events-none"
     >
-      <Link href="/dashboard" className="pointer-events-auto flex flex-col items-start group">
-        <span className="text-text-primary/70 font-medium tracking-[0.3em] text-xs uppercase group-hover:text-accent transition-colors duration-500">
-          KAIRO
-        </span>
+      <Link href="/dashboard" className="pointer-events-auto flex items-center group hover:opacity-80 transition-opacity">
+        <KairoBrand variant="default" />
       </Link>
 
       <div className="flex items-center gap-8 pointer-events-auto">

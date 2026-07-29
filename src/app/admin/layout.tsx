@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 const ADMIN_ITEMS = [
   { label: "Overview", href: "/admin", icon: "BarChart3" },
@@ -40,7 +41,7 @@ export default async function AdminLayout({
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative">
         {/* Mobile Topbar Spacer */}
         <div className="w-full h-16 shrink-0 lg:hidden flex items-center justify-between px-4 border-b border-[var(--border)] bg-[var(--surface)] sticky top-0 z-40">
-           <span className="text-text-primary font-medium tracking-[0.15em] text-sm">KAIRO ADMIN</span>
+           <KairoBrand variant="admin" />
            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20 font-bold tracking-wider">
              ROOT
            </span>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -38,13 +39,8 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20">
-                <span className="text-accent font-bold text-xs tracking-wider">K</span>
-              </div>
-              <span className="text-text-primary font-medium tracking-[0.2em] text-sm">
-                KAIRO
-              </span>
+            <Link href="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
+              <KairoBrand variant="default" />
             </Link>
             <p className="text-text-muted text-sm leading-relaxed max-w-[200px]">
               Your invisible intelligence. Always beside you.

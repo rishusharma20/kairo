@@ -10,6 +10,7 @@ import {
   Code2, FileText, Wrench, Shield, MessageSquare, Puzzle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { KairoBrand } from "@/components/layout/kairo-brand";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard, BarChart3, Clock, Crown, Users, HelpCircle,
@@ -59,19 +60,7 @@ export function Sidebar({ items, title = "KAIRO", badge, user }: SidebarProps) {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
-                  <img src="/logo-icon.png" alt="Kairo Logo" className="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <span className="text-text-primary font-medium tracking-[0.15em] text-sm block">
-                    {title}
-                  </span>
-                  {badge && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                      {badge}
-                    </span>
-                  )}
-                </div>
+                <KairoBrand variant={badge ? "admin" : "default"} />
               </motion.div>
             )}
           </AnimatePresence>
