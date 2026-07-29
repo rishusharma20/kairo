@@ -4,17 +4,24 @@ import { MODEL_REGISTRY, getModelsForTask, TaskCategory, ModelConfig } from "@/l
 import { decryptKey } from "@/lib/services/encryption";
 
 export async function validateCredentialWithProvider(apiKey: string): Promise<boolean> {
+  console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_START");
   try {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    console.log(`[KAIRO_CREDENTIAL_TRACE]\nstage=PROVIDER_RESPONSE\nstatus=${res.status}`);
+    
     if (res.status === 200) {
+      console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_RESULT\nresult=VALID");
       return true;
     }
     // Rate limit 429 means key is structurally valid but exhausted. We still allow adding it.
     if (res.status === 429) {
+      console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_RESULT\nresult=VALID");
       return true;
     }
+    console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_RESULT\nresult=INVALID");
     return false;
-  } catch {
+  } catch (error: any) {
+    console.log(`[KAIRO_CREDENTIAL_TRACE]\nstage=PROVIDER_FETCH_ERROR\nerrorName=${error?.name || 'UnknownError'}`);
     // Network failure during validation
     throw new Error("Failed to contact provider for validation");
   }
