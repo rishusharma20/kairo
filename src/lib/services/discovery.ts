@@ -18,6 +18,35 @@ export async function validateCredentialWithProvider(apiKey: string): Promise<bo
       console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_RESULT\nresult=VALID");
       return true;
     }
+
+    let googleStatus = "UNKNOWN";
+    let message = "UNPARSEABLE_PROVIDER_ERROR";
+
+    try {
+      const errorText = await res.text();
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson && errorJson.error) {
+          googleStatus = typeof errorJson.error.status === 'string' ? errorJson.error.status : googleStatus;
+          if (typeof errorJson.error.message === 'string') {
+            message = errorJson.error.message.replace(/[\r\n]+/g, " ");
+            if (message.length > 300) {
+              message = message.substring(0, 300) + "...";
+            }
+          } else {
+            message = "NO_ERROR_MESSAGE";
+          }
+        } else {
+          message = "UNKNOWN_JSON_FORMAT";
+        }
+      } catch {
+        // Parsing failed, remains UNPARSEABLE_PROVIDER_ERROR
+      }
+    } catch {
+      message = "UNREADABLE_PROVIDER_ERROR";
+    }
+
+    console.log(`[KAIRO_CREDENTIAL_TRACE]\nstage=PROVIDER_ERROR\nhttpStatus=${res.status}\ngoogleStatus=${googleStatus}\nmessage=${message}`);
     console.log("[KAIRO_CREDENTIAL_TRACE]\nstage=VALIDATION_RESULT\nresult=INVALID");
     return false;
   } catch (error: any) {

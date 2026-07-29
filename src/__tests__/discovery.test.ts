@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { validateProjectModels, getAvailableModelsForProject } from '@/lib/services/discovery';
+import { validateProjectModels, getAvailableModelsForProject, validateCredentialWithProvider } from '@/lib/services/discovery';
 import { prisma } from '@/lib/db';
 import * as poolService from '@/lib/services/pool';
 import * as encryptionService from '@/lib/services/encryption';
@@ -25,6 +25,61 @@ describe('Discovery Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     global.fetch = vi.fn();
+  });
+
+  describe('validateCredentialWithProvider', () => {
+    it('returns true for 200 status', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({ status: 200 } as Response);
+      const res = await validateCredentialWithProvider('some-key');
+      expect(res).toBe(true);
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('?key=some-key'));
+    });
+
+    it('returns true for 429 status', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({ status: 429 } as Response);
+      const res = await validateCredentialWithProvider('some-key');
+      expect(res).toBe(true);
+    });
+
+    it('returns false and parses structured Google 400 error', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        status: 400,
+        text: async () => JSON.stringify({
+          error: {
+            code: 400,
+            message: "API key not valid. Please pass a valid API key.",
+            status: "INVALID_ARGUMENT"
+          }
+        })
+      } as Response);
+      
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const res = await validateCredentialWithProvider('bad-key');
+      expect(res).toBe(false);
+      
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('googleStatus=INVALID_ARGUMENT'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('message=API key not valid. Please pass a valid API key.'));
+      // Ensure key is NOT logged
+      expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('bad-key'));
+    });
+
+    it('returns false and handles malformed/non-JSON 500 error gracefully', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        status: 500,
+        text: async () => "Internal Server Error Text"
+      } as Response);
+      
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const res = await validateCredentialWithProvider('some-key');
+      expect(res).toBe(false);
+      
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('message=UNPARSEABLE_PROVIDER_ERROR'));
+    });
+
+    it('throws error on network failure (fetch throws)', async () => {
+      vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'));
+      await expect(validateCredentialWithProvider('some-key')).rejects.toThrow('Failed to contact provider for validation');
+    });
   });
 
   describe('validateProjectModels', () => {
