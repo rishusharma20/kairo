@@ -44,13 +44,15 @@ export async function middleware(request: NextRequest) {
     }
 
     // 2FA Admin Verification
+    const isExactAdminRoute = pathname === '/admin';
     const isVerifyRoute = pathname === '/admin/verify';
-    if (!session.adminSecondFactorVerified && !isVerifyRoute) {
-      const url = new URL('/admin/verify', request.url)
+
+    if (isVerifyRoute) {
+      const url = new URL('/admin', request.url)
       return NextResponse.redirect(url)
     }
     
-    if (session.adminSecondFactorVerified && isVerifyRoute) {
+    if (!session.adminSecondFactorVerified && !isExactAdminRoute) {
       const url = new URL('/admin', request.url)
       return NextResponse.redirect(url)
     }

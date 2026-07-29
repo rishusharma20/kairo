@@ -34,7 +34,22 @@ describe('Admin 2FA Security', () => {
       expect(res.status).not.toBe(307); // No redirect
     });
 
-    it('B, C. admin accessing /admin without 2FA redirects to /admin/verify', async () => {
+    it('B, C. admin accessing /admin/users without 2FA redirects to /admin', async () => {
+      vi.mocked(auth.verifySession).mockResolvedValue({ 
+        email: 'admin@gmail.com', 
+        status: 'ACTIVE',
+        adminSecondFactorVerified: undefined
+      } as any);
+      
+      const req = new NextRequest('http://localhost:3000/admin/users');
+      req.cookies.set('kairo_session', 'token');
+      
+      const res = await middleware(req);
+      expect(res.status).toBe(307);
+      expect(res.headers.get('Location')).toBe('http://localhost:3000/admin');
+    });
+
+    it('B, C. admin accessing /admin without 2FA DOES NOT redirect (allows modal render)', async () => {
       vi.mocked(auth.verifySession).mockResolvedValue({ 
         email: 'admin@gmail.com', 
         status: 'ACTIVE',
@@ -45,8 +60,7 @@ describe('Admin 2FA Security', () => {
       req.cookies.set('kairo_session', 'token');
       
       const res = await middleware(req);
-      expect(res.status).toBe(307);
-      expect(res.headers.get('Location')).toBe('http://localhost:3000/admin/verify');
+      expect(res.status).not.toBe(307);
     });
 
     it('J. verified admin can access /admin', async () => {
@@ -63,7 +77,7 @@ describe('Admin 2FA Security', () => {
       expect(res.status).not.toBe(307);
     });
 
-    it('prevents redirect loops on /admin/verify for unverified admins', async () => {
+    it('prevents redirect loops by redirecting /admin/verify to /admin', async () => {
       vi.mocked(auth.verifySession).mockResolvedValue({ 
         email: 'admin@gmail.com', 
         status: 'ACTIVE',
@@ -74,7 +88,8 @@ describe('Admin 2FA Security', () => {
       req.cookies.set('kairo_session', 'token');
       
       const res = await middleware(req);
-      expect(res.status).not.toBe(307);
+      expect(res.status).toBe(307);
+      expect(res.headers.get('Location')).toBe('http://localhost:3000/admin');
     });
   });
 

@@ -1,8 +1,16 @@
 import { prisma } from "@/lib/db";
 import { getPaymentRequests } from "@/lib/services/payment";
 import { Users, Activity, Shield, Clock, Crown } from "lucide-react";
+import { getSession } from "@/lib/auth";
+import { AdminVerificationModal } from "@/components/admin/admin-verification-modal";
 
 export default async function AdminOverview() {
+  const session = await getSession();
+  
+  if (!session?.adminSecondFactorVerified) {
+    return <AdminVerificationModal />;
+  }
+
   // Fetch real authoritative data for the overview
   const totalUsers = await prisma.user.count();
   const freeUsers = await prisma.user.count({ where: { plan: "FREE" } });
