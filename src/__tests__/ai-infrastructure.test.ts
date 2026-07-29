@@ -42,7 +42,10 @@ describe('AI Infrastructure Admin API', () => {
   });
 
   const createAdminRequest = () => {
-    vi.mocked(getSession).mockResolvedValue({ email: process.env.ADMIN_EMAIL || "admin@gmail.com" } as any);
+    vi.mocked(getSession).mockResolvedValue({ 
+      email: process.env.ADMIN_EMAIL || "admin@gmail.com",
+      adminSecondFactorVerified: true
+    } as any);
     return new NextRequest('http://localhost:3000/api/admin/ai-infrastructure');
   };
 

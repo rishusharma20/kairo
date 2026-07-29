@@ -40,6 +40,12 @@ export function withSessionAdmin<T extends unknown[]>(handler: (request: Request
       if (session.email !== adminEmail) {
         return NextResponse.json({ error: "Forbidden: Admin access required." }, { status: 403 });
       }
+      
+      // Exception: the verification route itself does not need 2FA to be accessed
+      const url = new URL(request.url);
+      if (url.pathname !== '/api/admin/verify' && !session.adminSecondFactorVerified) {
+        return NextResponse.json({ error: "Forbidden: Admin second-factor verification required." }, { status: 403 });
+      }
 
       return await handler(request, ...args);
     } catch (err) {

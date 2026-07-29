@@ -42,6 +42,18 @@ export async function middleware(request: NextRequest) {
       const url = new URL('/dashboard', request.url)
       return NextResponse.redirect(url)
     }
+
+    // 2FA Admin Verification
+    const isVerifyRoute = pathname === '/admin/verify';
+    if (!session.adminSecondFactorVerified && !isVerifyRoute) {
+      const url = new URL('/admin/verify', request.url)
+      return NextResponse.redirect(url)
+    }
+    
+    if (session.adminSecondFactorVerified && isVerifyRoute) {
+      const url = new URL('/admin', request.url)
+      return NextResponse.redirect(url)
+    }
   }
 
   // Redirect to dashboard if trying to access auth routes with valid session

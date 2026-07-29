@@ -43,7 +43,10 @@ vi.mock('@/lib/services/discovery', () => ({
 
 // Create authenticated admin requests
 const createAdminRequest = (url: string, method: string, body: any) => {
-  vi.mocked(getSession).mockResolvedValue({ email: process.env.ADMIN_EMAIL || "admin@gmail.com" } as any);
+  vi.mocked(getSession).mockResolvedValue({ 
+    email: process.env.ADMIN_EMAIL || "admin@gmail.com",
+    adminSecondFactorVerified: true
+  } as any);
   return new NextRequest(url, {
     method,
     headers: { 'content-type': 'application/json' },

@@ -15,6 +15,7 @@ export interface SessionPayload {
   plan: string;
   status: string;
   createdAt: string;
+  adminSecondFactorVerified?: boolean;
 }
 
 export async function createSession(payload: SessionPayload) {
@@ -55,6 +56,14 @@ export async function getSession() {
 export async function destroySession() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
+}
+
+export async function updateSession(updates: Partial<SessionPayload>) {
+  const session = await getSession();
+  if (!session) return;
+  
+  const updatedSession = { ...session, ...updates };
+  await createSession(updatedSession);
 }
 
 // Extension Utility: Verifies the session from an API request header or cookie
