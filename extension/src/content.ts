@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 // Kairo Extension Content Script
 // Objective 7: Safe Page Context Extraction
 
-import { extractPageContext } from './pageContext';
+import { extractPageContext } from './context/extractor';
 
 const KAIRO_ROOT_ID = 'kairo-extension-root';
 
@@ -558,21 +558,25 @@ function initKairo() {
     inputEl.value = '';
     updateInputState();
 
-    let contextText = '';
+    let contextPayload: any = null;
     let detectedFormat = 'General';
     const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
     if (ctx) {
-      const parts = [];
-      if (ctx.url) parts.push(`Page URL: ${ctx.url}`);
-      if (ctx.title) parts.push(`Page Title: ${ctx.title}`);
-      if (ctx.selectedText) {
-        parts.push(`[SELECTED TEXT]\n${ctx.selectedText}\n[/SELECTED TEXT]`);
+      if (ctx.questionType === 'UNKNOWN' || (!ctx.question && !ctx.visibleContext)) {
+        isProcessing = false;
+        updateInputState();
+        await addMessage('error', "Kairo couldn't detect the complete question on this page.");
+        return;
       }
-      if (ctx.text) {
-        parts.push(`[VISIBLE PAGE CONTENT]\n${ctx.text}\n[/VISIBLE PAGE CONTENT]`);
+      if (ctx.questionType === 'CODING' && !ctx.selectedLanguage) {
+        isProcessing = false;
+        updateInputState();
+        await addMessage('error', "Select a programming language on the page and try again.");
+        return;
       }
-      contextText = parts.join('\n\n');
-      detectedFormat = ctx.format;
+      
+      contextPayload = ctx;
+      detectedFormat = ctx.questionType;
       
       const indicator = shadow.querySelector('#kairo-context-indicator');
       if (indicator) {
@@ -601,7 +605,7 @@ function initKairo() {
       type: 'AI_QUERY', 
       payload: { 
         query: text, 
-        context: contextText, 
+        context: contextPayload, 
         format: detectedFormat 
       } 
     }, async (response) => {
@@ -645,7 +649,7 @@ function initKairo() {
       const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
       const indicator = shadow.querySelector('#kairo-context-indicator');
       if (indicator) {
-        if (ctx && (ctx.selectedText || ctx.text)) {
+        if (ctx && (ctx.question || ctx.visibleContext)) {
           indicator.classList.remove('hidden');
         } else {
           indicator.classList.add('hidden');

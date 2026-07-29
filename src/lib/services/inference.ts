@@ -2,6 +2,7 @@ import { atomicReserveUsage, refundUsage } from "@/lib/services/usage";
 import { executeSharedAiRoute } from "@/lib/services/ai-router";
 import type { QueryFeature, ResponseFormat } from "@/lib/services/prompts";
 import type { TaskCategory } from "@/lib/services/models";
+import { PageContext } from "@/types/extension-context";
 
 export async function executeKairoQuery({
   userId,
@@ -16,7 +17,7 @@ export async function executeKairoQuery({
   feature: QueryFeature;
   query: string;
   format: ResponseFormat;
-  context?: string;
+  context?: string | PageContext;
   requestId?: string;
   startTime?: number;
 }) {

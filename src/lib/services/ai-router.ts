@@ -2,7 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getHealthyCredentials, markKeyUsed, markKeyCooldown, markKeyDisabled } from "@/lib/services/pool";
 import { getAvailableModelsForProject } from "@/lib/services/discovery";
 import { decryptKey } from "@/lib/services/encryption";
-import { buildPrompt, QueryFeature, ResponseFormat } from "@/lib/services/prompts";
+import { buildPrompt, buildExtensionInferencePrompt, QueryFeature, ResponseFormat } from "@/lib/services/prompts";
+import { PageContext } from "@/types/extension-context";
 import { ROUTER_CONFIG } from "@/lib/services/ai-router.config";
 import type { TaskCategory } from "@/lib/services/models";
 import { prisma } from "@/lib/db";
@@ -28,7 +29,7 @@ export async function executeSharedAiRoute(
   feature: QueryFeature,
   query: string,
   format: ResponseFormat,
-  context?: string,
+  context?: string | PageContext,
   requestId: string = randomUUID(),
   startTime: number = Date.now()
 ): Promise<{ text: string; telemetry: RouterTelemetry[] }> {
@@ -40,7 +41,9 @@ export async function executeSharedAiRoute(
     const isEnvKeyPresent = !!process.env.GEMINI_ENCRYPTION_KEY;
     trace("GEMINI_ENCRYPTION_KEY_PRESENT", isEnvKeyPresent.toString());
 
-  const prompt = buildPrompt({ feature, query, format, context });
+  const prompt = typeof context === 'object' && context !== null
+    ? buildExtensionInferencePrompt({ feature, query, format, context })
+    : buildPrompt({ feature, query, format, context });
   const telemetryLog: RouterTelemetry[] = [];
   
   let totalAttempts = 0;

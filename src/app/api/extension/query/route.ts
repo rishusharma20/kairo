@@ -3,6 +3,66 @@ import { withUsageValidation } from "@/lib/middlewares/withUsage";
 import { executeKairoQuery } from "@/lib/services/inference";
 import { QueryFeature, ResponseFormat } from "@/lib/services/prompts";
 import { logRequestEventInBackground } from "@/lib/services/audit";
+import { PageContext, QuestionType } from "@/types/extension-context";
+
+function isValidPageContext(ctx: unknown): ctx is PageContext {
+  if (typeof ctx !== 'object' || ctx === null || Array.isArray(ctx)) return false;
+  
+  const obj = ctx as Record<string, unknown>;
+  const allowedFields = new Set([
+    'pageTitle', 'pageUrl', 'questionType', 'question', 'options',
+    'selectedLanguage', 'constraints', 'inputFormat', 'outputFormat',
+    'examples', 'starterCode', 'visibleContext'
+  ]);
+  
+  for (const key of Object.keys(obj)) {
+    if (!allowedFields.has(key)) return false;
+  }
+  
+  const validQuestionTypes = new Set(['MCQ', 'CODING', 'NUMERICAL', 'SHORT_ANSWER', 'GENERAL', 'UNKNOWN']);
+  if (typeof obj.questionType !== 'string' || !validQuestionTypes.has(obj.questionType)) return false;
+  
+  if (obj.pageTitle !== undefined && typeof obj.pageTitle !== 'string') return false;
+  if (obj.pageUrl !== undefined && typeof obj.pageUrl !== 'string') return false;
+  if (obj.question !== undefined && typeof obj.question !== 'string') return false;
+  if (obj.constraints !== undefined && typeof obj.constraints !== 'string') return false;
+  if (obj.inputFormat !== undefined && typeof obj.inputFormat !== 'string') return false;
+  if (obj.outputFormat !== undefined && typeof obj.outputFormat !== 'string') return false;
+  if (obj.starterCode !== undefined && typeof obj.starterCode !== 'string') return false;
+  if (obj.visibleContext !== undefined && typeof obj.visibleContext !== 'string') return false;
+  
+  if (obj.options !== undefined) {
+    if (!Array.isArray(obj.options) || obj.options.length > 10) return false;
+    for (const opt of obj.options) {
+      if (typeof opt !== 'object' || opt === null || Array.isArray(opt)) return false;
+      if (typeof (opt as any).text !== 'string') return false;
+      if ((opt as any).label !== undefined && typeof (opt as any).label !== 'string') return false;
+      if ((opt as any).text.length > 500) return false;
+    }
+  }
+  
+  if (obj.selectedLanguage !== undefined) {
+    if (typeof obj.selectedLanguage !== 'object' || obj.selectedLanguage === null || Array.isArray(obj.selectedLanguage)) return false;
+    if (typeof (obj.selectedLanguage as any).normalized !== 'string') return false;
+    if (typeof (obj.selectedLanguage as any).display !== 'string') return false;
+  }
+  
+  if (obj.examples !== undefined) {
+    if (!Array.isArray(obj.examples) || obj.examples.length > 10) return false;
+    for (const ex of obj.examples) {
+      if (typeof ex !== 'string' || ex.length > 2000) return false;
+    }
+  }
+  
+  if (obj.pageTitle && (obj.pageTitle as string).length > 1000) return false;
+  if (obj.pageUrl && (obj.pageUrl as string).length > 1000) return false;
+  if (obj.question && (obj.question as string).length > 5000) return false;
+  if (obj.constraints && (obj.constraints as string).length > 10000) return false;
+  if (obj.starterCode && (obj.starterCode as string).length > 10000) return false;
+  if (obj.visibleContext && (obj.visibleContext as string).length > 10000) return false;
+  
+  return true;
+}
 
 async function queryHandler(request: Request) {
   const origin = request.headers.get('origin') || '';
@@ -40,8 +100,8 @@ async function queryHandler(request: Request) {
       return NextResponse.json({ error: "Invalid type for query" }, { status: 400, headers });
     }
 
-    if (context !== undefined && typeof context !== 'string') {
-      return NextResponse.json({ error: "Invalid type for context" }, { status: 400, headers });
+    if (context !== undefined && typeof context !== 'string' && !isValidPageContext(context)) {
+      return NextResponse.json({ error: "Invalid structure for context" }, { status: 400, headers });
     }
 
     if (!query && feature !== "page_analyze") {
@@ -53,8 +113,12 @@ async function queryHandler(request: Request) {
       return NextResponse.json({ error: "Query exceeds maximum allowed length" }, { status: 413, headers });
     }
 
-    if (context && context.length > 15000) {
+    if (context && typeof context === 'string' && context.length > 15000) {
       return NextResponse.json({ error: "Page context exceeds maximum allowed length" }, { status: 413, headers });
+    }
+    
+    if (context && typeof context === 'object' && JSON.stringify(context).length > 25000) {
+      return NextResponse.json({ error: "Structured page context exceeds maximum allowed length" }, { status: 413, headers });
     }
 
     const validFeatures = ["ask", "page", "text", "page_analyze"];
