@@ -5,9 +5,15 @@ import { logSystemEventInBackground } from "@/lib/services/audit";
 import { validateCredentialWithProvider } from "@/lib/services/discovery";
 import { decryptKey } from "@/lib/services/encryption";
 
-async function patchHandler(request: Request, context: { params: { id: string } }) {
+async function patchHandler(request: Request, context: { params: { id: string } | Promise<{ id: string }> }) {
   try {
-    const { id } = context.params;
+    const params = await context.params;
+    const id = params?.id;
+
+    if (!id || typeof id !== "string" || id.trim() === "") {
+      return NextResponse.json({ success: false, error: "INVALID_CREDENTIAL_ID" }, { status: 400 });
+    }
+
     const body = await request.json();
     const { action } = body;
 
@@ -20,7 +26,7 @@ async function patchHandler(request: Request, context: { params: { id: string } 
     });
 
     if (!credential) {
-      return NextResponse.json({ success: false, error: "Credential not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "CREDENTIAL_NOT_FOUND" }, { status: 404 });
     }
 
     if (action === "ENABLE") {
@@ -52,9 +58,9 @@ async function patchHandler(request: Request, context: { params: { id: string } 
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update Credential Error:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: "CREDENTIAL_UPDATE_FAILED" }, { status: 500 });
   }
 }
 
