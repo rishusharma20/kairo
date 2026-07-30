@@ -10,6 +10,7 @@ export async function executeKairoQuery({
   query,
   format,
   context,
+  screenshot,
   requestId = "unknown",
   startTime = Date.now()
 }: {
@@ -18,6 +19,7 @@ export async function executeKairoQuery({
   query: string;
   format?: ResponseFormat | string;
   context?: string;
+  screenshot?: string;
   requestId?: string;
   startTime?: number;
 }) {
@@ -41,6 +43,7 @@ export async function executeKairoQuery({
       query,
       (format || 'General') as ResponseFormat,
       context,
+      screenshot,
       requestId,
       startTime
     );

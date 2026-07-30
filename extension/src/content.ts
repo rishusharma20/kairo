@@ -477,6 +477,13 @@ function initKairo() {
 
   inputEl.addEventListener('input', updateInputState);
 
+  // Prevent host page from intercepting typing in the Kairo textbox
+  ['keydown', 'keyup', 'keypress', 'beforeinput', 'input'].forEach(eventType => {
+    inputEl.addEventListener(eventType, (e) => {
+      e.stopPropagation();
+    });
+  });
+
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -568,23 +575,45 @@ function initKairo() {
         indicator.classList.remove('hidden');
       }
     }
+    let screenshotPayload: string | null = null;
+    if (!text) {
+      host.style.visibility = 'hidden';
+      try {
+        const response = await new Promise<any>((resolve) => {
+          setTimeout(() => {
+            chrome.runtime.sendMessage({ type: 'CAPTURE_SCREENSHOT' }, resolve);
+          }, 50);
+        });
+        if (response && response.status === 'SUCCESS') {
+          screenshotPayload = response.dataUrl;
+        }
+      } catch (err) {
+        console.error('Screenshot capture failed', err);
+      } finally {
+        host.style.visibility = 'visible';
+      }
+    }
 
-    const DEFAULT_SOLVE_PROMPT = `Solve the problem shown in the provided page context.
+    const DEFAULT_SOLVE_PROMPT = `You are solving the current question visible on the supplied page.
 
-Analyze the page yourself and determine what needs to be answered. Inspect the supplied page context for:
+Analyze BOTH:
+1. PAGE_CONTEXT
+2. supplied PAGE_SCREENSHOT
+
+Determine the actual question yourself. Inspect the context for:
 - problem statement
 - visible editor content
 - starter code
 - existing partial code
-- selected programming language
-- class name
-- function/method signature
-- parameters
-- return type
-- input/output format
-- constraints
-- examples
-- platform submission requirements
+
+Ignore unrelated navigation, timers, menus, question palettes, headers, footers, advertisements, and other interface noise.
+
+If the DOM context is incomplete, use the screenshot.
+If the screenshot is partially obscured or incomplete, use the DOM context.
+If they complement each other, combine both.
+
+Do not ask the user for additional information.
+Make the best possible determination from the supplied page.
 
 If the page contains a multiple-choice question, return only the correct option and answer. Do not add an explanation.
 
@@ -641,7 +670,8 @@ Use the supplied page context to solve the request directly.`;
       type: 'AI_QUERY', 
       payload: { 
         query: effectiveQuery, 
-        context: contextPayload
+        context: contextPayload,
+        screenshot: screenshotPayload || undefined
       } 
     }, async (response) => {
       const loader = shadow.querySelector('#kairo-loading');

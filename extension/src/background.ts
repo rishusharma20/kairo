@@ -23,6 +23,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handleGetQuota().then(sendResponse);
     return true;
   }
+  if (message.type === 'CAPTURE_SCREENSHOT') {
+    handleCaptureScreenshot().then(sendResponse);
+    return true;
+  }
 });
 
 async function handleAuthCheck() {
@@ -123,7 +127,7 @@ async function handleLogout() {
   }
 }
 
-async function handleAIQuery(payload: { query: string, context?: string, format?: string }) {
+async function handleAIQuery(payload: { query: string, context?: string, format?: string, screenshot?: string }) {
   try {
     const response = await fetch(`${BACKEND_URL}/api/extension/query`, {
       method: 'POST',
@@ -132,10 +136,11 @@ async function handleAIQuery(payload: { query: string, context?: string, format?
       },
       credentials: 'include',
       body: JSON.stringify({
-        feature: payload.query ? (payload.context ? 'page' : 'ask') : 'page_analyze',
+        feature: payload.query ? (payload.context || payload.screenshot ? 'page' : 'ask') : 'page_analyze',
         query: payload.query || '',
         format: payload.format || 'General',
-        context: payload.context || ''
+        context: payload.context || '',
+        screenshot: payload.screenshot || undefined
       })
     });
 
@@ -167,3 +172,26 @@ chrome.commands.onCommand.addListener((command) => {
     });
   }
 });
+
+async function handleCaptureScreenshot() {
+  try {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      chrome.tabs.captureVisibleTab(
+        // @ts-ignore - null means current window
+        null,
+        { format: 'jpeg', quality: 80 },
+        (dataUrl) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else {
+            resolve(dataUrl);
+          }
+        }
+      );
+    });
+    return { status: 'SUCCESS', dataUrl };
+  } catch (error) {
+    console.error('Kairo Screenshot Error:', error);
+    return { status: 'ERROR', error: (error as Error).message };
+  }
+}

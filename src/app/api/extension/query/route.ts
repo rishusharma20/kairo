@@ -9,7 +9,7 @@ import { PageContext } from "@/types/extension-context";
 async function queryHandler(request: Request) {
   const origin = request.headers.get('origin') || '';
   const isExtension = origin.startsWith('chrome-extension://');
-  
+
   const headers = new Headers();
   if (isExtension) {
     headers.set('Access-Control-Allow-Origin', origin);
@@ -28,7 +28,7 @@ async function queryHandler(request: Request) {
     if (!userId) throw new Error("Unauthorized");
 
     const body = await request.json();
-    const { feature, query, format, context } = body;
+    const { feature, query, format, context, screenshot } = body;
 
     if (!feature) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers });
@@ -44,6 +44,20 @@ async function queryHandler(request: Request) {
 
     if (context !== undefined && typeof context !== 'string') {
       return NextResponse.json({ error: "Invalid type for context" }, { status: 400, headers });
+    }
+
+    if (screenshot !== undefined) {
+      if (typeof screenshot !== 'string') {
+        return NextResponse.json({ error: "Invalid type for screenshot" }, { status: 400, headers });
+      }
+
+      if (screenshot.length > 5242880) { // 5 MB
+        return NextResponse.json({ error: "Screenshot exceeds maximum allowed size" }, { status: 413, headers });
+      }
+
+      if (!screenshot.match(/^data:image\/(jpeg|png|webp);base64,/)) {
+        return NextResponse.json({ error: "Invalid screenshot format. Must be a valid base64 data URL." }, { status: 400, headers });
+      }
     }
 
     if (!query && feature !== "page_analyze") {
@@ -71,6 +85,7 @@ async function queryHandler(request: Request) {
       query,
       format: undefined,
       context,
+      screenshot,
       requestId,
       startTime
     });
@@ -102,7 +117,7 @@ export const POST = withUsageValidation(queryHandler);
 export async function OPTIONS(request: Request) {
   const origin = request.headers.get('origin') || '';
   const isExtension = origin.startsWith('chrome-extension://');
-  
+
   const headers = new Headers();
   if (isExtension) {
     headers.set('Access-Control-Allow-Origin', origin);
@@ -110,6 +125,6 @@ export async function OPTIONS(request: Request) {
     headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   }
-  
+
   return new NextResponse(null, { status: 204, headers });
 }

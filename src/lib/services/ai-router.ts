@@ -43,6 +43,7 @@ export async function executeSharedAiRoute(
   query: string,
   format?: ResponseFormat,
   context?: string,
+  screenshot?: string,
   requestId: string = randomUUID(),
   startTime: number = Date.now()
 ): Promise<{ text: string; telemetry: RouterTelemetry[] }> {
@@ -54,11 +55,28 @@ export async function executeSharedAiRoute(
     const isEnvKeyPresent = !!process.env.GEMINI_ENCRYPTION_KEY;
     trace("GEMINI_ENCRYPTION_KEY_PRESENT", isEnvKeyPresent.toString());
 
-  const prompt = format === undefined
+  const promptText = format === undefined
     ? buildExtensionInferencePrompt({ feature, query, context })
     : buildPrompt({ feature, query, format, context });
+
+  let prompt: any = promptText;
+  if (screenshot) {
+    const match = screenshot.match(/^data:(image\/(jpeg|png|webp));base64,/);
+    const mimeType = match ? match[1] : 'image/jpeg';
+    const base64Data = screenshot.replace(/^data:image\/(jpeg|png|webp);base64,/, "");
+    prompt = [
+      promptText,
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: mimeType
+        }
+      }
+    ];
+  }
+
   const telemetryLog: RouterTelemetry[] = [];
-  
+
   let totalAttempts = 0;
   const attemptedRoutes = new Set<string>(); // Track "credentialId:modelId" to prevent duplicates
   const excludedProjects = new Set<string>();
@@ -143,12 +161,12 @@ export async function executeSharedAiRoute(
 
       try {
         const model = genAI.getGenerativeModel({ model: modelConfig.id });
-        
+
         // Timeout wrapper
         trace("PROVIDER_START");
         const result = await Promise.race([
           model.generateContent(prompt),
-          new Promise<never>((_, reject) => 
+          new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error("PROVIDER_TIMEOUT")), ROUTER_CONFIG.PROVIDER_TIMEOUT_MS)
           )
         ]);
@@ -159,7 +177,7 @@ export async function executeSharedAiRoute(
 
         // SUCCESS — update LRU timestamp for fair future rotation
         await markKeyUsed(credential.id);
-        
+
         telemetryLog.push({
           requestId,
           projectId,
@@ -188,13 +206,13 @@ export async function executeSharedAiRoute(
         let failureCategory = "UNKNOWN_ERROR";
 
         const isTimeout = err instanceof Error && err.message === "PROVIDER_TIMEOUT";
-        
+
         // 400: Bad Request
         if (apiError.status === 400) {
           failureCategory = "BAD_REQUEST";
           const errMsg = apiError.message?.toLowerCase() || "";
           const isModelSpecific = errMsg.includes("model") || errMsg.includes("supported") || errMsg.includes("version") || errMsg.includes("invalid argument");
-          
+
           if (isModelSpecific) {
             excludedCredentials.add(credential.id); // Try a different route
           } else {
@@ -208,7 +226,7 @@ export async function executeSharedAiRoute(
             throw new Error(`AI Router Error: 400 Bad Request. ${apiError.message}`);
           }
         }
-        
+
         // 401: Authentication failure (strictly disable credential)
         else if (apiError.status === 401) {
           failureCategory = "AUTH_ERROR";
