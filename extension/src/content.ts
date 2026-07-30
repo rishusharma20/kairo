@@ -567,12 +567,63 @@ function initKairo() {
       if (indicator) {
         indicator.classList.remove('hidden');
       }
-    } else if (!text) {
-      isProcessing = false;
-      updateInputState();
-      await addMessage('error', 'Ask Kairo something.');
-      return;
     }
+
+    const DEFAULT_SOLVE_PROMPT = `Solve the problem shown in the provided page context.
+
+Analyze the page yourself and determine what needs to be answered. Inspect the supplied page context for:
+- problem statement
+- visible editor content
+- starter code
+- existing partial code
+- selected programming language
+- class name
+- function/method signature
+- parameters
+- return type
+- input/output format
+- constraints
+- examples
+- platform submission requirements
+
+If the page contains a multiple-choice question, return only the correct option and answer. Do not add an explanation.
+
+If the page contains a coding problem, determine exactly what the current editor expects. Return only the shortest correct working solution that satisfies the problem and platform requirements. Correctness and platform compatibility take priority over minimizing characters.
+
+If the platform expects a Solution class/method: return the complete pasteable Solution class/method implementation. Preserve the required class name, method name, parameters, return type, and signature. Do NOT invent main().
+If the platform expects a complete stdin/stdout program: return the complete working program including required imports/includes, input handling, algorithm and output handling.
+If the page contains partial/starter code: complete the required implementation while preserving the platform contract.
+
+The response must be directly pasteable into the current editor.
+
+Determine the required programming language from the page/editor when possible.
+If C++ is selected or indicated, return C++.
+If Java is selected or indicated, return Java.
+If another language is clearly selected, use that language.
+If no language can be determined, default to C++.
+
+For coding responses:
+- return raw code only
+- no comments
+- no explanation
+- no markdown code fences
+- no headings
+- no complexity analysis
+
+For MCQ responses:
+- return only the correct option/answer
+- no explanation
+
+For other solvable questions: return the direct answer as concisely as possible.
+
+Do not ask the user to provide the question.
+Do not ask the user to select a category.
+Do not ask the user what type of problem this is.
+Do not ask the user to provide a programming language before attempting the problem.
+
+Use the supplied page context to solve the request directly.`;
+
+    const effectiveQuery = text.length > 0 ? text : DEFAULT_SOLVE_PROMPT;
 
     const loadingRow = document.createElement('div');
     loadingRow.className = 'loading-bubble';
@@ -589,7 +640,7 @@ function initKairo() {
     chrome.runtime.sendMessage({ 
       type: 'AI_QUERY', 
       payload: { 
-        query: text, 
+        query: effectiveQuery, 
         context: contextPayload
       } 
     }, async (response) => {
