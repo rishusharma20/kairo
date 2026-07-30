@@ -65,6 +65,57 @@ export async function getHealthyCredentialsForProject(projectId: string): Promis
   });
 }
 
+/**
+ * Phase 19: Retrieves all eligible credentials across ALL active projects
+ * that support a specific model.
+ * 
+ * Performs dynamic project discovery — no hard-coded project names or positions.
+ * New projects automatically participate once they are ACTIVE with AVAILABLE model status.
+ * 
+ * Returns credentials ordered by last_used_at ASC (nulls first) for LRU fairness.
+ */
+export async function getHealthyCredentialsForModel(modelId: string): Promise<GeminiKey[]> {
+  const now = new Date();
+
+  // 1. Find all ACTIVE projects that have this model AVAILABLE
+  const eligibleProjectModels = await prisma.projectModelAvailability.findMany({
+    where: {
+      model_id: modelId,
+      status: "AVAILABLE",
+      project: {
+        status: "ACTIVE"
+      }
+    },
+    select: {
+      project_id: true
+    }
+  });
+
+  const eligibleProjectIds = eligibleProjectModels.map(pm => pm.project_id);
+
+  if (eligibleProjectIds.length === 0) {
+    return [];
+  }
+
+  // 2. Load all healthy credentials for those projects, ordered by LRU
+  return await prisma.geminiKey.findMany({
+    where: {
+      project_id: { in: eligibleProjectIds },
+      OR: [
+        { status: { in: ["AVAILABLE", "ACTIVE", "ASSIGNED"] } },
+        {
+          status: "COOLDOWN",
+          cooldown_until: { lt: now }
+        }
+      ],
+      status: { not: "DISABLED" }
+    },
+    orderBy: [
+      { last_used_at: "asc" } // Nulls first = never-used credentials preferred
+    ]
+  });
+}
+
 export async function markKeyUsed(keyId: string) {
   await prisma.geminiKey.update({
     where: { id: keyId },

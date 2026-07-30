@@ -16,8 +16,8 @@ export async function executeKairoQuery({
   userId: string;
   feature: QueryFeature;
   query: string;
-  format: ResponseFormat;
-  context?: string | PageContext;
+  format?: ResponseFormat | string;
+  context?: string;
   requestId?: string;
   startTime?: number;
 }) {
@@ -39,7 +39,7 @@ export async function executeKairoQuery({
       taskCategory,
       feature,
       query,
-      format,
+      (format || 'General') as ResponseFormat,
       context,
       requestId,
       startTime

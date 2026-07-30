@@ -1,9 +1,8 @@
 export const ROUTER_CONFIG = {
-  MAX_MODELS_PER_CREDENTIAL: 5,
-  MAX_CREDENTIALS_PER_REQUEST: 3,
-  MAX_PROJECTS_PER_REQUEST: 3,
-  MAX_TOTAL_ATTEMPTS: 5,
-  PROVIDER_TIMEOUT_MS: 15000,
-  FAILURE_THRESHOLD: 3, // For circuit breaking
-  COOLDOWN_MINUTES: 5,  // Temporary cooldown duration
+  MAX_ATTEMPTS_PER_MODEL: 3,    // max credential attempts per model priority level
+  MAX_TOTAL_ATTEMPTS: 5,        // global cap across all models
+  MAX_MODELS_PER_CREDENTIAL: 5, // preserved for legacy compatibility
+  PROVIDER_TIMEOUT_MS: 15000,   // per-provider-call timeout
+  FAILURE_THRESHOLD: 3,         // circuit breaking threshold
+  COOLDOWN_MINUTES: 5,          // temporary cooldown duration
 };

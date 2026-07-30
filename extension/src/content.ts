@@ -559,24 +559,9 @@ function initKairo() {
     updateInputState();
 
     let contextPayload: any = null;
-    let detectedFormat = 'General';
     const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
     if (ctx) {
-      if (ctx.questionType === 'UNKNOWN' || (!ctx.question && !ctx.visibleContext)) {
-        isProcessing = false;
-        updateInputState();
-        await addMessage('error', "Kairo couldn't detect the complete question on this page.");
-        return;
-      }
-      if (ctx.questionType === 'CODING' && !ctx.selectedLanguage) {
-        isProcessing = false;
-        updateInputState();
-        await addMessage('error', "Select a programming language on the page and try again.");
-        return;
-      }
-      
       contextPayload = ctx;
-      detectedFormat = ctx.questionType;
       
       const indicator = shadow.querySelector('#kairo-context-indicator');
       if (indicator) {
@@ -605,8 +590,7 @@ function initKairo() {
       type: 'AI_QUERY', 
       payload: { 
         query: text, 
-        context: contextPayload, 
-        format: detectedFormat 
+        context: contextPayload
       } 
     }, async (response) => {
       const loader = shadow.querySelector('#kairo-loading');
@@ -649,7 +633,7 @@ function initKairo() {
       const ctx = typeof extractPageContext === 'function' ? extractPageContext() : null;
       const indicator = shadow.querySelector('#kairo-context-indicator');
       if (indicator) {
-        if (ctx && (ctx.question || ctx.visibleContext)) {
+        if (ctx && ctx.length > 0) {
           indicator.classList.remove('hidden');
         } else {
           indicator.classList.add('hidden');

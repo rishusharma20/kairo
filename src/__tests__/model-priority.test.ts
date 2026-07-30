@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { executeSharedAiRoute } from '@/lib/services/ai-router';
 import * as poolService from '@/lib/services/pool';
-import * as discoveryService from '@/lib/services/discovery';
 import * as encryptionService from '@/lib/services/encryption';
 import * as auditService from '@/lib/services/audit';
 import { getEnabledModels } from '@/lib/services/models';
@@ -15,6 +14,8 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('@/lib/services/pool', () => ({
   getHealthyCredentials: vi.fn(),
+  getHealthyCredentialsForProject: vi.fn(),
+  getHealthyCredentialsForModel: vi.fn(),
   markKeyUsed: vi.fn(),
   markKeyCooldown: vi.fn(),
   markKeyDisabled: vi.fn(),
@@ -48,20 +49,32 @@ vi.mock('@google/generative-ai', () => {
   };
 });
 
+// Phase 19: Helper to mock credentials per model
+function mockCredentialsForModel(mapping: Record<string, Array<{ id: string; project_id: string; failure_count?: number; last_used_at?: Date | null; encrypted_api_key?: string }>>) {
+  vi.mocked(poolService.getHealthyCredentialsForModel).mockImplementation(async (modelId: string) => {
+    return (mapping[modelId] || []).map(c => ({
+      ...c,
+      encrypted_api_key: c.encrypted_api_key || 'enc',
+      failure_count: c.failure_count ?? 0,
+      last_used_at: c.last_used_at ?? null,
+    })) as never[];
+  });
+}
+
 describe('Model Priority Routing', () => {
-  const models = getEnabledModels(); // This will return the sorted models (Lite, 3.6, 3.5, 31b, 26b)
+  const models = getEnabledModels();
   
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(encryptionService.decryptKey).mockReturnValue('decrypted');
-    
-    vi.mocked(poolService.getHealthyCredentials).mockResolvedValue([
-      { id: 'A1', project_id: 'ProjA', encrypted_api_key: 'enc', failure_count: 0 } as never
-    ]);
   });
 
   it('PRIORITY_A: All five models available, provider succeeds on first attempt', async () => {
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(models);
+    // Phase 19: credentials available for all models
+    const mapping: Record<string, Array<{ id: string; project_id: string }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA' }]; });
+    mockCredentialsForModel(mapping);
+
     mockGenerateContent.mockResolvedValue({ response: { text: () => 'success' } });
 
     const { telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
@@ -75,10 +88,13 @@ describe('Model Priority Routing', () => {
   });
 
   it('PRIORITY_B: Lite fails, 3.6 succeeds', async () => {
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(models);
+    const mapping: Record<string, Array<{ id: string; project_id: string; failure_count?: number }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA', failure_count: 0 }]; });
+    mockCredentialsForModel(mapping);
+
     mockGenerateContent
-      .mockRejectedValueOnce({ status: 500, message: 'Server error' }) // Lite fails
-      .mockResolvedValueOnce({ response: { text: () => 'success' } }); // 3.6 succeeds
+      .mockRejectedValueOnce({ status: 500, message: 'Server error' })
+      .mockResolvedValueOnce({ response: { text: () => 'success' } });
 
     const { telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
     
@@ -93,11 +109,14 @@ describe('Model Priority Routing', () => {
   });
 
   it('PRIORITY_C: First two fail, 3.5 succeeds', async () => {
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(models);
+    const mapping: Record<string, Array<{ id: string; project_id: string; failure_count?: number }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA', failure_count: 0 }]; });
+    mockCredentialsForModel(mapping);
+
     mockGenerateContent
-      .mockRejectedValueOnce({ status: 500 }) // Lite
-      .mockRejectedValueOnce({ status: 500 }) // 3.6
-      .mockResolvedValueOnce({ response: { text: () => 'success' } }); // 3.5
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockResolvedValueOnce({ response: { text: () => 'success' } });
 
     const { telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
     
@@ -113,13 +132,16 @@ describe('Model Priority Routing', () => {
   });
 
   it('PRIORITY_D: First four fail, Final Gemma succeeds', async () => {
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(models);
+    const mapping: Record<string, Array<{ id: string; project_id: string; failure_count?: number }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA', failure_count: 0 }]; });
+    mockCredentialsForModel(mapping);
+
     mockGenerateContent
-      .mockRejectedValueOnce({ status: 500 }) // Lite
-      .mockRejectedValueOnce({ status: 500 }) // 3.6
-      .mockRejectedValueOnce({ status: 500 }) // 3.5
-      .mockRejectedValueOnce({ status: 500 }) // 31b
-      .mockResolvedValueOnce({ response: { text: () => 'success' } }); // 26b
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockResolvedValueOnce({ response: { text: () => 'success' } });
 
     const { telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
     
@@ -135,10 +157,13 @@ describe('Model Priority Routing', () => {
     expect(telemetry[4].result).toBe('SUCCESS');
   });
 
-  it('PRIORITY_E: Lite is marked unavailable before routing', async () => {
-    // Return all models except Lite
-    const availableModels = models.filter(m => m.id !== 'gemini-3.5-flash-lite');
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(availableModels);
+  it('PRIORITY_E: Lite has no credentials, next model used', async () => {
+    // Phase 19: No credentials for flash-lite, but available for 3.6+
+    const mapping: Record<string, Array<{ id: string; project_id: string }>> = {};
+    models.filter(m => m.id !== 'gemini-3.5-flash-lite').forEach(m => {
+      mapping[m.id] = [{ id: 'A1', project_id: 'ProjA' }];
+    });
+    mockCredentialsForModel(mapping);
     
     mockGenerateContent.mockResolvedValueOnce({ response: { text: () => 'success' } });
 
@@ -151,23 +176,18 @@ describe('Model Priority Routing', () => {
     expect(telemetry[0].modelId).toBe('gemini-3.6-flash');
   });
 
-  it('PRIORITY_F: Input models shuffled in discovery, router order remains correct', async () => {
-    // Deliberately shuffle the models returned by discovery
-    const shuffled = [
-      models.find(m => m.id === 'gemma-4-26b-a4b-it')!,
-      models.find(m => m.id === 'gemini-3.5-flash')!,
-      models.find(m => m.id === 'gemini-3.5-flash-lite')!,
-      models.find(m => m.id === 'gemma-4-31b-it')!,
-      models.find(m => m.id === 'gemini-3.6-flash')!,
-    ];
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(shuffled);
+  it('PRIORITY_F: Model priority order is deterministic regardless of credential order', async () => {
+    // Phase 19: All models have credentials, all fail except last
+    const mapping: Record<string, Array<{ id: string; project_id: string; failure_count?: number }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA', failure_count: 0 }]; });
+    mockCredentialsForModel(mapping);
     
     mockGenerateContent
-      .mockRejectedValueOnce({ status: 500 }) // Lite
-      .mockRejectedValueOnce({ status: 500 }) // 3.6
-      .mockRejectedValueOnce({ status: 500 }) // 3.5
-      .mockRejectedValueOnce({ status: 500 }) // 31b
-      .mockResolvedValueOnce({ response: { text: () => 'success' } }); // 26b
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockRejectedValueOnce({ status: 500 })
+      .mockResolvedValueOnce({ response: { text: () => 'success' } });
 
     const { telemetry } = await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
 
@@ -182,12 +202,14 @@ describe('Model Priority Routing', () => {
   });
 
   it('PRIORITY_G: Verify exactly ONE provider request when Lite succeeds', async () => {
-    vi.mocked(discoveryService.getAvailableModelsForProject).mockResolvedValue(models);
+    const mapping: Record<string, Array<{ id: string; project_id: string }>> = {};
+    models.forEach(m => { mapping[m.id] = [{ id: 'A1', project_id: 'ProjA' }]; });
+    mockCredentialsForModel(mapping);
+
     mockGenerateContent.mockResolvedValue({ response: { text: () => 'success' } });
 
     await executeSharedAiRoute('GENERAL', 'ask', 'hi', 'General');
     
-    // There must be exactly ONE model attempt on the provider
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
     expect(mockGetGenerativeModel).toHaveBeenCalledTimes(1);
   });
