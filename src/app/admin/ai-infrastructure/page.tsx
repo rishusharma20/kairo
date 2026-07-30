@@ -88,7 +88,8 @@ export default function AdminAiInfrastructurePage() {
       if (!json.success) throw new Error(json.error);
       await fetchData();
     } catch (err: any) {
-      alert("Error: " + err.message);
+      console.error(err);
+      setError("Unable to refresh models. Please try again.");
     }
   };
 

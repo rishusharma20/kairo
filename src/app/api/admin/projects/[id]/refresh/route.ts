@@ -4,9 +4,14 @@ import { prisma } from "@/lib/db";
 import { logSystemEventInBackground } from "@/lib/services/audit";
 import { validateProjectModels } from "@/lib/services/discovery";
 
-async function postHandler(request: Request, context: { params: { id: string } }) {
+async function postHandler(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = context.params;
+    const params = await context.params;
+    const { id } = params;
+
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ success: false, error: "Invalid project ID" }, { status: 400 });
+    }
 
     const project = await prisma.providerProject.findUnique({
       where: { id }
