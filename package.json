@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "extension:build": "node extension/build.mjs",
+    "extension:build:firefox": "node extension/build.mjs firefox",
     "extension:zip": "node extension/build.mjs"
   },
   "dependencies": {

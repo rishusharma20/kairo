@@ -136,25 +136,32 @@ try {
 }
 
 // 6. Create Zip files
+const target = process.argv[2];
+
 try {
-  const chromeZipPath = path.join(EXTENSION_DIR, 'kairo-extension.zip');
-  if (fs.existsSync(chromeZipPath)) fs.unlinkSync(chromeZipPath);
-  execSync(`cd "${DIST_DIR}" && zip -q -r "${chromeZipPath}" .`, { stdio: 'inherit' });
-  console.log(`Created Chrome extension zip: ${chromeZipPath}`);
+  if (!target || target !== 'firefox') {
+    const chromeZipPath = path.join(EXTENSION_DIR, 'kairo-extension.zip');
+    if (fs.existsSync(chromeZipPath)) fs.unlinkSync(chromeZipPath);
+    execSync(`cd "${DIST_DIR}" && zip -q -r "${chromeZipPath}" .`, { stdio: 'inherit' });
+    console.log(`Created Chrome extension zip: ${chromeZipPath}`);
+  }
 
   const firefoxZipPath = path.join(EXTENSION_DIR, 'kairo-firefox-extension.zip');
-  const firefoxAltZipPath = path.join(EXTENSION_DIR, 'kairo-extension-firefox.zip');
   if (fs.existsSync(firefoxZipPath)) fs.unlinkSync(firefoxZipPath);
-  if (fs.existsSync(firefoxAltZipPath)) fs.unlinkSync(firefoxAltZipPath);
 
   execSync(`cd "${DIST_FIREFOX_DIR}" && zip -q -r "${firefoxZipPath}" .`, { stdio: 'inherit' });
-  fs.copyFileSync(firefoxZipPath, firefoxAltZipPath);
   console.log(`Created Firefox standard extension zip: ${firefoxZipPath}`);
 
-  const firefoxPrivateZipPath = path.join(EXTENSION_DIR, 'kairo-private-firefox-extension.zip');
-  if (fs.existsSync(firefoxPrivateZipPath)) fs.unlinkSync(firefoxPrivateZipPath);
-  execSync(`cd "${DIST_FIREFOX_PRIVATE_DIR}" && zip -q -r "${firefoxPrivateZipPath}" .`, { stdio: 'inherit' });
-  console.log(`Created Firefox PRIVATE extension zip: ${firefoxPrivateZipPath}`);
+  if (!target || target !== 'firefox') {
+    const firefoxAltZipPath = path.join(EXTENSION_DIR, 'kairo-extension-firefox.zip');
+    if (fs.existsSync(firefoxAltZipPath)) fs.unlinkSync(firefoxAltZipPath);
+    fs.copyFileSync(firefoxZipPath, firefoxAltZipPath);
+    
+    const firefoxPrivateZipPath = path.join(EXTENSION_DIR, 'kairo-private-firefox-extension.zip');
+    if (fs.existsSync(firefoxPrivateZipPath)) fs.unlinkSync(firefoxPrivateZipPath);
+    execSync(`cd "${DIST_FIREFOX_PRIVATE_DIR}" && zip -q -r "${firefoxPrivateZipPath}" .`, { stdio: 'inherit' });
+    console.log(`Created Firefox PRIVATE extension zip: ${firefoxPrivateZipPath}`);
+  }
 } catch (err) {
   console.error('Failed to create extension zip files:', err);
   process.exit(1);
