@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { createSession } from "@/lib/auth";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {

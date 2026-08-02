@@ -5,7 +5,7 @@ import { verifySession } from '@/lib/auth'
 const protectedRoutes = ['/dashboard', '/admin']
 const authRoutes = ['/auth/login', '/auth/register']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Check if it's a protected route or auth route

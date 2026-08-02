@@ -262,7 +262,7 @@ https://aikairo.vercel.app
   const transporter = getTransporter();
 
   await transporter.sendMail({
-    from: \`"KAIRO" <\${user}>\`,
+    from: `"KAIRO" <${user}>`,
     to,
     subject: "Kairo Verification Code",
     text: textContent,
