@@ -48,10 +48,25 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    // Simulate API call to send OTP
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setStep("otp");
+    try {
+      const res = await fetch("/api/auth/register/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          fullName: formData.name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send verification code");
+      }
+      setLoading(false);
+      setStep("otp");
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : "An error occurred.");
+    }
   };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
@@ -74,6 +89,7 @@ export default function RegisterPage() {
           fullName: formData.name,
           email: formData.email,
           password: formData.password,
+          otp: otpCode,
         }),
       });
 

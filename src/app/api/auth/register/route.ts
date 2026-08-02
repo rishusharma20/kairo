@@ -5,25 +5,27 @@ import { createSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    const { fullName, email, password } = await request.json();
+    const { fullName, email, password, otp } = await request.json();
 
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !otp) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields (including OTP)" },
         { status: 400 }
       );
     }
 
-    if (typeof fullName !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+    if (typeof fullName !== 'string' || typeof email !== 'string' || typeof password !== 'string' || typeof otp !== 'string') {
       return NextResponse.json(
         { error: "Invalid field types" },
         { status: 400 }
       );
     }
 
+    const emailTrimmed = email.trim().toLowerCase();
+
     // Check duplicate email
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: emailTrimmed },
     });
 
     if (existingUser) {
@@ -32,6 +34,57 @@ export async function POST(request: Request) {
         { status: 409 }
       );
     }
+
+    // Verify OTP
+    const latestOtpLog = await prisma.auditLog.findFirst({
+      where: {
+        action: "SIGNUP_OTP",
+        metadata: {
+          contains: `"email":"${emailTrimmed}"`
+        }
+      },
+      orderBy: { created_at: "desc" }
+    });
+
+    if (!latestOtpLog) {
+      return NextResponse.json({ error: "No verification code requested for this email." }, { status: 400 });
+    }
+
+    const metadata = JSON.parse(latestOtpLog.metadata || "{}");
+
+    if (metadata.attempts >= 5 || metadata.used) {
+      return NextResponse.json({ error: "This verification code has been invalidated due to too many failed attempts or reuse." }, { status: 400 });
+    }
+
+    const submittedOtpHash = crypto.createHash("sha256").update(otp.trim()).digest("hex");
+
+    if (metadata.otpHash !== submittedOtpHash) {
+      await prisma.auditLog.update({
+        where: { id: latestOtpLog.id },
+        data: {
+          metadata: JSON.stringify({
+            ...metadata,
+            attempts: (metadata.attempts || 0) + 1
+          })
+        }
+      });
+      return NextResponse.json({ error: "Invalid verification code." }, { status: 400 });
+    }
+
+    if (new Date(metadata.expiresAt).getTime() < Date.now()) {
+      return NextResponse.json({ error: "Verification code has expired." }, { status: 400 });
+    }
+
+    // Mark OTP as used
+    await prisma.auditLog.update({
+      where: { id: latestOtpLog.id },
+      data: {
+        metadata: JSON.stringify({
+          ...metadata,
+          used: true
+        })
+      }
+    });
 
     // Hash password
     const salt = await bcrypt.genSalt(10);

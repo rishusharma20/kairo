@@ -9,14 +9,13 @@ const __dirname = path.dirname(__filename);
 const EXTENSION_DIR = __dirname;
 const DIST_DIR = path.join(EXTENSION_DIR, 'dist');
 const DIST_FIREFOX_DIR = path.join(EXTENSION_DIR, 'dist-firefox');
-const DIST_FIREFOX_PRIVATE_DIR = path.join(EXTENSION_DIR, 'dist-firefox-private');
 const TSCONFIG_PATH = path.join(EXTENSION_DIR, 'tsconfig.json');
 const MANIFEST_PATH = path.join(EXTENSION_DIR, 'manifest.json');
 
 console.log('Building Kairo Extension Foundation for Chrome & Firefox (Standard & Private)...');
 
 // 1. Clean dist directories
-for (const dir of [DIST_DIR, DIST_FIREFOX_DIR, DIST_FIREFOX_PRIVATE_DIR]) {
+for (const dir of [DIST_DIR, DIST_FIREFOX_DIR]) {
   if (fs.existsSync(dir)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -48,7 +47,6 @@ for (const file of copyJsFiles) {
   const src = path.join(DIST_DIR, file);
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(DIST_FIREFOX_DIR, file));
-    fs.copyFileSync(src, path.join(DIST_FIREFOX_PRIVATE_DIR, file));
   }
 }
 
@@ -57,22 +55,19 @@ try {
   const assetsIconDir = path.join(EXTENSION_DIR, 'assets', 'icons');
   const distIconDir = path.join(DIST_DIR, 'icons');
   const firefoxIconDir = path.join(DIST_FIREFOX_DIR, 'icons');
-  const firefoxPrivateIconDir = path.join(DIST_FIREFOX_PRIVATE_DIR, 'icons');
 
   if (fs.existsSync(assetsIconDir)) {
     fs.mkdirSync(distIconDir, { recursive: true });
     fs.mkdirSync(firefoxIconDir, { recursive: true });
-    fs.mkdirSync(firefoxPrivateIconDir, { recursive: true });
 
     const icons = fs.readdirSync(assetsIconDir);
     for (const icon of icons) {
       if (icon.endsWith('.png')) {
         fs.copyFileSync(path.join(assetsIconDir, icon), path.join(distIconDir, icon));
         fs.copyFileSync(path.join(assetsIconDir, icon), path.join(firefoxIconDir, icon));
-        fs.copyFileSync(path.join(assetsIconDir, icon), path.join(firefoxPrivateIconDir, icon));
       }
     }
-    console.log('Copied icons to dist, dist-firefox, and dist-firefox-private.');
+    console.log('Copied icons to dist and dist-firefox.');
   }
 } catch (err) {
   console.error('Failed to copy icons:', err);
@@ -87,7 +82,7 @@ try {
   process.exit(1);
 }
 
-// 5. Firefox Manifests (Standard & Private with Unique ID)
+// 5. Firefox Manifest
 try {
   const baseManifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
   
@@ -109,27 +104,7 @@ try {
   };
   fs.writeFileSync(path.join(DIST_FIREFOX_DIR, 'manifest.json'), JSON.stringify(firefoxManifest, null, 2));
 
-  // Private Firefox Manifest (Guaranteed Unique Non-colliding ID for private AMO upload)
-  const uniquePrivateId = `kairo-private-${Math.floor(Date.now() / 1000)}@kairo.ai`;
-  const firefoxPrivateManifest = {
-    ...baseManifest,
-    name: "Kairo (Private)",
-    browser_specific_settings: {
-      gecko: {
-        id: uniquePrivateId,
-        strict_min_version: "109.0",
-        data_collection_permissions: {
-          required: ["none"]
-        }
-      }
-    },
-    background: {
-      scripts: ["background.js"]
-    }
-  };
-  fs.writeFileSync(path.join(DIST_FIREFOX_PRIVATE_DIR, 'manifest.json'), JSON.stringify(firefoxPrivateManifest, null, 2));
-
-  console.log(`Generated Firefox manifests (Standard ID: kairo@kairo.ai | Private Unique ID: ${uniquePrivateId}).`);
+  console.log(`Generated Firefox manifest (Standard ID: kairo@kairo.ai).`);
 } catch (err) {
   console.error('Failed to create Firefox manifests:', err);
   process.exit(1);
@@ -156,11 +131,6 @@ try {
     const firefoxAltZipPath = path.join(EXTENSION_DIR, 'kairo-extension-firefox.zip');
     if (fs.existsSync(firefoxAltZipPath)) fs.unlinkSync(firefoxAltZipPath);
     fs.copyFileSync(firefoxZipPath, firefoxAltZipPath);
-    
-    const firefoxPrivateZipPath = path.join(EXTENSION_DIR, 'kairo-private-firefox-extension.zip');
-    if (fs.existsSync(firefoxPrivateZipPath)) fs.unlinkSync(firefoxPrivateZipPath);
-    execSync(`cd "${DIST_FIREFOX_PRIVATE_DIR}" && zip -q -r "${firefoxPrivateZipPath}" .`, { stdio: 'inherit' });
-    console.log(`Created Firefox PRIVATE extension zip: ${firefoxPrivateZipPath}`);
   }
 } catch (err) {
   console.error('Failed to create extension zip files:', err);

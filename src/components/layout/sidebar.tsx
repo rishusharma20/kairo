@@ -284,18 +284,23 @@ export function Sidebar({ items, title = "KAIRO", badge, user }: SidebarProps) {
                 </div>
 
                 {/* Primary CTA */}
-                <div className="text-center">
+                <div className="text-center space-y-3">
                   <a
-                    href="/downloads/kairo-extension-1.1.0.zip"
+                    href="/downloads/kairo-extension.zip"
                     download
                     className="inline-flex items-center justify-center w-full py-3 px-4 bg-accent text-[var(--background)] font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm no-underline cursor-pointer"
                   >
-                    Download Extension
+                    Download for Chrome / Chromium
+                  </a>
+                  <a
+                    href="/downloads/kairo-firefox-extension.zip"
+                    download
+                    className="inline-flex items-center justify-center w-full py-3 px-4 bg-[var(--surface)] border border-[var(--border)] text-text-primary font-semibold rounded-xl hover:bg-[var(--card-hover)] transition-colors text-sm no-underline cursor-pointer"
+                  >
+                    Download for Firefox
                   </a>
                   <div className="mt-2 text-xs text-text-muted flex items-center justify-center gap-4">
-                    <span>Version 1.1.0</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--border)]" />
-                    <span>Chrome / Chromium</span>
+                    <span>Latest Version</span>
                   </div>
                 </div>
 
